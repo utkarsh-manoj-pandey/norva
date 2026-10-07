@@ -274,3 +274,11 @@ fn test_search_engines_and_query_router() {
         _ => panic!("Expected default engine search target"),
     }
 }
+
+#[test]
+fn test_gtk_chrome_css_validity() {
+    if gtk::init().is_err() {
+        return;
+    }
+    let _ = norva::ui::NorvaGtkChrome::new(false);
+}

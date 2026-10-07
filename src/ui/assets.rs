@@ -14,20 +14,20 @@ use crate::db::shields_db::{BlockedEvent, ShieldStats};
 pub fn get_common_css() -> &'static str {
     r###"
     :root {
-        --bg-primary: #1c1b22;
-        --bg-card: #2b2a33;
-        --bg-card-hover: #38383d;
-        --bg-subtle: #42414d;
-        --border-subtle: rgba(255, 255, 255, 0.08);
-        --border-hover: rgba(255, 255, 255, 0.2);
-        --border-focus: #0060df;
-        --accent-blue: #0060df;
+        --bg-primary: #16171b;
+        --bg-card: #212228;
+        --bg-card-hover: #292a32;
+        --bg-subtle: #30313c;
+        --border-subtle: rgba(255, 255, 255, 0.06);
+        --border-hover: rgba(255, 255, 255, 0.14);
+        --border-focus: #5884ff;
+        --accent-blue: #5884ff;
         --accent-purple: #9059ff;
-        --accent-green: #2ecc71;
+        --accent-green: #50c878;
         --accent-red: #ff5252;
-        --text-primary: #fbfbfe;
-        --text-secondary: #cfcfd4;
-        --text-muted: #8f8f9d;
+        --text-primary: #ededf2;
+        --text-secondary: #9d9da8;
+        --text-muted: #6e6e7a;
     }
     * {
         box-sizing: border-box;
@@ -35,27 +35,46 @@ pub fn get_common_css() -> &'static str {
         padding: 0;
     }
     body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
         background-color: var(--bg-primary);
         color: var(--text-primary);
         min-height: 100vh;
         overflow-x: hidden;
         padding-bottom: 40px;
         -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
     }
-    /* Internal Views Navigation Bar (Firefox about:preferences style) */
+
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Internal Views Navigation Bar */
     .internal-header {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 12px 24px;
-        background-color: #1c1b22;
+        padding: 14px 28px;
+        background-color: #212228;
         border-bottom: 1px solid var(--border-subtle);
         position: sticky;
         top: 0;
         z-index: 100;
         flex-wrap: wrap;
         gap: 12px;
+        backdrop-filter: blur(12px);
     }
     .internal-header-left {
         display: flex;
@@ -66,24 +85,25 @@ pub fn get_common_css() -> &'static str {
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        background-color: #2b2a33;
+        background-color: rgba(255, 255, 255, 0.05);
         border: 1px solid var(--border-subtle);
         color: var(--text-secondary);
-        padding: 6px 12px;
-        border-radius: 6px;
+        padding: 7px 14px;
+        border-radius: 8px;
         text-decoration: none;
         font-size: 13px;
         font-weight: 500;
-        transition: background-color 0.15s ease, color 0.15s ease;
+        transition: all 0.15s ease;
     }
     .back-link:hover {
-        background-color: #42414d;
+        background-color: rgba(255, 255, 255, 0.1);
         color: #ffffff;
     }
     .internal-title {
-        font-size: 16px;
-        font-weight: 600;
+        font-size: 17px;
+        font-weight: 700;
         color: var(--text-primary);
+        letter-spacing: -0.3px;
     }
     .internal-nav-chips {
         display: flex;
@@ -94,19 +114,19 @@ pub fn get_common_css() -> &'static str {
     .chip {
         color: var(--text-secondary);
         text-decoration: none;
-        padding: 5px 12px;
-        border-radius: 6px;
+        padding: 6px 14px;
+        border-radius: 8px;
         font-size: 13px;
         font-weight: 500;
         transition: all 0.15s ease;
         background: transparent;
     }
     .chip:hover {
-        background-color: #2b2a33;
+        background-color: rgba(255, 255, 255, 0.06);
         color: #ffffff;
     }
     .chip.active {
-        background-color: #42414d;
+        background-color: rgba(88, 132, 255, 0.12);
         color: #ffffff;
         font-weight: 600;
     }
@@ -116,21 +136,22 @@ pub fn get_common_css() -> &'static str {
         padding: 28px 24px;
     }
     .btn {
-        background-color: #2b2a33;
+        background-color: rgba(255, 255, 255, 0.06);
         border: 1px solid var(--border-subtle);
         color: var(--text-primary);
-        border-radius: 6px;
-        padding: 7px 14px;
+        border-radius: 8px;
+        padding: 8px 16px;
         font-size: 13px;
         font-weight: 500;
         cursor: pointer;
-        transition: background-color 0.15s ease;
+        transition: all 0.15s ease;
         display: inline-flex;
         align-items: center;
         gap: 6px;
     }
     .btn:hover {
-        background-color: #42414d;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.12);
     }
     .btn-primary {
         background-color: var(--accent-blue);
@@ -138,40 +159,44 @@ pub fn get_common_css() -> &'static str {
         color: #ffffff;
     }
     .btn-primary:hover {
-        background-color: #003eaa;
+        background-color: #4a72e8;
     }
     .btn-danger {
-        background-color: rgba(255, 82, 82, 0.15);
-        border: 1px solid rgba(255, 82, 82, 0.35);
+        background-color: rgba(255, 82, 82, 0.1);
+        border: 1px solid rgba(255, 82, 82, 0.25);
         color: #ff8585;
     }
     .btn-danger:hover {
-        background-color: rgba(255, 82, 82, 0.28);
+        background-color: rgba(255, 82, 82, 0.2);
     }
     .card {
         background-color: var(--bg-card);
         border: 1px solid var(--border-subtle);
-        border-radius: 12px;
+        border-radius: 14px;
         padding: 22px;
         margin-bottom: 20px;
+        transition: border-color 0.15s ease;
+    }
+    .card:hover {
+        border-color: rgba(255, 255, 255, 0.1);
     }
     .mode-badge {
-        padding: 3px 10px;
-        border-radius: 12px;
+        padding: 4px 14px;
+        border-radius: 20px;
         font-size: 11px;
         font-weight: 600;
-        letter-spacing: 0.3px;
+        letter-spacing: 0.5px;
         display: inline-block;
     }
     .mode-badge.secure {
-        background: rgba(255, 82, 82, 0.15);
-        color: #ff6b6b;
-        border: 1px solid rgba(255, 82, 82, 0.3);
+        background: rgba(255, 82, 82, 0.1);
+        color: #ff7070;
+        border: 1px solid rgba(255, 82, 82, 0.22);
     }
     .mode-badge.normal {
-        background: rgba(46, 204, 113, 0.12);
-        color: #2ecc71;
-        border: 1px solid rgba(46, 204, 113, 0.3);
+        background: rgba(80, 200, 120, 0.08);
+        color: #50c878;
+        border: 1px solid rgba(80, 200, 120, 0.2);
     }
     "###
 }
@@ -230,6 +255,9 @@ pub fn render_newtab_page(
     <style>
         {{COMMON_CSS}}
 
+        /* Import Inter font */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
         /* Modern Browser Canvas */
         .nt-canvas {
             max-width: 1260px;
@@ -253,10 +281,10 @@ pub fn render_newtab_page(
             color: inherit;
         }
         .nt-brand-text {
-            font-size: 28px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            color: #fbfbfe;
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -0.8px;
+            color: #e8e8ed;
         }
         .nt-topbar-actions {
             display: flex;
@@ -264,10 +292,10 @@ pub fn render_newtab_page(
             gap: 12px;
         }
         .customize-top-btn {
-            background-color: #2b2a33;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #cfcfd4;
-            padding: 6px 14px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #a0a0aa;
+            padding: 7px 16px;
             border-radius: 20px;
             font-size: 13px;
             font-weight: 500;
@@ -278,7 +306,7 @@ pub fn render_newtab_page(
             transition: all 0.15s ease;
         }
         .customize-top-btn:hover {
-            background-color: #42414d;
+            background-color: rgba(255, 255, 255, 0.1);
             color: #ffffff;
         }
 
@@ -290,19 +318,19 @@ pub fn render_newtab_page(
         .nt-search-box {
             display: flex;
             align-items: center;
-            background-color: #2b2a33;
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            background-color: #24232c;
+            border: 1.5px solid rgba(255, 255, 255, 0.08);
             border-radius: 28px;
-            height: 50px;
-            padding: 0 16px;
+            height: 52px;
+            padding: 0 18px;
             transition: all 0.2s ease;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
             position: relative;
         }
         .nt-search-box:focus-within {
-            border-color: #0060df;
-            box-shadow: 0 0 0 1.5px #0060df, 0 4px 16px rgba(0, 0, 0, 0.4);
-            background-color: #32313c;
+            border-color: rgba(88, 132, 255, 0.5);
+            box-shadow: 0 0 0 2px rgba(88, 132, 255, 0.15), 0 6px 24px rgba(0, 0, 0, 0.4);
+            background-color: #2a2935;
         }
         .engine-picker-btn {
             display: flex;
@@ -326,13 +354,13 @@ pub fn render_newtab_page(
         .engine-dropdown-menu {
             display: none;
             position: absolute;
-            top: 56px;
+            top: 58px;
             left: 12px;
-            width: 250px;
-            background-color: #2b2a33;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            width: 260px;
+            background-color: #28272f;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
             z-index: 200;
             overflow: hidden;
             padding: 6px;
@@ -344,15 +372,15 @@ pub fn render_newtab_page(
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: 8px 12px;
-            border-radius: 8px;
-            color: #cfcfd4;
+            padding: 9px 14px;
+            border-radius: 10px;
+            color: #b0b0ba;
             font-size: 13px;
             cursor: pointer;
-            transition: background-color 0.15s ease, color 0.15s ease;
+            transition: all 0.15s ease;
         }
         .engine-dropdown-item:hover, .engine-dropdown-item.active {
-            background-color: #42414d;
+            background-color: rgba(88, 132, 255, 0.12);
             color: #ffffff;
         }
         .engine-item-icon {
@@ -364,8 +392,8 @@ pub fn render_newtab_page(
         }
         .engine-item-bang {
             font-size: 11px;
-            color: #8f8f9d;
-            background: rgba(0, 0, 0, 0.3);
+            color: #6e6e7a;
+            background: rgba(0, 0, 0, 0.25);
             padding: 2px 6px;
             border-radius: 4px;
         }
@@ -373,7 +401,7 @@ pub fn render_newtab_page(
             flex: 1;
             background: transparent;
             border: none;
-            color: #fbfbfe;
+            color: #e8e8ed;
             font-size: 15px;
             outline: none;
         }
@@ -410,7 +438,7 @@ pub fn render_newtab_page(
             transition: background-color 0.15s ease, color 0.15s ease;
         }
         .nt-search-btn:hover {
-            background-color: #42414d;
+            background-color: rgba(255, 255, 255, 0.08);
             color: #ffffff;
         }
 
@@ -425,17 +453,17 @@ pub fn render_newtab_page(
         }
         .search-chip {
             background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 14px;
-            padding: 3px 10px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 4px 12px;
             font-size: 11px;
-            color: #cfcfd4;
+            color: #8e8e98;
             cursor: pointer;
             transition: all 0.15s ease;
             text-decoration: none;
         }
         .search-chip:hover {
-            background: #42414d;
+            background: rgba(255, 255, 255, 0.08);
             color: #ffffff;
             border-color: rgba(255, 255, 255, 0.2);
         }
@@ -462,21 +490,21 @@ pub fn render_newtab_page(
             position: relative;
         }
         .shortcut-tile {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 22px;
             margin-bottom: 8px;
-            transition: transform 0.15s ease, box-shadow 0.15s ease;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+            transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
             position: relative;
         }
         .shortcut-item:hover .shortcut-tile {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
+            transform: translateY(-3px) scale(1.04);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45);
         }
         .shortcut-menu-trigger {
             display: none;
@@ -486,7 +514,7 @@ pub fn render_newtab_page(
             width: 20px;
             height: 20px;
             border-radius: 50%;
-            background-color: #42414d;
+            background-color: #38374a;
             color: #ffffff;
             font-size: 10px;
             align-items: center;
@@ -500,7 +528,7 @@ pub fn render_newtab_page(
         .shortcut-label {
             font-size: 12px;
             font-weight: 500;
-            color: #fbfbfe;
+            color: #d1d1d6;
             text-align: center;
             white-space: nowrap;
             overflow: hidden;
@@ -510,7 +538,7 @@ pub fn render_newtab_page(
         }
         .shortcut-sub {
             font-size: 10px;
-            color: #8f8f9d;
+            color: #6e6e7a;
             text-align: center;
             margin-top: 2px;
         }
@@ -526,15 +554,16 @@ pub fn render_newtab_page(
         .section-title {
             display: flex;
             align-items: center;
+            letter-spacing: -0.3px;
             gap: 8px;
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 700;
             color: #fbfbfe;
             cursor: pointer;
             user-select: none;
         }
         .section-menu-btn {
-            color: #8f8f9d;
+            color: #6e6e7a;
             cursor: pointer;
             font-size: 16px;
             background: none;
@@ -552,10 +581,10 @@ pub fn render_newtab_page(
             position: absolute;
             right: 0;
             top: 32px;
-            width: 200px;
-            background-color: #2b2a33;
+            width: 220px;
+            background-color: #28272f;
             border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 10px;
+            border-radius: 12px;
             padding: 6px;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
             z-index: 150;
@@ -567,15 +596,15 @@ pub fn render_newtab_page(
             display: flex;
             align-items: center;
             gap: 8px;
-            padding: 8px 12px;
-            border-radius: 6px;
+            padding: 9px 14px;
+            border-radius: 8px;
             font-size: 13px;
             color: #cfcfd4;
             cursor: pointer;
             transition: all 0.15s ease;
         }
         .popover-item:hover {
-            background-color: #42414d;
+            background-color: rgba(88, 132, 255, 0.12);
             color: #ffffff;
         }
 
@@ -597,15 +626,19 @@ pub fn render_newtab_page(
         }
 
         .widget-card {
-            background-color: #2b2a33;
-            border-radius: 12px;
-            padding: 16px;
-            min-height: 116px;
+            background-color: #24232c;
+            border-radius: 14px;
+            padding: 18px;
+            min-height: 120px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            border: 1px solid rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.05);
             position: relative;
+            transition: border-color 0.15s ease;
+        }
+        .widget-card:hover {
+            border-color: rgba(255, 255, 255, 0.1);
         }
 
         /* 1. World Clock Card */
@@ -627,13 +660,13 @@ pub fn render_newtab_page(
             border-right: none;
         }
         .clock-city {
-            font-size: 11px;
-            font-weight: 600;
+            font-size: 11.5px;
+            font-weight: 700;
             color: #fbfbfe;
         }
         .clock-tz {
             font-size: 9px;
-            color: #8f8f9d;
+            color: #6e6e7a;
             margin-top: 1px;
         }
         .clock-time {
@@ -691,9 +724,9 @@ pub fn render_newtab_page(
             width: 38px;
             height: 38px;
             border-radius: 50%;
-            background-color: #42414d;
+            background-color: #38374a;
             border: none;
-            color: #fbfbfe;
+            color: #e8e8ed;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -702,24 +735,24 @@ pub fn render_newtab_page(
             transition: background-color 0.15s ease;
         }
         .timer-play-btn:hover {
-            background-color: #52525e;
+            background-color: #4a4960;
         }
         .timer-digits {
             font-size: 18px;
             font-weight: 700;
-            color: #fbfbfe;
+            color: #e8e8ed;
             letter-spacing: 0.5px;
         }
         .timer-ctrl-btn {
             background: none;
             border: none;
-            color: #8f8f9d;
+            color: #6e6e7a;
             font-size: 16px;
             cursor: pointer;
             padding: 0 4px;
         }
         .timer-ctrl-btn:hover {
-            color: #fbfbfe;
+            color: #e8e8ed;
         }
         .timer-pills {
             display: flex;
@@ -729,7 +762,7 @@ pub fn render_newtab_page(
         .timer-pill {
             background: transparent;
             border: 1px solid rgba(255, 255, 255, 0.15);
-            color: #cfcfd4;
+            color: #a0a0aa;
             padding: 3px 12px;
             border-radius: 12px;
             font-size: 11px;
@@ -737,17 +770,17 @@ pub fn render_newtab_page(
             font-weight: 500;
         }
         .timer-pill.active {
-            background-color: #42414d;
-            border-color: #42414d;
+            background-color: rgba(88, 132, 255, 0.15);
+            border-color: rgba(88, 132, 255, 0.25);
             color: #ffffff;
             font-weight: 600;
         }
 
         /* 4. Checklist Card */
         .checklist-title {
-            font-size: 12px;
-            font-weight: 600;
-            color: #cfcfd4;
+            font-size: 12.5px;
+            font-weight: 700;
+            color: #a0a0aa;
             margin-bottom: 6px;
         }
         .checklist-add-btn {
@@ -799,11 +832,11 @@ pub fn render_newtab_page(
             margin-bottom: 14px;
         }
         .category-chip {
-            background: #2b2a33;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            color: #cfcfd4;
-            padding: 4px 12px;
-            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: #8e8e98;
+            padding: 5px 14px;
+            border-radius: 18px;
             font-size: 12px;
             font-weight: 500;
             cursor: pointer;
@@ -811,7 +844,7 @@ pub fn render_newtab_page(
             white-space: nowrap;
         }
         .category-chip:hover, .category-chip.active {
-            background: #42414d;
+            background: rgba(88, 132, 255, 0.12);
             color: #ffffff;
             border-color: rgba(255, 255, 255, 0.2);
         }
@@ -832,27 +865,28 @@ pub fn render_newtab_page(
             }
         }
         .story-card {
-            background-color: #2b2a33;
-            border-radius: 12px;
+            background-color: #24232c;
+            border-radius: 14px;
             overflow: hidden;
             text-decoration: none;
             color: inherit;
             display: flex;
             flex-direction: column;
             transition: transform 0.15s ease, background-color 0.15s ease;
-            border: 1px solid rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.05);
             cursor: pointer;
         }
         .story-card:hover {
-            transform: translateY(-3px);
-            background-color: #38383d;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            transform: translateY(-4px);
+            background-color: #2a2935;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+            border-color: rgba(255, 255, 255, 0.1);
         }
         .story-thumb-wrap {
             width: 100%;
-            height: 154px;
+            height: 160px;
             position: relative;
-            background-color: #1c1b22;
+            background-color: #17161d;
             overflow: hidden;
         }
         .story-thumb {
@@ -898,6 +932,7 @@ pub fn render_newtab_page(
             overflow: hidden;
         }
         .story-footer {
+            margin-top: auto;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -923,18 +958,18 @@ pub fn render_newtab_page(
             margin-top: 16px;
         }
         .vault-pill-link {
-            background-color: #2b2a33;
-            color: #cfcfd4;
+            background-color: rgba(255, 255, 255, 0.04);
+            color: #8e8e98;
             text-decoration: none;
-            padding: 5px 12px;
-            border-radius: 14px;
+            padding: 6px 14px;
+            border-radius: 18px;
             font-size: 12px;
             font-weight: 500;
             transition: all 0.15s ease;
         }
         .vault-pill-link:hover {
-            background-color: #42414d;
-            color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.08);
+            color: #e0e0e6;
         }
 
         /* Bottom Right Customise Button (Matching Chrome Image 2 & Firefox Image 1) */
@@ -942,24 +977,25 @@ pub fn render_newtab_page(
             position: fixed;
             right: 24px;
             bottom: 24px;
-            background-color: #2b2a33;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: #fbfbfe;
-            padding: 8px 16px;
-            border-radius: 20px;
+            background-color: #28272f;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #d1d1d6;
+            padding: 9px 18px;
+            border-radius: 22px;
             font-size: 13px;
             font-weight: 500;
             display: flex;
             align-items: center;
             gap: 8px;
             cursor: pointer;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
-            transition: all 0.15s ease;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
             z-index: 99;
         }
         .customize-floating-pill:hover {
-            background-color: #42414d;
-            transform: translateY(-2px);
+            background-color: #32313c;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 32px rgba(0, 0, 0, 0.6);
         }
 
         /* Comprehensive Homepage Customization Drawer */
@@ -979,9 +1015,9 @@ pub fn render_newtab_page(
             right: -360px;
             width: 360px;
             height: 100vh;
-            background-color: #24242c;
-            border-left: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: -8px 0 32px rgba(0, 0, 0, 0.6);
+            background-color: #1e1d27;
+            border-left: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: -12px 0 48px rgba(0, 0, 0, 0.65);
             z-index: 301;
             transition: right 0.25s cubic-bezier(0.16, 1, 0.3, 1);
             display: flex;
@@ -1076,8 +1112,9 @@ pub fn render_newtab_page(
         .slider {
             position: absolute;
             cursor: pointer;
+            border-radius: 20px;
             top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #42414d;
+            background-color: #38374a;
             transition: .2s;
             border-radius: 20px;
         }
@@ -1093,7 +1130,7 @@ pub fn render_newtab_page(
             border-radius: 50%;
         }
         input:checked + .slider {
-            background-color: #0060df;
+            background-color: #5884ff;
         }
         input:checked + .slider:before {
             transform: translateX(16px);
@@ -1113,12 +1150,12 @@ pub fn render_newtab_page(
             display: flex;
         }
         .modal-box {
-            background-color: #2b2a33;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 14px;
-            width: 380px;
-            padding: 24px;
-            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
+            background-color: #28272f;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            width: 400px;
+            padding: 28px;
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.65);
         }
         .modal-title {
             font-size: 16px;
@@ -1128,18 +1165,19 @@ pub fn render_newtab_page(
         }
         .modal-input {
             width: 100%;
-            background-color: #1c1b22;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 8px;
-            padding: 10px 12px;
-            color: #fbfbfe;
+            background-color: #1e1d27;
+            border: 1.5px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 11px 14px;
+            color: #e8e8ed;
             font-size: 14px;
             outline: none;
             margin-bottom: 12px;
             box-sizing: border-box;
         }
         .modal-input:focus {
-            border-color: #0060df;
+            border-color: rgba(88, 132, 255, 0.5);
+            box-shadow: 0 0 0 2px rgba(88, 132, 255, 0.12);
         }
         .modal-actions {
             display: flex;

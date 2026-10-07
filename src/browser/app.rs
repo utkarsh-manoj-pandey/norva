@@ -421,6 +421,7 @@ impl NorvaBrowser {
 
             // Ensure all GTK chrome widgets are visible and interactive
             vbox.show_all();
+            window.gtk_window().present();
 
             (webview, chrome)
         };
