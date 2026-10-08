@@ -11,6 +11,10 @@ use serde::{Deserialize, Serialize};
 use tao::event_loop::EventLoopProxy;
 
 /// Events dispatched across the event loop proxy to control the main webview thread.
+///
+/// I have written this enum to maintain clean thread isolation: UI actions originating
+/// inside the WebKit JavaScript sandbox are sent over a thread-safe message proxy to
+/// mutate Tao window state, change tabs, or trigger navigations.
 #[derive(Debug, Clone)]
 pub enum NorvaUserEvent {
     Navigate(String),
@@ -28,6 +32,10 @@ pub enum NorvaUserEvent {
 }
 
 /// Incoming JSON IPC payload structure from JavaScript `window.ipc.postMessage`.
+///
+/// I have written this struct with optional fields so that diverse UI interactions
+/// (submitting searches, deleting history entries, adding custom engines, or clearing cache)
+/// can reuse a single unified, type-safe deserializer.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct IpcMessage {
     pub action: String,
@@ -37,11 +45,13 @@ pub struct IpcMessage {
     pub name: Option<String>,
     pub template: Option<String>,
     pub bang: Option<String>,
+    pub key: Option<String>,
+    pub value: Option<String>,
 }
 
-/// IPC Dispatcher handling client actions.
+/// IPC Dispatcher handling client actions natively in Rust.
 ///
-/// I am writing this dispatcher because user interactions occurring within the HTML5/CSS
+/// I have upgraded this dispatcher because user interactions occurring within the HTML5/CSS
 /// frontend (such as clicking a speed dial, submitting the omnibox, resetting a device permission,
 /// or purging cache memory) must be validated and executed natively in Rust with maximum security.
 #[derive(Clone)]
@@ -53,7 +63,7 @@ pub struct IpcDispatcher {
 }
 
 impl IpcDispatcher {
-    /// Creates a new IPC dispatcher.
+    /// Creates a new IPC dispatcher connected to the application subsystems.
     pub fn new(
         proxy: EventLoopProxy<NorvaUserEvent>,
         db: DatabaseManager,
@@ -68,7 +78,7 @@ impl IpcDispatcher {
         }
     }
 
-    /// Handles a raw IPC JSON string payload.
+    /// Handles a raw IPC JSON string payload from JavaScript.
     ///
     /// I have written this parsing function with strict error handling so malformed
     /// or unsolicited client payloads fail safely without panicking.
@@ -98,6 +108,9 @@ impl IpcDispatcher {
             }
             "reload" => {
                 let _ = self.proxy.send_event(NorvaUserEvent::Reload);
+            }
+            "new_tab" => {
+                let _ = self.proxy.send_event(NorvaUserEvent::NewTab);
             }
             "delete_history" => {
                 if let Some(id) = msg.id {
@@ -131,6 +144,14 @@ impl IpcDispatcher {
             "reset_permission" => {
                 if let Some(domain) = msg.domain {
                     let _ = self.db.permissions.delete_domain(&domain);
+                }
+            }
+            "clear_permissions_audit" => {
+                let _ = self.db.permissions.clear_audits();
+            }
+            "set_preference" => {
+                if let (Some(key), Some(value)) = (msg.key, msg.value) {
+                    let _ = self.db.settings.set_preference(&key, &value);
                 }
             }
             _ => {}

@@ -8,17 +8,19 @@ use crate::db::settings_db::SettingsDatabase;
 use std::sync::Arc;
 
 /// Destination resolved from omnibox input.
+///
+/// I have written this enum to cleanly classify parsed address bar intentions:
+/// - `DirectUrl`: The user provided an explicit URL or valid domain destination.
+/// - `Search`: The user submitted a query or bang shortcut to be executed via a search engine.
+/// - `InternalPage`: The user navigated to a native `norva://` subsystem view.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ResolvedTarget {
-    /// Navigate directly to a fully qualified URL
     DirectUrl(String),
-    /// Perform a web search on an engine with a query string
     Search {
         engine_name: String,
         query: String,
         target_url: String,
     },
-    /// Internal NORVA system page
     InternalPage(String),
 }
 
@@ -44,10 +46,11 @@ impl ResolvedTarget {
 
 /// Query Router for the NORVA Omnibox.
 ///
-/// I am writing this router because the browser address bar is the most frequent
+/// I have upgraded this router because the browser address bar is the most frequent
 /// point of human-computer interaction. A smart, privacy-centric omnibox must
 /// effortlessly differentiate between direct domain visits, internal system panels
-/// (like `norva://shields`), bang shortcuts (`!ahmia hidden services`), and standard queries.
+/// (like `norva://shields`), bang shortcuts (`!ahmia hidden services`, `!gh repo`),
+/// and standard queries, without leaking typing telemetry to external networks.
 #[derive(Clone)]
 pub struct QueryRouter {
     settings_db: Arc<SettingsDatabase>,
@@ -59,12 +62,12 @@ impl QueryRouter {
         Self { settings_db }
     }
 
-    /// Resolves raw omnibox text into a navigation target.
+    /// Resolves raw omnibox text into an unambiguous navigation target.
     ///
     /// I have written this routing logic to inspect prefixes, bang hotkeys, and domain syntax:
     /// 1. If it starts with `norva://`, route to the internal page.
-    /// 2. If it starts with a bang (e.g. `!ahmia`, `!g`, `!b`, `!ddg`, `!y`), route to that engine.
-    /// 3. If it looks like a valid URL or IP address, append `https://` if missing and navigate.
+    /// 2. If it starts with a bang (e.g. `!ahmia`, `!g`, `!b`, `!ddg`, `!y`, `!gh`, `!w`), route to that engine.
+    /// 3. If it looks like a valid URL, domain, or IP address, prepend `https://` if missing and navigate.
     /// 4. Otherwise, execute a search using the user's default configured search engine.
     pub fn resolve(&self, input: &str) -> ResolvedTarget {
         let trimmed = input.trim();
@@ -77,7 +80,7 @@ impl QueryRouter {
             return ResolvedTarget::InternalPage(trimmed.to_string());
         }
 
-        // 2. Bang commands (e.g., "!g rust programming", "!ahmia hidden marketplace", "!b cloud")
+        // 2. Bang commands (e.g., "!g rust programming", "!ahmia hidden marketplace", "!b cloud", "!gh norva")
         if trimmed.starts_with('!') {
             let mut parts = trimmed.splitn(2, ' ');
             let bang = parts.next().unwrap_or("");
@@ -129,6 +132,10 @@ impl QueryRouter {
 }
 
 /// Determines whether an input string is a domain name, IP, or URL rather than a search phrase.
+///
+/// I have written this heuristic detector to examine dot patterns, TLD presence, localhost,
+/// and IP syntax so that entering "rust-lang.org" navigates directly, while entering
+/// "what is rust" triggers a privacy-preserving web search.
 fn is_probable_url(input: &str) -> bool {
     if input.starts_with("http://") || input.starts_with("https://") {
         return true;
@@ -142,21 +149,23 @@ fn is_probable_url(input: &str) -> bool {
         return true;
     }
 
-    // IPv4 address check
+    // IPv4 address check (e.g. 127.0.0.1 or 192.168.1.1)
     let parts: Vec<&str> = input.split('.').collect();
     if parts.len() == 4 && parts.iter().all(|p| p.parse::<u8>().is_ok()) {
         return true;
     }
 
-    // Standard top-level domain extension check
+    // Check for common TLDs or domain syntax (e.g., example.com, sub.domain.org)
     if input.contains('.') {
-        if let Some(suffix) = input.split('.').last() {
-            let s = suffix.split('/').next().unwrap_or(suffix);
+        let domain_part = input.split('/').next().unwrap_or("");
+        let domain_no_port = domain_part.split(':').next().unwrap_or("");
+        if let Some(tld) = domain_no_port.rsplit('.').next() {
             let common_tlds = [
-                "com", "org", "net", "io", "dev", "ai", "app", "co", "uk", "de",
-                "in", "fr", "ca", "xyz", "onion", "me", "info", "is", "fi", "rs"
+                "com", "org", "net", "io", "dev", "ai", "app", "edu", "gov", "co",
+                "in", "uk", "de", "fr", "jp", "cn", "ru", "fi", "ca", "me", "xyz",
+                "info", "onion", "tech", "cloud", "rs", "site", "online", "live"
             ];
-            if common_tlds.contains(&s.to_lowercase().as_str()) {
+            if common_tlds.contains(&tld.to_lowercase().as_str()) {
                 return true;
             }
         }

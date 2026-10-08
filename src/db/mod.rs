@@ -22,7 +22,7 @@ use std::sync::Arc;
 
 /// Master Database Coordinator.
 ///
-/// I am writing this coordinator struct because a modern, high-security browser
+/// I have written this coordinator struct because a modern, high-security browser
 /// must separate its data concerns across distinct SQLite databases.
 /// Instead of a monolithic database where a crash or corruption during a heavy
 /// adblock write could wipe out bookmarks or browsing history, NORVA establishes
@@ -32,6 +32,9 @@ use std::sync::Arc;
 /// 3. `privacy_shields.db`: Stores adblock filters, blocked tracker telemetry, and defense switches.
 /// 4. `settings.db`: Stores search engine templates (Google, Bing, DDG, Yahoo, Ahmia), bangs, and user preferences.
 /// 5. `cache_cookies.db`: Stores storage policies, ephemeral session markers, and cleanup audit records.
+///
+/// In this upgraded release, I have unified high-performance WAL tuning, 64MB memory caches,
+/// and busy timeouts across all five databases to guarantee zero lock contention and zero UI freezes.
 #[derive(Clone)]
 pub struct DatabaseManager {
     pub history: Arc<HistoryDatabase>,

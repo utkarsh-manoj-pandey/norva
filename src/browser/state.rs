@@ -9,7 +9,7 @@ use std::sync::{Arc, RwLock};
 
 /// Thread-safe runtime session state.
 ///
-/// I am writing this struct because a modern asynchronous web browser operates across
+/// I have written this struct because a modern asynchronous web browser operates across
 /// multiple threads: network protocol interceptors, IPC message handlers, and the main
 /// GUI event loop all require synchronized, thread-safe access to the active URL,
 /// page title, and live privacy shield counters without deadlocking the UI.

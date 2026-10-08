@@ -10,7 +10,12 @@ use serde::{Deserialize, Serialize};
 use std::path::Path;
 use std::sync::{Arc, Mutex};
 
-/// Cookie handling and storage policy for a domain.
+/// Cookie handling and storage policy for an origin domain.
+///
+/// I have written this struct to allow granular per-domain storage controls:
+/// - `block_third_party`: Disallows third-party tracker cookies from setting state.
+/// - `clear_on_exit`: Wipes local cookies and storage as soon as the active tab closes.
+/// - `isolated_jar`: Partitions storage into an isolated jar to defeat cross-site tracking.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CookiePolicy {
     pub domain: String,
@@ -21,6 +26,9 @@ pub struct CookiePolicy {
 }
 
 /// Record of cache or cookie cleanup execution.
+///
+/// I have written this audit struct to verify that user-initiated or automatic
+/// purges actually executed, logging the cleanup category, byte count, and timestamp.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CleanupAudit {
     pub id: i64,
@@ -32,10 +40,11 @@ pub struct CleanupAudit {
 
 /// Dedicated Cache & Cookies Database Manager.
 ///
-/// I am writing this dedicated database manager because cookies and cache memory
-/// represent the physical persistence layer of tracking. By keeping storage policies,
-/// domain cookie rules, and cleanup verification logs in `cache_cookies.db`,
-/// the browser can manage site storage lifecycle without ever touching user history or settings.
+/// I have upgraded this dedicated database manager to use fine-tuned SQLite PRAGMAs
+/// including WAL mode, 64MB cache size, and busy timeout handlers. I wrote this
+/// architecture because cookies, Web Storage, and disk cache represent the physical
+/// persistence attack surface of tracking. By maintaining storage rules and cleanup
+/// records in `cache_cookies.db`, NORVA manages storage lifecycles without touching history.
 #[derive(Clone)]
 pub struct CacheCookiesDatabase {
     conn: Arc<Mutex<Connection>>,
@@ -45,14 +54,18 @@ impl CacheCookiesDatabase {
     /// Opens or initializes the cache & cookies database.
     ///
     /// I have written this initialization routine to enforce WAL mode and initialize
-    /// tables for per-site storage rules and audit logs.
+    /// tables for per-site storage rules, cleanup verification logs, and storage settings.
     pub fn new(path: &Path) -> Result<Self> {
         let conn = Connection::open(path)?;
 
+        // High-performance SQLite tuning: WAL mode, memory temp store, 64MB cache
         conn.execute_batch(
             "PRAGMA journal_mode = WAL;
              PRAGMA synchronous = NORMAL;
-             PRAGMA foreign_keys = ON;"
+             PRAGMA foreign_keys = ON;
+             PRAGMA temp_store = MEMORY;
+             PRAGMA cache_size = -64000;
+             PRAGMA busy_timeout = 5000;"
         )?;
 
         // Per-domain cookie and storage rules
@@ -107,7 +120,7 @@ impl CacheCookiesDatabase {
         })
     }
 
-    /// Retrieves or defaults cookie policy for a domain.
+    /// Retrieves or defaults cookie policy for an origin domain.
     ///
     /// I have written this lookup function so NORVA can dynamically enforce
     /// whether a domain is permitted to write persistent cookies or must be wiped on tab exit.
@@ -138,7 +151,7 @@ impl CacheCookiesDatabase {
         })
     }
 
-    /// Sets or updates a domain cookie policy.
+    /// Sets or updates an origin domain cookie policy.
     pub fn set_cookie_policy(
         &self,
         domain: &str,
@@ -150,9 +163,8 @@ impl CacheCookiesDatabase {
         let now = Utc::now().to_rfc3339();
 
         conn.execute(
-            "INSERT INTO domain_cookie_policies 
-             (domain, block_third_party, clear_on_exit, isolated_jar, last_modified)
-             VALUES (?1, ?2, ?3, ?4, ?5)
+            "INSERT INTO domain_cookie_policies (domain, block_third_party, clear_on_exit, isolated_jar, last_modified)
+             VALUES (?, ?, ?, ?, ?)
              ON CONFLICT(domain) DO UPDATE SET
                 block_third_party = excluded.block_third_party,
                 clear_on_exit = excluded.clear_on_exit,
@@ -164,22 +176,22 @@ impl CacheCookiesDatabase {
         Ok(())
     }
 
-    /// Records a cleanup action in the audit log.
-    pub fn log_cleanup(&self, cleanup_type: &str, details: &str, bytes: i64) -> Result<()> {
+    /// Logs an audited storage purge event with freed byte counts.
+    pub fn log_cleanup(&self, cleanup_type: &str, details: &str, bytes_cleared: i64) -> Result<()> {
         let conn = self.conn.lock().unwrap();
         let now = Utc::now().to_rfc3339();
 
         conn.execute(
             "INSERT INTO storage_cleanups (cleanup_type, details, bytes_cleared, timestamp)
              VALUES (?, ?, ?, ?)",
-            params![cleanup_type, details, bytes, now],
+            params![cleanup_type, details, bytes_cleared, now],
         )?;
 
         Ok(())
     }
 
-    /// Retrieves all cleanup audit logs.
-    pub fn get_cleanup_audits(&self, limit: usize) -> Result<Vec<CleanupAudit>> {
+    /// Retrieves recent cleanup audit logs.
+    pub fn get_recent_cleanups(&self, limit: usize) -> Result<Vec<CleanupAudit>> {
         let conn = self.conn.lock().unwrap();
         let mut stmt = conn.prepare(
             "SELECT id, cleanup_type, details, bytes_cleared, timestamp
@@ -198,40 +210,18 @@ impl CacheCookiesDatabase {
             })
         })?;
 
-        let mut list = Vec::new();
-        for item in rows {
-            if let Ok(c) = item {
-                list.push(c);
-            }
+        let mut audits = Vec::new();
+        for r in rows {
+            audits.push(r?);
         }
-        Ok(list)
+
+        Ok(audits)
     }
 
-    /// Retrieves all configured cookie policies.
-    pub fn get_all_policies(&self) -> Result<Vec<CookiePolicy>> {
+    /// Deletes all historical cleanup audit records.
+    pub fn clear_cleanups(&self) -> Result<()> {
         let conn = self.conn.lock().unwrap();
-        let mut stmt = conn.prepare(
-            "SELECT domain, block_third_party, clear_on_exit, isolated_jar, last_modified
-             FROM domain_cookie_policies
-             ORDER BY domain ASC"
-        )?;
-
-        let rows = stmt.query_map([], |row| {
-            Ok(CookiePolicy {
-                domain: row.get(0)?,
-                block_third_party: row.get::<_, i64>(1)? == 1,
-                clear_on_exit: row.get::<_, i64>(2)? == 1,
-                isolated_jar: row.get::<_, i64>(3)? == 1,
-                last_modified: row.get(4)?,
-            })
-        })?;
-
-        let mut list = Vec::new();
-        for item in rows {
-            if let Ok(p) = item {
-                list.push(p);
-            }
-        }
-        Ok(list)
+        conn.execute("DELETE FROM storage_cleanups;", [])?;
+        Ok(())
     }
 }

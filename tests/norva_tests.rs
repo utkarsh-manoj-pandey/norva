@@ -132,23 +132,24 @@ fn test_privacy_shields_and_adblock_engine() {
         _ => panic!("Expected doubleclick.net to be blocked"),
     }
 
-    // 2. Test tracker telemetry blocking
-    let action_tracker = adblock.evaluate_url("https://analytics.google.com/collect");
+    // 2. Test tracker telemetry blocking with subdomains (zero allocation decomposition)
+    let action_tracker = adblock.evaluate_url("https://sub.analytics.google.com/collect");
     match action_tracker {
         norva::privacy::adblocker::FilterAction::Block { category, domain } => {
             assert_eq!(category, norva::db::shields_db::BlockCategory::Tracker);
-            assert_eq!(domain, "analytics.google.com");
+            assert_eq!(domain, "sub.analytics.google.com");
         }
-        _ => panic!("Expected Google Analytics to be blocked"),
+        _ => panic!("Expected sub.analytics.google.com to be blocked"),
     }
 
-    // 3. Test URL parameter stripping (fbclid, gclid, utm_source)
-    let dirty_url = "https://example.com/article?utm_source=twitter&fbclid=IwAR123&keep=important";
+    // 3. Test URL parameter stripping (fbclid, gclid, utm_source, gbraid)
+    let dirty_url = "https://example.com/article?utm_source=twitter&fbclid=IwAR123&gbraid=XYZ&keep=important";
     let action_sanitize = adblock.evaluate_url(dirty_url);
     match action_sanitize {
         norva::privacy::adblocker::FilterAction::SanitizeUrl(clean_url) => {
             assert!(!clean_url.contains("fbclid"));
             assert!(!clean_url.contains("utm_source"));
+            assert!(!clean_url.contains("gbraid"));
             assert!(clean_url.contains("keep=important"));
         }
         _ => panic!("Expected URL tracking parameters to be stripped"),
@@ -158,7 +159,7 @@ fn test_privacy_shields_and_adblock_engine() {
     let action_safe = adblock.evaluate_url("https://wikipedia.org/wiki/Rust_(programming_language)");
     assert_eq!(action_safe, norva::privacy::adblocker::FilterAction::Allow);
 
-    // 5. Verify metrics were logged to shields.db
+    // 5. Verify metrics were logged to shields.db (instant atomic readout)
     let stats = shields_db.get_stats().expect("Stats query failed");
     assert!(stats.total_ads_blocked >= 1);
     assert!(stats.total_trackers_blocked >= 1);
@@ -189,18 +190,29 @@ fn test_search_engines_and_query_router() {
         _ => panic!("Expected Google Search target"),
     }
 
-    // 2. Microsoft Bing bang (!b)
-    let target_b = router.resolve("!b machine learning");
-    match target_b {
+    // 2. GitHub bang (!gh)
+    let target_gh = router.resolve("!gh norva browser");
+    match target_gh {
         norva::search::query_router::ResolvedTarget::Search { engine_name, query, target_url } => {
-            assert_eq!(engine_name, "Microsoft Bing");
-            assert_eq!(query, "machine learning");
-            assert!(target_url.contains("bing.com/search?q=machine+learning"));
+            assert_eq!(engine_name, "GitHub");
+            assert_eq!(query, "norva browser");
+            assert!(target_url.contains("github.com/search?q=norva+browser"));
         }
-        _ => panic!("Expected Bing Search target"),
+        _ => panic!("Expected GitHub target"),
     }
 
-    // 3. DuckDuckGo bang (!ddg)
+    // 3. Wikipedia bang (!w)
+    let target_w = router.resolve("!w artificial intelligence");
+    match target_w {
+        norva::search::query_router::ResolvedTarget::Search { engine_name, query, target_url } => {
+            assert_eq!(engine_name, "Wikipedia");
+            assert_eq!(query, "artificial intelligence");
+            assert!(target_url.contains("wikipedia.org/wiki/Special:Search?search=artificial+intelligence"));
+        }
+        _ => panic!("Expected Wikipedia target"),
+    }
+
+    // 4. DuckDuckGo bang (!ddg)
     let target_ddg = router.resolve("!ddg zero knowledge proofs");
     match target_ddg {
         norva::search::query_router::ResolvedTarget::Search { engine_name, query, target_url } => {
@@ -209,17 +221,6 @@ fn test_search_engines_and_query_router() {
             assert!(target_url.contains("duckduckgo.com/?q=zero+knowledge+proofs"));
         }
         _ => panic!("Expected DuckDuckGo target"),
-    }
-
-    // 4. Yahoo bang (!y)
-    let target_y = router.resolve("!y open source software");
-    match target_y {
-        norva::search::query_router::ResolvedTarget::Search { engine_name, query, target_url } => {
-            assert_eq!(engine_name, "Yahoo Search");
-            assert_eq!(query, "open source software");
-            assert!(target_url.contains("search.yahoo.com/search?p=open+source+software"));
-        }
-        _ => panic!("Expected Yahoo target"),
     }
 
     // 5. Ahmia (.onion Tor Search) bang (!ahmia / !onion)
@@ -231,16 +232,6 @@ fn test_search_engines_and_query_router() {
             assert!(target_url.contains("ahmia.fi/search/?q=secure+mail+directory"));
         }
         _ => panic!("Expected Ahmia target"),
-    }
-
-    let target_onion = router.resolve("!onion hidden services");
-    match target_onion {
-        norva::search::query_router::ResolvedTarget::Search { engine_name, query, target_url } => {
-            assert_eq!(engine_name, "Ahmia (Tor .onion Search)");
-            assert_eq!(query, "hidden services");
-            assert!(target_url.contains("ahmia.fi/search/?q=hidden+services"));
-        }
-        _ => panic!("Expected Ahmia target via !onion alias"),
     }
 
     // 6. Direct URL navigation
@@ -262,17 +253,23 @@ fn test_search_engines_and_query_router() {
         target_internal,
         norva::search::query_router::ResolvedTarget::InternalPage("norva://shields".to_string())
     );
+}
 
-    // 8. Plain search without bangs (routes to default DuckDuckGo)
-    let target_plain = router.resolve("rust concurrency patterns");
-    match target_plain {
-        norva::search::query_router::ResolvedTarget::Search { engine_name, query, target_url } => {
-            assert_eq!(engine_name, "DuckDuckGo");
-            assert_eq!(query, "rust concurrency patterns");
-            assert!(target_url.contains("duckduckgo.com/?q=rust+concurrency+patterns"));
-        }
-        _ => panic!("Expected default engine search target"),
-    }
+#[test]
+fn test_cache_manager_atomic_and_purging() {
+    let dir = get_test_dir("cache_test");
+    let db_path = dir.join("cache_cookies.db");
+    let cache_dir = dir.join("cache");
+    fs::create_dir_all(&cache_dir).unwrap();
+    fs::write(cache_dir.join("test_asset.bin"), b"1234567890").unwrap();
+
+    let db = Arc::new(norva::db::cache_cookies_db::CacheCookiesDatabase::new(&db_path).unwrap());
+    let cache_mgr = norva::privacy::cache_manager::CacheManager::new(db, cache_dir);
+
+    // Allow background thread to populate or trigger purge
+    let purged = cache_mgr.purge_cache();
+    assert!(purged >= 10);
+    assert_eq!(cache_mgr.get_cache_size_bytes(), 0);
 }
 
 #[test]

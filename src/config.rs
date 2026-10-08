@@ -9,10 +9,13 @@ use std::path::PathBuf;
 
 /// Application configuration and profile path management.
 ///
-/// I am writing this struct because a privacy-focused browser must maintain absolute
+/// I have written this struct because a privacy-focused browser must maintain absolute
 /// control and predictability over where user artifacts, databases, and cache files reside.
 /// By explicitly isolating our configuration directories, we ensure zero leakage to
 /// shared OS directories and provide users with a clean single directory to inspect or wipe.
+///
+/// In this upgraded architecture, each database path maps to an isolated SQLite file:
+/// `history.db`, `permissions.db`, `privacy_shields.db`, `settings.db`, and `cache_cookies.db`.
 #[derive(Debug, Clone)]
 pub struct NorvaConfig {
     /// Base profile directory (e.g. ~/.local/share/norva)
@@ -40,7 +43,7 @@ impl NorvaConfig {
     ///
     /// I have written this initialization function because before any database or webview
     /// attempts to open files, we must guarantee that the entire directory hierarchy
-    /// exists with strict POSIX permissions (0700) so that other local system users
+    /// exists with strict POSIX permissions so that other local system users
     /// cannot peek into NORVA's private data stores.
     pub fn init(secure_mode: bool) -> Self {
         // I am writing this path resolution logic because standard XDG directories
@@ -76,7 +79,7 @@ impl NorvaConfig {
 
     /// Returns whether the current session is operating in Secure / Ghost Mode.
     ///
-    /// I am writing this helper because multiple subsystems (history logger, cookie persister,
+    /// I have written this helper because multiple subsystems (history logger, cookie persister,
     /// tracker shields) need an immediate, lightweight boolean check to decide whether to
     /// suppress persistent disk writes entirely.
     #[inline]

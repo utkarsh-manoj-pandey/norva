@@ -11,7 +11,7 @@ use wry::{PermissionKind, PermissionResponse};
 
 /// Hardware & Location Permissions Arbiter.
 ///
-/// I am writing this arbiter because camera, microphone, and location sensors represent
+/// I have written this arbiter because camera, microphone, and location sensors represent
 /// the most intrusive physical hardware attack surface on any operating system.
 /// Whether a user has an integrated laptop webcam, an external USB podcast microphone,
 /// or an external DSLR connected via capture card, NORVA strictly verifies whether the
@@ -29,10 +29,12 @@ impl PermissionsManager {
 
     /// Evaluates an incoming WebKit permission request for Camera, Mic, or Geolocation.
     ///
-    /// I have written this evaluation routine to query the isolated `permissions.db`.
-    /// If a site rule exists (Allow or Block), it is obeyed immediately.
-    /// If no explicit rule has been established yet, NORVA defaults to safety (Deny or Ask)
-    /// and logs the access request to the forensic audit log for user inspection.
+    /// I have upgraded this evaluation routine to query the isolated `permissions.db`
+    /// with zero-trust defaults:
+    /// - If a site rule exists (Allow or Block), it is obeyed immediately.
+    /// - If no rule exists, it defaults safely to Deny (zero-trust security) to prevent
+    ///   stealth background activations.
+    /// - Every request is logged to the forensic audit log for transparent user inspection.
     pub fn handle_permission_request(
         &self,
         kind: PermissionKind,
@@ -50,7 +52,7 @@ impl PermissionsManager {
             _ => "other",
         };
 
-        // Internal NORVA pages have full native clearance
+        // Internal NORVA pages and local developer test endpoints have full native clearance
         if domain == "norva" || domain == "localhost" {
             let _ = self.permissions_db.log_audit(&domain, perm_type_str, "allowed_internal");
             return PermissionResponse::Allow;
@@ -60,19 +62,18 @@ impl PermissionsManager {
 
         let decision = match kind {
             PermissionKind::Camera => {
-                // I am writing this camera policy branch to handle internal webcams and external video capture
+                // I have written this camera policy branch to handle internal webcams and external video capture
                 match site_policy.as_ref().map(|p| p.camera).unwrap_or(PermissionPolicy::Ask) {
                     PermissionPolicy::Allow => PermissionResponse::Allow,
                     PermissionPolicy::Block => PermissionResponse::Deny,
                     PermissionPolicy::Ask => {
-                        // In non-interactive callbacks, default to safe Allow if user previously trusted,
-                        // or Deny if unknown to prevent rogue background activations
+                        // In non-interactive callbacks, default to safe Deny to prevent rogue background activations
                         PermissionResponse::Deny
                     }
                 }
             }
             PermissionKind::Microphone => {
-                // I am writing this microphone branch to manage internal mics and external USB/XLR inputs
+                // I have written this microphone branch to manage internal mics and external USB/XLR inputs
                 match site_policy.as_ref().map(|p| p.microphone).unwrap_or(PermissionPolicy::Ask) {
                     PermissionPolicy::Allow => PermissionResponse::Allow,
                     PermissionPolicy::Block => PermissionResponse::Deny,
@@ -80,7 +81,7 @@ impl PermissionsManager {
                 }
             }
             PermissionKind::Geolocation => {
-                // I am writing this location branch to prevent stealth geo-triangulation
+                // I have written this location branch to prevent stealth geo-triangulation
                 match site_policy.as_ref().map(|p| p.location).unwrap_or(PermissionPolicy::Ask) {
                     PermissionPolicy::Allow => PermissionResponse::Allow,
                     PermissionPolicy::Block => PermissionResponse::Deny,

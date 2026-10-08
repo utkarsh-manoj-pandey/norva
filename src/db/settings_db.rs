@@ -11,10 +11,11 @@ use std::sync::{Arc, Mutex};
 
 /// A registered Search Engine definition in NORVA.
 ///
-/// I am writing this struct because users should have total freedom over how they
+/// I have written this struct because users should have total freedom over how they
 /// navigate the web. Supporting major search engines (Google, Bing, DuckDuckGo, Yahoo,
-/// and Ahmia for Tor .onion hidden services) with hotkey bangs (e.g. !g, !b, !ddg, !y, !ahmia)
-/// makes navigation instantaneous while keeping the door wide open for custom user engines.
+/// Ahmia for Tor .onion hidden services, Brave Search, Startpage, GitHub, Wikipedia)
+/// with hotkey bangs (e.g. !g, !b, !ddg, !y, !ahmia, !gh, !w) makes navigation
+/// instantaneous while keeping the door wide open for custom user engines.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SearchEngineConfig {
     pub id: String,
@@ -28,28 +29,33 @@ pub struct SearchEngineConfig {
 
 /// Dedicated Settings Database Manager.
 ///
-/// I have written this dedicated SQLite database (`settings.db`) because browser
-/// preferences, search engine templates, and proxy toggles should be completely separated
-/// from browsing history and shield counters. If a user deletes all their history or resets
-/// their adblock logs, their carefully customized search engines and preferences remain intact.
+/// I have upgraded this dedicated SQLite database (`settings.db`) with optimized
+/// caching and WAL mode. I wrote this architecture because browser preferences,
+/// search engine templates, and user toggles must be isolated from history and
+/// shield logs: when a user wipes history or clears cookies, their personalized
+/// search engines, shortcuts, and settings remain completely intact.
 #[derive(Clone)]
 pub struct SettingsDatabase {
     conn: Arc<Mutex<Connection>>,
 }
 
 impl SettingsDatabase {
-    /// Opens or initializes the settings database.
+    /// Opens or initializes the settings database with pre-seeded search engines.
     ///
-    /// I have written this function to seed the primary search engines required by NORVA:
-    /// Google, Microsoft Bing, DuckDuckGo, Yahoo, and Ahmia (for Tor .onion web searches),
-    /// plus Startpage and Brave Search for extra privacy options.
+    /// I have written this initialization function to seed a premier catalog of
+    /// 9 high-utility search engines: DuckDuckGo (privacy default), Google, Bing,
+    /// Yahoo, Ahmia (.onion Tor search), Startpage, Brave Search, GitHub, and Wikipedia.
     pub fn new(path: &Path) -> Result<Self> {
         let conn = Connection::open(path)?;
 
+        // High-performance SQLite tuning: WAL mode, memory temp store, 64MB cache
         conn.execute_batch(
             "PRAGMA journal_mode = WAL;
              PRAGMA synchronous = NORMAL;
-             PRAGMA foreign_keys = ON;"
+             PRAGMA foreign_keys = ON;
+             PRAGMA temp_store = MEMORY;
+             PRAGMA cache_size = -64000;
+             PRAGMA busy_timeout = 5000;"
         )?;
 
         // Search engine catalog table
@@ -66,7 +72,7 @@ impl SettingsDatabase {
             [],
         )?;
 
-        // Generic key-value preferences table
+        // Generic key-value preferences table for theme and widget toggles
         conn.execute(
             "CREATE TABLE IF NOT EXISTS preferences (
                 key TEXT PRIMARY KEY,
@@ -82,7 +88,7 @@ impl SettingsDatabase {
                 "DuckDuckGo",
                 "https://duckduckgo.com/?q={}",
                 "!ddg",
-                "Privacy-focused search engine that doesn't track search history",
+                "Privacy-first search engine with zero user tracking",
                 1,
                 1, // default
             ),
@@ -91,7 +97,7 @@ impl SettingsDatabase {
                 "Google Search",
                 "https://www.google.com/search?q={}",
                 "!g",
-                "World's most ubiquitous search engine index",
+                "Global search index with comprehensive web crawling",
                 0,
                 0,
             ),
@@ -118,7 +124,16 @@ impl SettingsDatabase {
                 "Ahmia (Tor .onion Search)",
                 "https://ahmia.fi/search/?q={}",
                 "!ahmia",
-                "Specialized search engine designed to discover and index Tor .onion hidden services",
+                "Premier search engine for Tor hidden services (.onion)",
+                1,
+                0,
+            ),
+            (
+                "startpage",
+                "Startpage",
+                "https://www.startpage.com/sp/search?query={}",
+                "!sp",
+                "Google results served with strict European privacy protections",
                 1,
                 0,
             ),
@@ -132,33 +147,41 @@ impl SettingsDatabase {
                 0,
             ),
             (
-                "startpage",
-                "Startpage",
-                "https://www.startpage.com/sp/search?query={}",
-                "!sp",
-                "Google search results served with complete privacy protection",
+                "github",
+                "GitHub",
+                "https://github.com/search?q={}",
+                "!gh",
+                "Open-source code repositories, packages, and developer discussions",
+                0,
+                0,
+            ),
+            (
+                "wikipedia",
+                "Wikipedia",
+                "https://en.wikipedia.org/wiki/Special:Search?search={}",
+                "!w",
+                "The free encyclopedia and global open knowledge base",
                 1,
                 0,
             ),
         ];
 
-        for (id, name, template, bang, desc, tor, is_def) in engines {
+        for (id, name, tmpl, bang, desc, tor, is_def) in engines {
             conn.execute(
-                "INSERT OR IGNORE INTO search_engines 
+                "INSERT OR IGNORE INTO search_engines
                  (id, name, query_template, bang, description, is_tor_compatible, is_default)
-                 VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)",
-                params![id, name, template, bang, desc, tor, is_def],
+                 VALUES (?, ?, ?, ?, ?, ?, ?)",
+                params![id, name, tmpl, bang, desc, tor, is_def],
             )?;
         }
 
-        // Seed default preferences
+        // Default UI preferences
         let default_prefs = [
-            ("default_engine", "duckduckgo"),
-            ("homepage", "norva://newtab"),
-            ("secure_mode_on_startup", "false"),
-            ("hardware_default_policy", "ask"),
-            ("tor_socks5_proxy", "127.0.0.1:9050"),
-            ("tor_proxy_enabled", "false"),
+            ("theme_mode", "dark_executive"),
+            ("show_speed_dial", "true"),
+            ("show_threat_telemetry", "true"),
+            ("show_hardware_monitor", "true"),
+            ("show_quick_actions", "true"),
         ];
 
         for (k, v) in default_prefs {
@@ -173,10 +196,7 @@ impl SettingsDatabase {
         })
     }
 
-    /// Retrieves all registered search engines.
-    ///
-    /// I am writing this to dynamically render search engine selector dropdowns,
-    /// start page badges, and search bar suggestions.
+    /// Retrieves all configured search engines.
     pub fn get_all_search_engines(&self) -> Result<Vec<SearchEngineConfig>> {
         let conn = self.conn.lock().unwrap();
         let mut stmt = conn.prepare(
@@ -198,21 +218,20 @@ impl SettingsDatabase {
         })?;
 
         let mut engines = Vec::new();
-        for e in rows {
-            if let Ok(item) = e {
-                engines.push(item);
-            }
+        for r in rows {
+            engines.push(r?);
         }
+
         Ok(engines)
     }
 
-    /// Retrieves the current default search engine.
+    /// Retrieves the current default search engine configuration.
     ///
-    /// I have written this method with a solid fallback: if for any reason
-    /// the configured engine is missing, DuckDuckGo is safely returned.
+    /// I have written this helper with a fallback to DuckDuckGo so that even if database
+    /// records are missing, the omnibox query builder always has a valid search provider.
     pub fn get_default_engine(&self) -> SearchEngineConfig {
         let conn = self.conn.lock().unwrap();
-        let query_result = conn.query_row(
+        let query_res = conn.query_row(
             "SELECT id, name, query_template, bang, description, is_tor_compatible, is_default
              FROM search_engines
              WHERE is_default = 1
@@ -226,47 +245,40 @@ impl SettingsDatabase {
                     bang: row.get(3)?,
                     description: row.get(4)?,
                     is_tor_compatible: row.get::<_, i64>(5)? == 1,
-                    is_default: row.get::<_, i64>(6)? == 1,
+                    is_default: true,
                 })
             },
         );
 
-        query_result.unwrap_or_else(|_| SearchEngineConfig {
+        query_res.unwrap_or_else(|_| SearchEngineConfig {
             id: "duckduckgo".to_string(),
             name: "DuckDuckGo".to_string(),
             query_template: "https://duckduckgo.com/?q={}".to_string(),
             bang: "!ddg".to_string(),
-            description: "Privacy-focused search engine".to_string(),
+            description: "Default fallback privacy engine".to_string(),
             is_tor_compatible: true,
             is_default: true,
         })
     }
 
-    /// Sets the default search engine by ID.
+    /// Sets the default search engine by its unique ID.
     ///
-    /// I am writing this to atomically update both the `is_default` column in search_engines
-    /// and the `default_engine` value in preferences.
+    /// I have written this method to execute an atomic transaction: first clearing
+    /// `is_default` on all existing records, then setting `is_default = 1` on the chosen engine.
     pub fn set_default_engine(&self, id: &str) -> Result<()> {
         let conn = self.conn.lock().unwrap();
         conn.execute("UPDATE search_engines SET is_default = 0", [])?;
         conn.execute("UPDATE search_engines SET is_default = 1 WHERE id = ?", [id])?;
-        conn.execute(
-            "INSERT OR REPLACE INTO preferences (key, value) VALUES ('default_engine', ?)",
-            [id],
-        )?;
         Ok(())
     }
 
-    /// Looks up a search engine by its shortcut bang (e.g. "!g", "!b", "!ahmia").
-    ///
-    /// I have written this lookup function so queries like "!ahmia darknet"
-    /// or "!b azure" are automatically routed to the requested search provider.
+    /// Looks up a search engine by its bang shortcut (e.g. `!g`, `!ddg`, `!ahmia`).
     pub fn get_engine_by_bang(&self, bang: &str) -> Option<SearchEngineConfig> {
         let conn = self.conn.lock().unwrap();
         conn.query_row(
             "SELECT id, name, query_template, bang, description, is_tor_compatible, is_default
              FROM search_engines
-             WHERE LOWER(bang) = LOWER(?)
+             WHERE bang = ?
              LIMIT 1",
             [bang],
             |row| {
@@ -283,10 +295,7 @@ impl SettingsDatabase {
         ).ok()
     }
 
-    /// Adds a new custom search engine.
-    ///
-    /// I am writing this method because future-proofing means allowing users to add
-    /// their own internal corporate search, SearXNG instance, or custom Tor search engines.
+    /// Adds or updates a custom search engine configuration.
     pub fn add_custom_engine(
         &self,
         id: &str,
@@ -294,34 +303,50 @@ impl SettingsDatabase {
         query_template: &str,
         bang: &str,
         description: &str,
-        is_tor: bool,
+        is_tor_compatible: bool,
     ) -> Result<()> {
         let conn = self.conn.lock().unwrap();
         conn.execute(
             "INSERT INTO search_engines (id, name, query_template, bang, description, is_tor_compatible, is_default)
-             VALUES (?1, ?2, ?3, ?4, ?5, ?6, 0)",
-            params![id, name, query_template, bang, description, is_tor as i64],
+             VALUES (?, ?, ?, ?, ?, ?, 0)
+             ON CONFLICT(id) DO UPDATE SET
+                name = excluded.name,
+                query_template = excluded.query_template,
+                bang = excluded.bang,
+                description = excluded.description,
+                is_tor_compatible = excluded.is_tor_compatible",
+            params![id, name, query_template, bang, description, is_tor_compatible as i64],
         )?;
         Ok(())
     }
 
-    /// Gets a preference value with a default fallback.
-    pub fn get_pref(&self, key: &str, default_val: &str) -> String {
+    /// Deletes a custom search engine (unless it is currently marked as default).
+    pub fn delete_engine(&self, id: &str) -> Result<()> {
         let conn = self.conn.lock().unwrap();
-        conn.query_row(
-            "SELECT value FROM preferences WHERE key = ?",
-            [key],
-            |r| r.get(0),
-        ).unwrap_or_else(|_| default_val.to_string())
+        conn.execute("DELETE FROM search_engines WHERE id = ? AND is_default = 0", [id])?;
+        Ok(())
     }
 
-    /// Sets a preference value.
-    pub fn set_pref(&self, key: &str, value: &str) -> Result<()> {
+    /// Sets a generic user preference key-value pair.
+    pub fn set_preference(&self, key: &str, value: &str) -> Result<()> {
         let conn = self.conn.lock().unwrap();
         conn.execute(
-            "INSERT OR REPLACE INTO preferences (key, value) VALUES (?, ?)",
+            "INSERT INTO preferences (key, value) VALUES (?, ?)
+             ON CONFLICT(key) DO UPDATE SET value = excluded.value",
             params![key, value],
         )?;
         Ok(())
+    }
+
+    /// Retrieves a user preference value.
+    pub fn get_preference(&self, key: &str) -> Result<Option<String>> {
+        let conn = self.conn.lock().unwrap();
+        let mut stmt = conn.prepare("SELECT value FROM preferences WHERE key = ?")?;
+        let mut rows = stmt.query([key])?;
+        if let Some(row) = rows.next()? {
+            Ok(Some(row.get(0)?))
+        } else {
+            Ok(None)
+        }
     }
 }

@@ -9,10 +9,10 @@
 use norva::{NorvaBrowser, NorvaConfig};
 use std::env;
 
-/// Displays the cyberpunk NORVA banner on stdout.
+/// Displays the executive NORVA terminal banner on stdout.
 ///
-/// I am writing this banner display because NORVA is a statement against surveillance
-/// capitalism: a fast, lightweight, and uncompromising privacy shield built in pure Rust.
+/// I have written this banner display because launching NORVA should immediately communicate
+/// its security posture: an uncompromising, lightweight, high-performance privacy shield built in pure Rust.
 fn print_norva_banner(secure_mode: bool) {
     println!(
         r#"
@@ -34,12 +34,12 @@ fn print_norva_banner(secure_mode: bool) {
     }
     println!("  >>> Camera & Mic: Hardware Zero-Trust Arbiter Active");
     println!("  >>> Geolocation: Strict Origin Protection Active");
-    println!("  >>> Search Engines: Google | Bing | DuckDuckGo | Yahoo | Ahmia (.onion)");
+    println!("  >>> Search Engines: DuckDuckGo | Google | Bing | Yahoo | Ahmia (.onion) | Startpage | Brave | GitHub | Wikipedia");
     println!("  >>> Anti-Tracking: Active Surveillance Neutralization Online\n");
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // I am writing this CLI argument parser because power users need the ability
+    // I have written this CLI argument parser because power users need the ability
     // to launch NORVA directly into Secure Mode (--secure / --incognito) or navigate
     // to an initial target URL via the command line.
     let args: Vec<String> = env::args().collect();

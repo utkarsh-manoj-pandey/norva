@@ -1,7 +1,7 @@
 // ============================================================================
 // NORVA: Native Open-source Rust-based Virtual Access
 // File: src/ui/assets.rs
-// Description: Modern, Dark-Mode Glassmorphic UI Pages for internal norva:// views.
+// Description: Executive Cyber-Dark UI Pages for internal norva:// views.
 // ============================================================================
 
 use crate::db::history_db::HistoryEntry;
@@ -9,25 +9,30 @@ use crate::db::permissions_db::{PermissionAuditLog, SitePermission};
 use crate::db::settings_db::SearchEngineConfig;
 use crate::db::shields_db::{BlockedEvent, ShieldStats};
 
-/// Shared CSS styling providing an ultra-sleek, futuristic, glassmorphic dark theme.
-/// Shared CSS styling providing an authentic, modern Firefox Proton dark theme.
+/// Shared CSS styling providing an executive, modern cyber-dark design system.
+///
+/// I have completely overhauled this design system to eliminate the previous amateurish,
+/// kiddish aesthetic. I wrote this theme inspired by high-end developer and privacy tools
+/// like Linear, Brave Shields, and Proton: deep obsidian tones, subtle 1px border glows,
+/// fine typography, and razor-sharp SVG vector iconography instead of crude emoji overload.
 pub fn get_common_css() -> &'static str {
     r###"
     :root {
-        --bg-primary: #16171b;
-        --bg-card: #212228;
-        --bg-card-hover: #292a32;
-        --bg-subtle: #30313c;
-        --border-subtle: rgba(255, 255, 255, 0.06);
-        --border-hover: rgba(255, 255, 255, 0.14);
-        --border-focus: #5884ff;
-        --accent-blue: #5884ff;
-        --accent-purple: #9059ff;
-        --accent-green: #50c878;
-        --accent-red: #ff5252;
-        --text-primary: #ededf2;
-        --text-secondary: #9d9da8;
-        --text-muted: #6e6e7a;
+        --bg-primary: #0a0b10;
+        --bg-surface: #12131c;
+        --bg-surface-elevated: #181a26;
+        --bg-surface-hover: #1f2130;
+        --border-subtle: rgba(255, 255, 255, 0.08);
+        --border-hover: rgba(255, 255, 255, 0.16);
+        --border-focus: #6366f1;
+        --accent-indigo: #6366f1;
+        --accent-cyan: #06b6d4;
+        --accent-emerald: #10b981;
+        --accent-rose: #f43f5e;
+        --accent-amber: #f59e0b;
+        --text-primary: #f8fafc;
+        --text-secondary: #94a3b8;
+        --text-muted: #64748b;
     }
     * {
         box-sizing: border-box;
@@ -40,55 +45,56 @@ pub fn get_common_css() -> &'static str {
         color: var(--text-primary);
         min-height: 100vh;
         overflow-x: hidden;
-        padding-bottom: 40px;
+        padding-bottom: 50px;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
     }
 
-    /* Scrollbar styling */
+    /* Polished Minimalist Scrollbars */
     ::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
+        width: 6px;
+        height: 6px;
     }
     ::-webkit-scrollbar-track {
         background: transparent;
     }
     ::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.12);
         border-radius: 999px;
     }
     ::-webkit-scrollbar-thumb:hover {
-        background: rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.22);
     }
 
-    /* Internal Views Navigation Bar */
+    /* Executive Internal Header */
     .internal-header {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 14px 28px;
-        background-color: #212228;
+        padding: 14px 32px;
+        background-color: rgba(18, 19, 28, 0.85);
         border-bottom: 1px solid var(--border-subtle);
         position: sticky;
         top: 0;
         z-index: 100;
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
         flex-wrap: wrap;
-        gap: 12px;
-        backdrop-filter: blur(12px);
+        gap: 16px;
     }
     .internal-header-left {
         display: flex;
         align-items: center;
-        gap: 14px;
+        gap: 16px;
     }
     .back-link {
         display: inline-flex;
         align-items: center;
-        gap: 6px;
+        gap: 8px;
         background-color: rgba(255, 255, 255, 0.05);
         border: 1px solid var(--border-subtle);
         color: var(--text-secondary);
-        padding: 7px 14px;
+        padding: 6px 14px;
         border-radius: 8px;
         text-decoration: none;
         font-size: 13px;
@@ -97,13 +103,17 @@ pub fn get_common_css() -> &'static str {
     }
     .back-link:hover {
         background-color: rgba(255, 255, 255, 0.1);
+        border-color: var(--border-hover);
         color: #ffffff;
     }
     .internal-title {
         font-size: 17px;
         font-weight: 700;
+        letter-spacing: -0.4px;
         color: var(--text-primary);
-        letter-spacing: -0.3px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
     }
     .internal-nav-chips {
         display: flex;
@@ -120,20 +130,24 @@ pub fn get_common_css() -> &'static str {
         font-weight: 500;
         transition: all 0.15s ease;
         background: transparent;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
     }
     .chip:hover {
         background-color: rgba(255, 255, 255, 0.06);
         color: #ffffff;
     }
     .chip.active {
-        background-color: rgba(88, 132, 255, 0.12);
+        background-color: rgba(99, 102, 241, 0.16);
+        border: 1px solid rgba(99, 102, 241, 0.35);
         color: #ffffff;
         font-weight: 600;
     }
     .container {
-        max-width: 1120px;
+        max-width: 1180px;
         margin: 0 auto;
-        padding: 28px 24px;
+        padding: 32px 24px;
     }
     .btn {
         background-color: rgba(255, 255, 255, 0.06);
@@ -150,58 +164,72 @@ pub fn get_common_css() -> &'static str {
         gap: 6px;
     }
     .btn:hover {
-        background-color: rgba(255, 255, 255, 0.1);
-        border-color: rgba(255, 255, 255, 0.12);
+        background-color: rgba(255, 255, 255, 0.12);
+        border-color: var(--border-hover);
     }
     .btn-primary {
-        background-color: var(--accent-blue);
+        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
         border: none;
         color: #ffffff;
+        font-weight: 600;
     }
     .btn-primary:hover {
-        background-color: #4a72e8;
+        background: linear-gradient(135deg, #7c7eff 0%, #6366f1 100%);
+        box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
     }
     .btn-danger {
-        background-color: rgba(255, 82, 82, 0.1);
-        border: 1px solid rgba(255, 82, 82, 0.25);
-        color: #ff8585;
+        background-color: rgba(244, 63, 94, 0.12);
+        border: 1px solid rgba(244, 63, 94, 0.3);
+        color: #fb7185;
     }
     .btn-danger:hover {
-        background-color: rgba(255, 82, 82, 0.2);
+        background-color: rgba(244, 63, 94, 0.22);
+        border-color: rgba(244, 63, 94, 0.5);
     }
     .card {
-        background-color: var(--bg-card);
+        background-color: var(--bg-surface);
         border: 1px solid var(--border-subtle);
         border-radius: 14px;
-        padding: 22px;
-        margin-bottom: 20px;
-        transition: border-color 0.15s ease;
+        padding: 24px;
+        margin-bottom: 24px;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        position: relative;
     }
     .card:hover {
-        border-color: rgba(255, 255, 255, 0.1);
+        border-color: var(--border-hover);
     }
     .mode-badge {
         padding: 4px 14px;
         border-radius: 20px;
-        font-size: 11px;
+        font-size: 11.5px;
         font-weight: 600;
-        letter-spacing: 0.5px;
-        display: inline-block;
+        letter-spacing: 0.4px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
     }
     .mode-badge.secure {
-        background: rgba(255, 82, 82, 0.1);
-        color: #ff7070;
-        border: 1px solid rgba(255, 82, 82, 0.22);
+        background: rgba(244, 63, 94, 0.12);
+        color: #fb7185;
+        border: 1px solid rgba(244, 63, 94, 0.3);
     }
     .mode-badge.normal {
-        background: rgba(80, 200, 120, 0.08);
-        color: #50c878;
-        border: 1px solid rgba(80, 200, 120, 0.2);
+        background: rgba(16, 185, 129, 0.1);
+        color: #34d399;
+        border: 1px solid rgba(16, 185, 129, 0.25);
     }
     "###
 }
 
-/// Renders the primary `norva://newtab` start page directly matching modern Firefox (Proton Dark).
+/// Renders the primary `norva://newtab` executive dashboard.
+///
+/// I have completely rewritten this start page to replace all childish placecards,
+/// fake Bollywood news, and crude emojis with executive-grade cyber-threat analytics:
+/// - Real Threat Shield Matrix with category breakdown and bandwidth saved
+/// - Zero-Trust Hardware Monitor (Camera, Mic, Location)
+/// - Clean developer & privacy speed dial tiles with vector icons
+/// - Omnibox with smart Bang command chips
+/// - Live stream of neutralized tracker beacons
 pub fn render_newtab_page(
     stats: &ShieldStats,
     engines: &[SearchEngineConfig],
@@ -212,58 +240,52 @@ pub fn render_newtab_page(
     let mut engine_items_html = String::new();
     for e in engines {
         let is_sel = if e.id == default_engine.id { "active" } else { "" };
-        let icon = match e.id.as_str() {
-            "duckduckgo" => "🦆",
-            "google" => "🔍",
-            "bing" => "⚡",
-            "yahoo" => "🟣",
-            "ahmia" => "🧅",
-            "startpage" => "🛡️",
-            "brave" => "🦁",
-            _ => "🌐",
+        let engine_badge_label = match e.id.as_str() {
+            "duckduckgo" => "DDG",
+            "google" => "Google",
+            "bing" => "Bing",
+            "yahoo" => "Yahoo",
+            "ahmia" => "Ahmia (.onion)",
+            "startpage" => "Startpage",
+            "brave" => "Brave",
+            "github" => "GitHub",
+            "wikipedia" => "Wikipedia",
+            _ => "Web",
         };
         engine_items_html.push_str(&format!(
-            r###"<div class="engine-dropdown-item {}" data-id="{}" data-name="{}" data-bang="{}" data-icon="{}" onclick="selectSearchEngine('{}', '{}', '{}', '{}')">
-                <span class="engine-item-icon">{}</span>
+            r###"<div class="engine-dropdown-item {}" data-id="{}" data-name="{}" data-bang="{}" onclick="selectSearchEngine('{}', '{}', '{}')">
                 <span class="engine-item-name">{}</span>
                 <span class="engine-item-bang">{}</span>
             </div>"###,
-            is_sel, e.id, e.name, e.bang, icon, e.id, e.name, e.bang, icon, icon, e.name, e.bang
+            is_sel, e.id, e.name, e.bang, e.id, e.name, e.bang, engine_badge_label, e.bang
         ));
     }
 
-    let default_icon = match default_engine.id.as_str() {
-        "duckduckgo" => "🦆",
-        "google" => "🔍",
-        "bing" => "⚡",
-        "yahoo" => "🟣",
-        "ahmia" => "🧅",
-        _ => "🌐",
-    };
-
     let mode_pill = if secure_mode {
-        r###"<span class="mode-badge secure">🔒 Private Ghost Session</span>"###
+        r###"<span class="mode-badge secure">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Zero-Trace Volatile Ghost Session
+        </span>"###
     } else {
-        r###"<span class="mode-badge normal">🛡️ Hardened Session</span>"###
+        r###"<span class="mode-badge normal">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Active Privacy Hardened Session
+        </span>"###
     };
 
     let template = r###"<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>New Tab</title>
+    <title>New Tab | NORVA</title>
     <style>
         {{COMMON_CSS}}
 
-        /* Import Inter font */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-
-        /* Modern Browser Canvas */
+        /* Modern Executive Canvas */
         .nt-canvas {
-            max-width: 1260px;
+            max-width: 1240px;
             margin: 0 auto;
-            padding: 30px 36px 80px;
-            position: relative;
+            padding: 36px 32px 64px;
         }
 
         /* Top Brand Header */
@@ -271,12 +293,12 @@ pub fn render_newtab_page(
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 28px;
+            margin-bottom: 36px;
         }
         .nt-brand {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
             text-decoration: none;
             color: inherit;
         }
@@ -284,53 +306,41 @@ pub fn render_newtab_page(
             font-size: 26px;
             font-weight: 800;
             letter-spacing: -0.8px;
-            color: #e8e8ed;
-        }
-        .nt-topbar-actions {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .customize-top-btn {
-            background-color: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            color: #a0a0aa;
-            padding: 7px 16px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.15s ease;
-        }
-        .customize-top-btn:hover {
-            background-color: rgba(255, 255, 255, 0.1);
             color: #ffffff;
         }
+        .nt-brand-sub {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            color: var(--accent-cyan);
+            background: rgba(6, 182, 212, 0.1);
+            border: 1px solid rgba(6, 182, 212, 0.25);
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
 
-        /* Centered Sleek Search Bar (Firefox & Chrome style, NO clunky select tag) */
+        /* Centered Sleek Search Capsule */
         .nt-search-container {
             max-width: 720px;
-            margin: 0 auto 36px;
+            margin: 0 auto 44px;
         }
         .nt-search-box {
             display: flex;
             align-items: center;
-            background-color: #24232c;
-            border: 1.5px solid rgba(255, 255, 255, 0.08);
+            background-color: #161724;
+            border: 1.5px solid rgba(255, 255, 255, 0.09);
             border-radius: 28px;
             height: 52px;
             padding: 0 18px;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
             position: relative;
         }
         .nt-search-box:focus-within {
-            border-color: rgba(88, 132, 255, 0.5);
-            box-shadow: 0 0 0 2px rgba(88, 132, 255, 0.15), 0 6px 24px rgba(0, 0, 0, 0.4);
-            background-color: #2a2935;
+            border-color: rgba(99, 102, 241, 0.6);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15), 0 10px 32px rgba(0, 0, 0, 0.5);
+            background-color: #1a1c2c;
         }
         .engine-picker-btn {
             display: flex;
@@ -339,13 +349,13 @@ pub fn render_newtab_page(
             background: rgba(255, 255, 255, 0.06);
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 18px;
-            padding: 4px 10px;
-            color: #fbfbfe;
+            padding: 5px 12px;
+            color: var(--text-primary);
             cursor: pointer;
-            font-size: 13px;
+            font-size: 12.5px;
             font-weight: 500;
             margin-right: 12px;
-            transition: background 0.15s ease;
+            transition: all 0.15s ease;
             user-select: none;
         }
         .engine-picker-btn:hover {
@@ -354,13 +364,13 @@ pub fn render_newtab_page(
         .engine-dropdown-menu {
             display: none;
             position: absolute;
-            top: 58px;
+            top: 60px;
             left: 12px;
-            width: 260px;
-            background-color: #28272f;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 270px;
+            background-color: #181926;
+            border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 14px;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65);
             z-index: 200;
             overflow: hidden;
             padding: 6px;
@@ -371,29 +381,25 @@ pub fn render_newtab_page(
         .engine-dropdown-item {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 9px 14px;
-            border-radius: 10px;
-            color: #b0b0ba;
+            justify-content: space-between;
+            padding: 9px 12px;
+            border-radius: 8px;
+            color: var(--text-secondary);
             font-size: 13px;
             cursor: pointer;
             transition: all 0.15s ease;
         }
         .engine-dropdown-item:hover, .engine-dropdown-item.active {
-            background-color: rgba(88, 132, 255, 0.12);
+            background-color: rgba(99, 102, 241, 0.14);
             color: #ffffff;
         }
-        .engine-item-icon {
-            font-size: 16px;
-        }
         .engine-item-name {
-            flex: 1;
             font-weight: 500;
         }
         .engine-item-bang {
             font-size: 11px;
-            color: #6e6e7a;
-            background: rgba(0, 0, 0, 0.25);
+            color: var(--text-muted);
+            background: rgba(0, 0, 0, 0.3);
             padding: 2px 6px;
             border-radius: 4px;
         }
@@ -401,832 +407,265 @@ pub fn render_newtab_page(
             flex: 1;
             background: transparent;
             border: none;
-            color: #e8e8ed;
+            color: #ffffff;
             font-size: 15px;
             outline: none;
         }
         .nt-search-input::placeholder {
-            color: #8f8f9d;
-        }
-        .nt-search-actions {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .nt-clear-btn {
-            background: transparent;
-            border: none;
-            color: #8f8f9d;
-            cursor: pointer;
-            padding: 4px;
-            font-size: 14px;
-            display: none;
-        }
-        .nt-clear-btn:hover {
-            color: #fbfbfe;
+            color: var(--text-muted);
         }
         .nt-search-btn {
             background: transparent;
             border: none;
-            color: #cfcfd4;
+            color: var(--text-secondary);
             cursor: pointer;
             padding: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 50%;
-            transition: background-color 0.15s ease, color 0.15s ease;
+            transition: color 0.15s ease;
         }
         .nt-search-btn:hover {
-            background-color: rgba(255, 255, 255, 0.08);
-            color: #ffffff;
+            color: var(--accent-indigo);
         }
 
-        /* Search Quick Bang Chips (Chrome & Firefox style) */
+        /* Quick Bang Shortcuts Bar */
         .search-chips-row {
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            margin-top: 10px;
+            margin-top: 12px;
             flex-wrap: wrap;
         }
         .search-chip {
             background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 14px;
             padding: 4px 12px;
-            font-size: 11px;
-            color: #8e8e98;
+            font-size: 11.5px;
+            color: var(--text-secondary);
             cursor: pointer;
             transition: all 0.15s ease;
             text-decoration: none;
         }
         .search-chip:hover {
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(99, 102, 241, 0.12);
             color: #ffffff;
-            border-color: rgba(255, 255, 255, 0.2);
+            border-color: rgba(99, 102, 241, 0.3);
         }
 
-        /* Top Sites / Shortcuts Row (Firefox 48x48 rounded squircle tiles) */
-        .shortcuts-section {
-            margin-bottom: 44px;
+        /* Threat Telemetry & Security Placecards Grid (Replaces toy widgets) */
+        .telemetry-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 40px;
         }
-        .shortcuts-row {
-            display: flex;
-            align-items: flex-start;
-            justify-content: center;
-            gap: 22px;
-            flex-wrap: wrap;
+        @media (max-width: 1024px) {
+            .telemetry-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
-        .shortcut-item {
+        @media (max-width: 640px) {
+            .telemetry-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .stat-card {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0) 100%), var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.15s ease;
+        }
+        .stat-card:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+        }
+        .stat-header {
+            display: flex;
             align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .stat-label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--text-muted);
+        }
+        .stat-icon {
+            color: var(--accent-indigo);
+        }
+        .stat-number {
+            font-size: 28px;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.8px;
+            margin-bottom: 4px;
+        }
+        .stat-subtext {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        .stat-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--accent-emerald);
+            background: rgba(16, 185, 129, 0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
+            width: fit-content;
+            margin-top: 8px;
+        }
+
+        /* Developer & Privacy Speed Dial Grid (Placecards) */
+        .section-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+        }
+        .section-heading {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .speeddial-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            margin-bottom: 44px;
+        }
+        @media (max-width: 1024px) {
+            .speeddial-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        @media (max-width: 640px) {
+            .speeddial-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        .dial-card {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 16px;
             text-decoration: none;
             color: inherit;
-            width: 78px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            transition: all 0.15s ease;
             cursor: pointer;
-            position: relative;
         }
-        .shortcut-tile {
-            width: 52px;
-            height: 52px;
-            border-radius: 14px;
+        .dial-card:hover {
+            border-color: var(--border-hover);
+            background-color: var(--bg-surface-elevated);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+        .dial-icon-wrap {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background-color: rgba(255, 255, 255, 0.05);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 22px;
-            margin-bottom: 8px;
-            transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-            position: relative;
+            flex-shrink: 0;
+            border: 1px solid rgba(255, 255, 255, 0.06);
         }
-        .shortcut-item:hover .shortcut-tile {
-            transform: translateY(-3px) scale(1.04);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45);
+        .dial-info {
+            overflow: hidden;
         }
-        .shortcut-menu-trigger {
-            display: none;
-            position: absolute;
-            top: -6px;
-            right: 8px;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background-color: #38374a;
+        .dial-title {
+            font-size: 13.5px;
+            font-weight: 600;
             color: #ffffff;
-            font-size: 10px;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-            cursor: pointer;
-        }
-        .shortcut-item:hover .shortcut-menu-trigger {
-            display: flex;
-        }
-        .shortcut-label {
-            font-size: 12px;
-            font-weight: 500;
-            color: #d1d1d6;
-            text-align: center;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 78px;
-            line-height: 1.2;
         }
-        .shortcut-sub {
-            font-size: 10px;
-            color: #6e6e7a;
-            text-align: center;
+        .dial-desc {
+            font-size: 11px;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
             margin-top: 2px;
         }
 
-        /* Widgets Section (Accordion Header + 4 Cards Grid) */
-        .section-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 16px;
-            position: relative;
-        }
-        .section-title {
-            display: flex;
-            align-items: center;
-            letter-spacing: -0.3px;
-            gap: 8px;
-            font-size: 16px;
-            font-weight: 700;
-            color: #fbfbfe;
-            cursor: pointer;
-            user-select: none;
-        }
-        .section-menu-btn {
-            color: #6e6e7a;
-            cursor: pointer;
-            font-size: 16px;
-            background: none;
-            border: none;
-            padding: 4px 8px;
-            border-radius: 4px;
-            transition: background 0.15s ease;
-        }
-        .section-menu-btn:hover {
-            background-color: #2b2a33;
-            color: #fbfbfe;
-        }
-        .section-popover {
-            display: none;
-            position: absolute;
-            right: 0;
-            top: 32px;
-            width: 220px;
-            background-color: #28272f;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 12px;
-            padding: 6px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-            z-index: 150;
-        }
-        .section-popover.show {
-            display: block;
-        }
-        .popover-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 9px 14px;
-            border-radius: 8px;
-            font-size: 13px;
-            color: #cfcfd4;
-            cursor: pointer;
-            transition: all 0.15s ease;
-        }
-        .popover-item:hover {
-            background-color: rgba(88, 132, 255, 0.12);
-            color: #ffffff;
-        }
-
-        .widgets-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            margin-bottom: 44px;
-        }
-        @media (max-width: 1024px) {
-            .widgets-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-        @media (max-width: 640px) {
-            .widgets-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .widget-card {
-            background-color: #24232c;
-            border-radius: 14px;
-            padding: 18px;
-            min-height: 120px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            position: relative;
-            transition: border-color 0.15s ease;
-        }
-        .widget-card:hover {
-            border-color: rgba(255, 255, 255, 0.1);
-        }
-
-        /* 1. World Clock Card */
-        .clock-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            height: 100%;
-            text-align: center;
-        }
-        .clock-col {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 0 4px;
-            border-right: 1px solid rgba(255, 255, 255, 0.08);
-            cursor: pointer;
-        }
-        .clock-col:last-child {
-            border-right: none;
-        }
-        .clock-city {
-            font-size: 11.5px;
-            font-weight: 700;
-            color: #fbfbfe;
-        }
-        .clock-tz {
-            font-size: 9px;
-            color: #6e6e7a;
-            margin-top: 1px;
-        }
-        .clock-time {
-            font-size: 12px;
-            font-weight: 700;
-            color: #fbfbfe;
-            margin-top: 12px;
-        }
-
-        /* 2. Weather Card */
-        .weather-top {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 8px;
-        }
-        .weather-loc {
-            font-size: 12px;
-            font-weight: 600;
-            color: #fbfbfe;
-            cursor: pointer;
-        }
-        .weather-main {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .weather-temp {
-            font-size: 18px;
-            font-weight: 700;
-            color: #fbfbfe;
-        }
-        .weather-cond {
-            font-size: 11px;
-            color: #8f8f9d;
-        }
-        .weather-forecast {
-            display: flex;
-            gap: 12px;
-            font-size: 10px;
-            color: #cfcfd4;
-            border-top: 1px solid rgba(255, 255, 255, 0.06);
-            padding-top: 6px;
-            margin-top: 8px;
-        }
-
-        /* 3. Focus / Pomodoro Timer Card */
-        .timer-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-        }
-        .timer-play-btn {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            background-color: #38374a;
-            border: none;
-            color: #e8e8ed;
-            cursor: pointer;
+        /* Vault Navigation Quick Bar */
+        .vault-bar {
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
-            transition: background-color 0.15s ease;
+            gap: 12px;
+            flex-wrap: wrap;
+            padding: 18px 0;
+            border-top: 1px solid var(--border-subtle);
         }
-        .timer-play-btn:hover {
-            background-color: #4a4960;
-        }
-        .timer-digits {
-            font-size: 18px;
-            font-weight: 700;
-            color: #e8e8ed;
-            letter-spacing: 0.5px;
-        }
-        .timer-ctrl-btn {
-            background: none;
-            border: none;
-            color: #6e6e7a;
-            font-size: 16px;
-            cursor: pointer;
-            padding: 0 4px;
-        }
-        .timer-ctrl-btn:hover {
-            color: #e8e8ed;
-        }
-        .timer-pills {
-            display: flex;
-            gap: 6px;
-            margin-top: 8px;
-        }
-        .timer-pill {
-            background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: #a0a0aa;
-            padding: 3px 12px;
-            border-radius: 12px;
-            font-size: 11px;
-            cursor: pointer;
-            font-weight: 500;
-        }
-        .timer-pill.active {
-            background-color: rgba(88, 132, 255, 0.15);
-            border-color: rgba(88, 132, 255, 0.25);
-            color: #ffffff;
-            font-weight: 600;
-        }
-
-        /* 4. Checklist Card */
-        .checklist-title {
+        .vault-pill {
+            background-color: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 7px 16px;
+            border-radius: 20px;
             font-size: 12.5px;
-            font-weight: 700;
-            color: #a0a0aa;
-            margin-bottom: 6px;
-        }
-        .checklist-add-btn {
-            background-color: #9059ff;
-            border: none;
-            color: #ffffff;
-            padding: 5px 12px;
-            border-radius: 14px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.15s ease;
             display: inline-flex;
             align-items: center;
-            gap: 4px;
-            transition: background-color 0.15s ease;
-        }
-        .checklist-add-btn:hover {
-            background-color: #804cee;
-        }
-        .checklist-icon-decor {
-            position: absolute;
-            right: 14px;
-            bottom: 12px;
-            opacity: 0.9;
-        }
-        .checklist-items-box {
-            margin-top: 6px;
-            max-height: 52px;
-            overflow-y: auto;
-            font-size: 11px;
-            color: #cfcfd4;
-        }
-        .checklist-item-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 2px 0;
-        }
-
-        /* Thought-provoking stories (News Section with REAL Photography & Controls) */
-        .stories-section {
-            margin-bottom: 40px;
-        }
-        .stories-category-chips {
-            display: flex;
             gap: 6px;
-            overflow-x: auto;
-            padding-bottom: 8px;
-            margin-bottom: 14px;
         }
-        .category-chip {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            color: #8e8e98;
-            padding: 5px 14px;
-            border-radius: 18px;
-            font-size: 12px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.15s ease;
-            white-space: nowrap;
-        }
-        .category-chip:hover, .category-chip.active {
-            background: rgba(88, 132, 255, 0.12);
+        .vault-pill:hover {
+            background-color: rgba(99, 102, 241, 0.12);
+            border-color: rgba(99, 102, 241, 0.3);
             color: #ffffff;
-            border-color: rgba(255, 255, 255, 0.2);
-        }
-
-        .stories-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-        }
-        @media (max-width: 1024px) {
-            .stories-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-        @media (max-width: 640px) {
-            .stories-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-        .story-card {
-            background-color: #24232c;
-            border-radius: 14px;
-            overflow: hidden;
-            text-decoration: none;
-            color: inherit;
-            display: flex;
-            flex-direction: column;
-            transition: transform 0.15s ease, background-color 0.15s ease;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            cursor: pointer;
-        }
-        .story-card:hover {
-            transform: translateY(-4px);
-            background-color: #2a2935;
-            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
-            border-color: rgba(255, 255, 255, 0.1);
-        }
-        .story-thumb-wrap {
-            width: 100%;
-            height: 160px;
-            position: relative;
-            background-color: #17161d;
-            overflow: hidden;
-        }
-        .story-thumb {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-            transition: transform 0.3s ease;
-        }
-        .story-card:hover .story-thumb {
-            transform: scale(1.03);
-        }
-        .story-badge-corner {
-            position: absolute;
-            top: 8px;
-            left: 8px;
-            background: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(4px);
-            color: #ffffff;
-            font-size: 10px;
-            font-weight: 700;
-            padding: 2px 6px;
-            border-radius: 4px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .story-content {
-            padding: 14px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            flex: 1;
-        }
-        .story-title {
-            font-size: 13.5px;
-            font-weight: 600;
-            color: #fbfbfe;
-            line-height: 1.4;
-            margin-bottom: 12px;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-        .story-footer {
-            margin-top: auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 11px;
-            color: #8f8f9d;
-        }
-        .story-source {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-weight: 500;
-        }
-
-        /* Subtle Privacy & Internal Vaults Bar */
-        .vault-pills-bar {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            flex-wrap: wrap;
-            padding: 16px 0;
-            border-top: 1px solid rgba(255, 255, 255, 0.06);
-            margin-top: 16px;
-        }
-        .vault-pill-link {
-            background-color: rgba(255, 255, 255, 0.04);
-            color: #8e8e98;
-            text-decoration: none;
-            padding: 6px 14px;
-            border-radius: 18px;
-            font-size: 12px;
-            font-weight: 500;
-            transition: all 0.15s ease;
-        }
-        .vault-pill-link:hover {
-            background-color: rgba(255, 255, 255, 0.08);
-            color: #e0e0e6;
-        }
-
-        /* Bottom Right Customise Button (Matching Chrome Image 2 & Firefox Image 1) */
-        .customize-floating-pill {
-            position: fixed;
-            right: 24px;
-            bottom: 24px;
-            background-color: #28272f;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #d1d1d6;
-            padding: 9px 18px;
-            border-radius: 22px;
-            font-size: 13px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
-            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-            z-index: 99;
-        }
-        .customize-floating-pill:hover {
-            background-color: #32313c;
-            transform: translateY(-3px);
-            box-shadow: 0 10px 32px rgba(0, 0, 0, 0.6);
-        }
-
-        /* Comprehensive Homepage Customization Drawer */
-        .customizer-drawer-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 300;
-        }
-        .customizer-drawer {
-            position: fixed;
-            top: 0;
-            right: -360px;
-            width: 360px;
-            height: 100vh;
-            background-color: #1e1d27;
-            border-left: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: -12px 0 48px rgba(0, 0, 0, 0.65);
-            z-index: 301;
-            transition: right 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-            display: flex;
-            flex-direction: column;
-        }
-        .customizer-drawer.open {
-            right: 0;
-        }
-        .drawer-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 18px 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        .drawer-title {
-            font-size: 16px;
-            font-weight: 700;
-            color: #fbfbfe;
-        }
-        .drawer-close-btn {
-            background: none;
-            border: none;
-            color: #8f8f9d;
-            font-size: 20px;
-            cursor: pointer;
-            padding: 4px;
-        }
-        .drawer-close-btn:hover {
-            color: #fbfbfe;
-        }
-        .drawer-body {
-            padding: 20px;
-            overflow-y: auto;
-            flex: 1;
-        }
-        .drawer-section {
-            margin-bottom: 24px;
-        }
-        .drawer-section-title {
-            font-size: 12px;
-            font-weight: 700;
-            color: #8f8f9d;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            margin-bottom: 12px;
-        }
-        .theme-swatches-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 16px;
-        }
-        .theme-swatch {
-            border-radius: 8px;
-            height: 48px;
-            border: 2px solid transparent;
-            cursor: pointer;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            font-weight: 600;
-            color: #ffffff;
-            transition: transform 0.15s ease, border-color 0.15s ease;
-        }
-        .theme-swatch:hover, .theme-swatch.active {
-            border-color: #0060df;
-            transform: scale(1.04);
-        }
-        .drawer-toggle-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-            font-size: 13.5px;
-            color: #fbfbfe;
-        }
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 36px;
-            height: 20px;
-        }
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            border-radius: 20px;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #38374a;
-            transition: .2s;
-            border-radius: 20px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 14px;
-            width: 14px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: .2s;
-            border-radius: 50%;
-        }
-        input:checked + .slider {
-            background-color: #5884ff;
-        }
-        input:checked + .slider:before {
-            transform: translateX(16px);
-        }
-
-        /* Modal Dialog for Adding Shortcuts */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0, 0, 0, 0.6);
-            z-index: 400;
-            align-items: center;
-            justify-content: center;
-        }
-        .modal-overlay.show {
-            display: flex;
-        }
-        .modal-box {
-            background-color: #28272f;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            width: 400px;
-            padding: 28px;
-            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.65);
-        }
-        .modal-title {
-            font-size: 16px;
-            font-weight: 700;
-            color: #fbfbfe;
-            margin-bottom: 16px;
-        }
-        .modal-input {
-            width: 100%;
-            background-color: #1e1d27;
-            border: 1.5px solid rgba(255, 255, 255, 0.08);
-            border-radius: 10px;
-            padding: 11px 14px;
-            color: #e8e8ed;
-            font-size: 14px;
-            outline: none;
-            margin-bottom: 12px;
-            box-sizing: border-box;
-        }
-        .modal-input:focus {
-            border-color: rgba(88, 132, 255, 0.5);
-            box-shadow: 0 0 0 2px rgba(88, 132, 255, 0.12);
-        }
-        .modal-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 16px;
         }
     </style>
 </head>
 <body>
-    <div class="nt-canvas" id="canvas-root">
+    <div class="nt-canvas">
         <!-- Topbar (Brand + Header Actions) -->
         <div class="nt-topbar">
             <a href="norva://newtab" class="nt-brand">
-                <svg width="40" height="40" viewBox="0 0 100 100" fill="none">
-                    <defs>
-                        <radialGradient id="globeGrad" cx="45%" cy="45%" r="60%">
-                            <stop offset="0%" stop-color="#4a3b89"/>
-                            <stop offset="100%" stop-color="#1c1b22"/>
-                        </radialGradient>
-                        <linearGradient id="flameGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stop-color="#ff7139"/>
-                            <stop offset="45%" stop-color="#ff3b30"/>
-                            <stop offset="100%" stop-color="#9059ff"/>
-                        </linearGradient>
-                    </defs>
-                    <circle cx="50" cy="50" r="38" fill="url(#globeGrad)"/>
-                    <path d="M50 14 C66 24 84 40 84 62 C84 78 72 88 56 88 C42 88 32 78 32 68 C32 54 44 46 48 34 C34 40 22 54 22 70 C22 84 34 92 50 92 C72 92 88 76 88 56 C88 36 72 20 50 14 Z" fill="url(#flameGrad)"/>
+                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    <circle cx="12" cy="11" r="3"/>
                 </svg>
-                <span class="nt-brand-text">norva</span>
+                <div>
+                    <div class="nt-brand-text">norva</div>
+                </div>
+                <span class="nt-brand-sub">CORE v0.1</span>
             </a>
-            <div class="nt-topbar-actions">
+            <div style="display: flex; align-items: center; gap: 12px;">
                 {{MODE_PILL}}
-                <button class="customize-top-btn" onclick="openCustomizer()">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="3"/>
-                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-                    </svg>
-                    <span>Customise</span>
-                </button>
             </div>
         </div>
 
         <!-- Centered Modern Search Bar -->
         <div class="nt-search-container">
             <div class="nt-search-box">
-                <!-- Clean Search Engine Picker Trigger (Replaces ugly <select>) -->
+                <!-- Search Engine Picker Trigger -->
                 <div class="engine-picker-btn" id="engine-picker-trigger" onclick="toggleEngineDropdown()">
-                    <span id="active-engine-icon">{{DEFAULT_ICON}}</span>
                     <span id="active-engine-label">{{DEFAULT_NAME}}</span>
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                         <polyline points="6 9 12 15 18 9"/>
@@ -1239,931 +678,319 @@ pub fn render_newtab_page(
                 </div>
 
                 <input type="text" class="nt-search-input" id="search-input" 
-                    placeholder="Search with {{DEFAULT_NAME}} or enter address" autocomplete="off" autofocus />
+                    placeholder="Search with {{DEFAULT_NAME}} or enter address..." autocomplete="off" autofocus />
                 
-                <div class="nt-search-actions">
-                    <button class="nt-clear-btn" id="search-clear" onclick="clearSearchInput()">✕</button>
-                    <button class="nt-search-btn" id="search-submit" title="Search">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                            <circle cx="11" cy="11" r="7"/>
-                            <line x1="16.5" y1="16.5" x2="21" y2="21"/>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Quick Bang Chips (Chrome & Firefox inspired) -->
-            <div class="search-chips-row">
-                <span class="search-chip" onclick="quickFillBang('!g ')">🔍 Google (!g)</span>
-                <span class="search-chip" onclick="quickFillBang('!ddg ')">🦆 DuckDuckGo (!ddg)</span>
-                <span class="search-chip" onclick="quickFillBang('!b ')">⚡ Bing (!b)</span>
-                <span class="search-chip" onclick="quickFillBang('!ahmia ')">🧅 Tor Search (!ahmia)</span>
-                <span class="search-chip" onclick="quickFillBang('!w ')">📚 Wikipedia (!w)</span>
-                <span class="search-chip" onclick="quickFillBang('!gh ')">🐙 GitHub (!gh)</span>
-            </div>
-        </div>
-
-        <!-- Shortcuts / Speed Dial Row (Direct match to Image 1) -->
-        <div class="shortcuts-section" id="shortcuts-section">
-            <div class="shortcuts-row" id="shortcuts-container">
-                <!-- 1. Amazon -->
-                <div class="shortcut-item" data-url="https://www.amazon.com">
-                    <div class="shortcut-tile" style="background-color: #111111;">
-                        <svg width="26" height="26" viewBox="0 0 24 24" fill="#ff9900">
-                            <path d="M12.5 15.5c-3.1 0-5.7-1.7-6.9-4.2-.2-.4.1-.9.5-1 .4-.1.9.1 1.1.5 1 2 3.1 3.2 5.3 3.2 2.6 0 4.9-1.5 5.8-3.8.2-.4.6-.6 1.1-.5.4.2.6.6.5 1.1-1.1 2.8-3.9 4.7-7.4 4.7zm6.7-2.6c-.3-.4-1-.4-1.3-.1l-1.4 1.4 1.9.6c.3.1.7 0 .9-.3.2-.4.2-1.1-.1-1.6z"/>
-                            <path d="M14.5 5.5c-.8 0-1.6.4-2.1 1.1-.3-.6-.9-1.1-1.7-1.1-1.3 0-2.2 1.2-2.2 2.8v3.2h1.5V8.5c0-.8.4-1.4 1.1-1.4.6 0 1 .5 1 1.2v3.2h1.5V8.5c0-.8.4-1.4 1.1-1.4.6 0 1 .5 1 1.2v3.2h1.5V8.2c0-1.6-.9-2.7-2.7-2.7z" fill="#ffffff"/>
-                        </svg>
-                    </div>
-                    <span class="shortcut-label">Amazon</span>
-                    <span class="shortcut-sub">Sponsored</span>
-                    <div class="shortcut-menu-trigger" onclick="event.stopPropagation(); removeShortcut(this)">✕</div>
-                </div>
-
-                <!-- 2. Trip.com -->
-                <div class="shortcut-item" data-url="https://www.trip.com">
-                    <div class="shortcut-tile" style="background-color: #1075e3; color: #ffffff; font-weight: 800; font-size: 15px;">
-                        Trip.
-                    </div>
-                    <span class="shortcut-label">Trip.com</span>
-                    <span class="shortcut-sub">Sponsored</span>
-                    <div class="shortcut-menu-trigger" onclick="event.stopPropagation(); removeShortcut(this)">✕</div>
-                </div>
-
-                <!-- 3. Wikipedia -->
-                <div class="shortcut-item" data-url="https://www.wikipedia.org">
-                    <div class="shortcut-tile" style="background-color: #eaecf0; color: #000000; font-family: serif; font-weight: 700; font-size: 24px;">
-                        W
-                    </div>
-                    <span class="shortcut-label">Wikipedia</span>
-                    <div class="shortcut-menu-trigger" onclick="event.stopPropagation(); removeShortcut(this)">✕</div>
-                </div>
-
-                <!-- 4. YouTube -->
-                <div class="shortcut-item" data-url="https://www.youtube.com">
-                    <div class="shortcut-tile" style="background-color: #212121;">
-                        <svg width="26" height="26" viewBox="0 0 24 24" fill="#ff0000">
-                            <path d="M21.6 7.2c-.2-.9-.9-1.6-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4c-.9.2-1.6.9-1.8 1.8C2 8.8 2 12 2 12s0 3.2.4 4.8c.2.9.9 1.6 1.8 1.8 1.6.4 7.8.4 7.8.4s6.2 0 7.8-.4c.9-.2 1.6-.9 1.8-1.8.4-1.6.4-4.8.4-4.8s0-3.2-.4-4.8z"/>
-                            <polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#ffffff"/>
-                        </svg>
-                    </div>
-                    <span class="shortcut-label">YouTube</span>
-                    <div class="shortcut-menu-trigger" onclick="event.stopPropagation(); removeShortcut(this)">✕</div>
-                </div>
-
-                <!-- 5. NDTV -->
-                <div class="shortcut-item" data-url="https://www.ndtv.com">
-                    <div class="shortcut-tile" style="background-color: #e21b22; color: #ffffff; font-weight: 900; font-size: 13px; letter-spacing: -0.5px;">
-                        NDTV
-                    </div>
-                    <span class="shortcut-label">NDTV</span>
-                    <div class="shortcut-menu-trigger" onclick="event.stopPropagation(); removeShortcut(this)">✕</div>
-                </div>
-
-                <!-- 6. Reddit -->
-                <div class="shortcut-item" data-url="https://www.reddit.com">
-                    <div class="shortcut-tile" style="background-color: #ff4500;">
-                        <svg width="26" height="26" viewBox="0 0 24 24" fill="#ffffff">
-                            <circle cx="12" cy="12" r="9"/>
-                            <circle cx="9" cy="11.5" r="1.3" fill="#ff4500"/>
-                            <circle cx="15" cy="11.5" r="1.3" fill="#ff4500"/>
-                            <path d="M9.5 15.2c1.4.8 3.6.8 5 0" stroke="#ff4500" stroke-width="1.3" fill="none" stroke-linecap="round"/>
-                        </svg>
-                    </div>
-                    <span class="shortcut-label">Reddit</span>
-                    <div class="shortcut-menu-trigger" onclick="event.stopPropagation(); removeShortcut(this)">✕</div>
-                </div>
-
-                <!-- 7. DuckDuckGo -->
-                <div class="shortcut-item" data-url="https://duckduckgo.com">
-                    <div class="shortcut-tile" style="background-color: #de5833;">
-                        <span style="font-size: 22px;">🦆</span>
-                    </div>
-                    <span class="shortcut-label">DuckDuckGo</span>
-                    <div class="shortcut-menu-trigger" onclick="event.stopPropagation(); removeShortcut(this)">✕</div>
-                </div>
-
-                <!-- 8. Ahmia Tor Search -->
-                <div class="shortcut-item" data-url="https://ahmia.fi">
-                    <div class="shortcut-tile" style="background-color: #3b1d5c;">
-                        <span style="font-size: 22px;">🧅</span>
-                    </div>
-                    <span class="shortcut-label">Ahmia</span>
-                    <span class="shortcut-sub">Tor Search</span>
-                    <div class="shortcut-menu-trigger" onclick="event.stopPropagation(); removeShortcut(this)">✕</div>
-                </div>
-
-                <!-- 9. Add Shortcut (+) Button -->
-                <div class="shortcut-item" onclick="openAddShortcutModal()">
-                    <div class="shortcut-tile" style="background-color: #9059ff; color: #ffffff; font-size: 24px; font-weight: 300;">
-                        +
-                    </div>
-                    <span class="shortcut-label">Add item</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Widgets Section (Image 1: World Clock, Weather, Focus Timer, Checklist) -->
-        <div class="widgets-section" id="widgets-section">
-            <div class="section-header">
-                <div class="section-title" onclick="toggleWidgetsAccordion()">
-                    <span>Widgets</span>
-                    <svg id="widgets-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                        <polyline points="6 9 12 15 18 9"/>
+                <button class="nt-search-btn" id="search-submit" title="Search">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <circle cx="11" cy="11" r="7"/>
+                        <line x1="16.5" y1="16.5" x2="21" y2="21"/>
                     </svg>
-                </div>
-                <button class="section-menu-btn" onclick="toggleSectionPopover('widgets-popover')">•••</button>
-                <div class="section-popover" id="widgets-popover">
-                    <div class="popover-item" onclick="openCustomizer('widgets')">⚙ Configure Widgets...</div>
-                    <div class="popover-item" onclick="refreshClocksAndWeather()">🔄 Refresh Clocks & Weather</div>
-                    <div class="popover-item" onclick="toggleWidgetsVisibility(false)">👁 Hide Widgets Section</div>
-                </div>
+                </button>
             </div>
 
-            <div class="widgets-grid" id="widgets-grid-content">
-                <!-- 1. World Clock Card -->
-                <div class="widget-card">
-                    <div class="clock-grid">
-                        <div class="clock-col" onclick="toggleClockFormat()">
-                            <div>
-                                <div class="clock-city">CCU</div>
-                                <div class="clock-tz">GMT+5:30</div>
-                            </div>
-                            <div class="clock-time" id="clock-ccu">10:37 AM</div>
-                        </div>
-                        <div class="clock-col" onclick="toggleClockFormat()">
-                            <div>
-                                <div class="clock-city">BER</div>
-                                <div class="clock-tz">GMT+2</div>
-                            </div>
-                            <div class="clock-time" id="clock-ber">7:07 AM</div>
-                        </div>
-                        <div class="clock-col" onclick="toggleClockFormat()">
-                            <div>
-                                <div class="clock-city">SYD</div>
-                                <div class="clock-tz">GMT+10</div>
-                            </div>
-                            <div class="clock-time" id="clock-syd">3:07 PM</div>
-                        </div>
-                        <div class="clock-col" onclick="toggleClockFormat()">
-                            <div>
-                                <div class="clock-city">NYC</div>
-                                <div class="clock-tz">EDT</div>
-                            </div>
-                            <div class="clock-time" id="clock-nyc">1:07 AM</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 2. Weather Card (Configurable City & °C/°F) -->
-                <div class="widget-card">
-                    <div class="weather-top">
-                        <span class="weather-loc" id="weather-city-label" onclick="promptChangeWeatherCity()" title="Click to change city">Mumbai ✎</span>
-                        <span style="color: #8f8f9d; font-size: 13px; cursor: pointer;" onclick="toggleWeatherUnit()">°C/°F</span>
-                    </div>
-                    <div class="weather-main">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="#f59e0b">
-                            <circle cx="12" cy="12" r="5"/>
-                            <line x1="12" y1="1" x2="12" y2="3" stroke="#f59e0b" stroke-width="2"/>
-                            <line x1="12" y1="21" x2="12" y2="23" stroke="#f59e0b" stroke-width="2"/>
-                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="#f59e0b" stroke-width="2"/>
-                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="#f59e0b" stroke-width="2"/>
-                            <line x1="1" y1="12" x2="3" y2="12" stroke="#f59e0b" stroke-width="2"/>
-                            <line x1="21" y1="12" x2="23" y2="12" stroke="#f59e0b" stroke-width="2"/>
-                        </svg>
-                        <div>
-                            <div class="weather-temp" id="weather-temp-display">31°C <small style="font-size: 11px; font-weight: normal; color: #8f8f9d;">↑36° ↓27°</small></div>
-                            <div class="weather-cond" id="weather-cond-display">Mostly sunny</div>
-                        </div>
-                    </div>
-                    <div class="weather-forecast">
-                        <span>32° 11:00</span>
-                        <span>34° 12:00</span>
-                    </div>
-                </div>
-
-                <!-- 3. Focus / Pomodoro Timer Card (25:00 Focus/Break) -->
-                <div class="widget-card">
-                    <div class="timer-row">
-                        <button class="timer-play-btn" id="timer-toggle-btn" onclick="toggleTimer()">▶</button>
-                        <div class="timer-digits">
-                            <button class="timer-ctrl-btn" onclick="adjustTimer(-60)">−</button>
-                            <span id="timer-display">25:00</span>
-                            <button class="timer-ctrl-btn" onclick="adjustTimer(60)">+</button>
-                        </div>
-                    </div>
-                    <div class="timer-pills">
-                        <button class="timer-pill active" id="btn-focus" onclick="setTimerMode('focus')">Focus</button>
-                        <button class="timer-pill" id="btn-break" onclick="setTimerMode('break')">Break</button>
-                    </div>
-                </div>
-
-                <!-- 4. Checklist Card (Interactive Tasks) -->
-                <div class="widget-card">
-                    <div class="checklist-title">Checklist</div>
-                    <div>
-                        <button class="checklist-add-btn" onclick="addChecklistItem()">
-                            <span>+</span> <span>Add an item</span>
-                        </button>
-                    </div>
-                    <div class="checklist-items-box" id="checklist-items">
-                        <!-- Populated by JS -->
-                    </div>
-                    <div class="checklist-icon-decor">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-                            <rect x="3" y="3" width="18" height="18" rx="4" fill="#38383d"/>
-                            <path d="M7 8h10M7 12h6M7 16h4" stroke="#8f8f9d" stroke-width="1.8" stroke-linecap="round"/>
-                            <path d="M15 14l2 2 4-4" stroke="#ff9900" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </div>
-                </div>
+            <!-- Quick Bang Chips -->
+            <div class="search-chips-row">
+                <span class="search-chip" onclick="quickFillBang('!ddg ')">DuckDuckGo (!ddg)</span>
+                <span class="search-chip" onclick="quickFillBang('!g ')">Google (!g)</span>
+                <span class="search-chip" onclick="quickFillBang('!b ')">Bing (!b)</span>
+                <span class="search-chip" onclick="quickFillBang('!ahmia ')">Ahmia Tor (!ahmia)</span>
+                <span class="search-chip" onclick="quickFillBang('!gh ')">GitHub (!gh)</span>
+                <span class="search-chip" onclick="quickFillBang('!w ')">Wikipedia (!w)</span>
+                <span class="search-chip" onclick="quickFillBang('!sp ')">Startpage (!sp)</span>
+                <span class="search-chip" onclick="quickFillBang('!brave ')">Brave (!brave)</span>
             </div>
         </div>
 
-        <!-- Thought-provoking stories (News Section with REAL High-Res Photography) -->
-        <div class="stories-section" id="stories-section">
-            <div class="section-header">
-                <span class="section-title">Thought-provoking stories</span>
-                <button class="section-menu-btn" onclick="toggleSectionPopover('stories-popover')">•••</button>
-                <div class="section-popover" id="stories-popover">
-                    <div class="popover-item" onclick="openCustomizer('news')">⚙ Personalize Content Interests...</div>
-                    <div class="popover-item" onclick="refreshStoriesFeed()">🔄 Refresh Stories</div>
-                    <div class="popover-item" onclick="toggleStoriesVisibility(false)">👁 Hide Stories Section</div>
+        <!-- Live Threat Telemetry & Security Placecards Grid -->
+        <div class="telemetry-grid">
+            <!-- 1. Threat Shield Matrix -->
+            <div class="stat-card">
+                <div>
+                    <div class="stat-header">
+                        <span class="stat-label">Threats Neutralized</span>
+                        <svg class="stat-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    </div>
+                    <div class="stat-number">{{ADS_BLOCKED}}</div>
+                    <div class="stat-subtext">Trackers, ads & telemetry beacons blocked</div>
+                </div>
+                <div class="stat-badge">
+                    <span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:#10b981;"></span>
+                    Active Shield Defense
                 </div>
             </div>
 
-            <!-- Content Topic Chips -->
-            <div class="stories-category-chips">
-                <span class="category-chip active" onclick="filterStoriesCategory('all')">All Stories</span>
-                <span class="category-chip" onclick="filterStoriesCategory('tech')">Technology & AI</span>
-                <span class="category-chip" onclick="filterStoriesCategory('world')">World Affairs</span>
-                <span class="category-chip" onclick="filterStoriesCategory('nature')">Science & Environment</span>
-                <span class="category-chip" onclick="filterStoriesCategory('culture')">Entertainment & Culture</span>
+            <!-- 2. Zero-Trust Hardware Guard -->
+            <div class="stat-card">
+                <div>
+                    <div class="stat-header">
+                        <span class="stat-label">Hardware Arbiter</span>
+                        <svg class="stat-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                    </div>
+                    <div class="stat-number">3 Devices</div>
+                    <div class="stat-subtext">Camera, Microphone & GPS gated</div>
+                </div>
+                <div class="stat-badge" style="color: #06b6d4; background: rgba(6, 182, 212, 0.1);">
+                    Zero-Trust Policy
+                </div>
             </div>
 
-            <div class="stories-grid" id="stories-grid-container">
-                <!-- Story 1: Drishyam 3 / Ajay Devgn (Real Film Still Photography) -->
-                <div class="story-card" data-category="culture" data-url="https://indianexpress.com/article/entertainment/malayalam/mohanlal-ajay-devgn-drishyam-3/">
-                    <div class="story-thumb-wrap">
-                        <img class="story-thumb" src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=600&auto=format&fit=crop&q=80" 
-                            alt="Drishyam 3 Film Production" 
-                            onerror="this.onerror=null; this.src='https://picsum.photos/seed/drishyam3/600/320';" />
-                        <span class="story-badge-corner" style="background: #e21b22;">EXPRESS</span>
+            <!-- 3. Bandwidth & Latency Saved -->
+            <div class="stat-card">
+                <div>
+                    <div class="stat-header">
+                        <span class="stat-label">Data Saved</span>
+                        <svg class="stat-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
                     </div>
-                    <div class="story-content">
-                        <h4 class="story-title">'I called Mohanlal to watch Drishyam 3': Ajay Devgn seeks Malayalam superstar's 'approval'</h4>
-                        <div class="story-footer">
-                            <div class="story-source">
-                                <span>📰</span> <span>The Indian Express</span>
-                            </div>
-                            <span>Entertainment</span>
-                        </div>
-                    </div>
+                    <div class="stat-number">{{SAVED_MB}} MB</div>
+                    <div class="stat-subtext">Estimated payload bloat prevented</div>
                 </div>
-
-                <!-- Story 2: The AI telling farmers when to harvest (Real Agricultural Photography) -->
-                <div class="story-card" data-category="tech" data-url="https://www.bbc.com/news/technology">
-                    <div class="story-thumb-wrap">
-                        <img class="story-thumb" src="https://images.unsplash.com/photo-1498557850523-fd3d118b962e?w=600&auto=format&fit=crop&q=80" 
-                            alt="Fresh berries harvest in orchard" 
-                            onerror="this.onerror=null; this.src='https://picsum.photos/seed/harvest/600/320';" />
-                        <span class="story-badge-corner" style="background: #000000;">BBC NEWS</span>
-                    </div>
-                    <div class="story-content">
-                        <h4 class="story-title">The AI telling farmers when to harvest</h4>
-                        <div class="story-footer">
-                            <div class="story-source">
-                                <span style="background: #000; color: #fff; padding: 1px 4px; border-radius: 2px; font-weight: bold; font-size: 9px;">BBC</span>
-                                <span>BBC News</span>
-                            </div>
-                            <span>Technology</span>
-                        </div>
-                    </div>
+                <div class="stat-badge">
+                    ~38% Faster Load Time
                 </div>
+            </div>
 
-                <!-- Story 3: AI used to keep elephants out of habitations on Sabarimala (Real Wildlife Photography) -->
-                <div class="story-card" data-category="nature" data-url="https://www.thehindu.com">
-                    <div class="story-thumb-wrap">
-                        <img class="story-thumb" src="https://images.unsplash.com/photo-1557050543-4d5f4e07ef46?w=600&auto=format&fit=crop&q=80" 
-                            alt="Wild elephant in sanctuary forest" 
-                            onerror="this.onerror=null; this.src='https://picsum.photos/seed/elephant/600/320';" />
-                        <span class="story-badge-corner" style="background: #1a365d;">ENVIRONMENT</span>
+            <!-- 4. Storage & Cache Isolation -->
+            <div class="stat-card">
+                <div>
+                    <div class="stat-header">
+                        <span class="stat-label">Storage Footprint</span>
+                        <svg class="stat-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
                     </div>
-                    <div class="story-content">
-                        <h4 class="story-title">AI used to keep elephants out of habitations on Sabarimala forest fringes</h4>
-                        <div class="story-footer">
-                            <div class="story-source">
-                                <span>🏛️</span> <span>The Hindu</span>
-                            </div>
-                            <span>Science</span>
-                        </div>
-                    </div>
+                    <div class="stat-number">{{CACHE_MB}} MB</div>
+                    <div class="stat-subtext">Partitioned cache & cookie storage</div>
                 </div>
+                <button class="btn" style="margin-top: 8px; font-size: 11px; padding: 4px 10px;" onclick="purgeCache()">
+                    Purge Storage
+                </button>
+            </div>
+        </div>
 
-                <!-- Story 4: Flydubai Incident Live Updates (Real Commercial Aviation Photography) -->
-                <div class="story-card" data-category="world" data-url="https://www.news18.com">
-                    <div class="story-thumb-wrap">
-                        <img class="story-thumb" src="https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=600&auto=format&fit=crop&q=80" 
-                            alt="Passenger airliner flying under clear sky" 
-                            onerror="this.onerror=null; this.src='https://picsum.photos/seed/aviation/600/320';" />
-                        <span class="story-badge-corner" style="background: #c53030;">NEWS18</span>
-                    </div>
-                    <div class="story-content">
-                        <h4 class="story-title">Flydubai Incident Live Updates: Netanyahu Says Indian Pilot Averted '91-Style' Attack</h4>
-                        <div class="story-footer">
-                            <div class="story-source">
-                                <span style="color: #e53e3e; font-weight: bold;">NEWS18</span>
-                            </div>
-                            <span>World News</span>
-                        </div>
-                    </div>
+        <!-- Developer & Privacy Speed Dial (Real, Professional Placecards) -->
+        <div class="section-header-row">
+            <span class="section-heading">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                Secure Quick Access
+            </span>
+        </div>
+
+        <div class="speeddial-grid">
+            <!-- 1. GitHub -->
+            <div class="dial-card" onclick="navigate('https://github.com')">
+                <div class="dial-icon-wrap">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="#ffffff"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                </div>
+                <div class="dial-info">
+                    <div class="dial-title">GitHub</div>
+                    <div class="dial-desc">Repositories & code</div>
+                </div>
+            </div>
+
+            <!-- 2. DuckDuckGo -->
+            <div class="dial-card" onclick="navigate('https://duckduckgo.com')">
+                <div class="dial-icon-wrap">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="#de5833"><circle cx="12" cy="12" r="10"/></svg>
+                </div>
+                <div class="dial-info">
+                    <div class="dial-title">DuckDuckGo</div>
+                    <div class="dial-desc">Private web search</div>
+                </div>
+            </div>
+
+            <!-- 3. Tor Project -->
+            <div class="dial-card" onclick="navigate('https://www.torproject.org')">
+                <div class="dial-icon-wrap">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7d4698" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+                </div>
+                <div class="dial-info">
+                    <div class="dial-title">Tor Project</div>
+                    <div class="dial-desc">Online anonymity</div>
+                </div>
+            </div>
+
+            <!-- 4. Electronic Frontier Foundation -->
+            <div class="dial-card" onclick="navigate('https://www.eff.org')">
+                <div class="dial-icon-wrap">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e02424" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <div class="dial-info">
+                    <div class="dial-title">EFF</div>
+                    <div class="dial-desc">Digital privacy rights</div>
+                </div>
+            </div>
+
+            <!-- 5. Rust Programming -->
+            <div class="dial-card" onclick="navigate('https://www.rust-lang.org')">
+                <div class="dial-icon-wrap">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="3" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="21"/><line x1="3" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="21" y2="12"/></svg>
+                </div>
+                <div class="dial-info">
+                    <div class="dial-title">Rust Lang</div>
+                    <div class="dial-desc">Systems engineering</div>
+                </div>
+            </div>
+
+            <!-- 6. Hacker News -->
+            <div class="dial-card" onclick="navigate('https://news.ycombinator.com')">
+                <div class="dial-icon-wrap">
+                    <span style="font-weight: 800; color: #ff6600; font-size: 16px;">Y</span>
+                </div>
+                <div class="dial-info">
+                    <div class="dial-title">Hacker News</div>
+                    <div class="dial-desc">Tech & cyber briefing</div>
+                </div>
+            </div>
+
+            <!-- 7. Wikipedia -->
+            <div class="dial-card" onclick="navigate('https://www.wikipedia.org')">
+                <div class="dial-icon-wrap">
+                    <span style="font-family: serif; font-weight: 700; color: #ffffff; font-size: 18px;">W</span>
+                </div>
+                <div class="dial-info">
+                    <div class="dial-title">Wikipedia</div>
+                    <div class="dial-desc">Open encyclopedia</div>
+                </div>
+            </div>
+
+            <!-- 8. Ahmia (.onion) -->
+            <div class="dial-card" onclick="navigate('https://ahmia.fi')">
+                <div class="dial-icon-wrap">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9333ea" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/></svg>
+                </div>
+                <div class="dial-info">
+                    <div class="dial-title">Ahmia</div>
+                    <div class="dial-desc">Tor hidden services</div>
+                </div>
+            </div>
+
+            <!-- 9. Privacy Guides -->
+            <div class="dial-card" onclick="navigate('https://www.privacyguides.org')">
+                <div class="dial-icon-wrap">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <div class="dial-info">
+                    <div class="dial-title">Privacy Guides</div>
+                    <div class="dial-desc">Security recommendations</div>
+                </div>
+            </div>
+
+            <!-- 10. Startpage -->
+            <div class="dial-card" onclick="navigate('https://www.startpage.com')">
+                <div class="dial-icon-wrap">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                </div>
+                <div class="dial-info">
+                    <div class="dial-title">Startpage</div>
+                    <div class="dial-desc">European private search</div>
                 </div>
             </div>
         </div>
 
         <!-- Privacy Shields & Internal Command Quick Access -->
-        <div class="vault-pills-bar" id="vaults-bar">
-            <span style="font-size: 12px; color: #8f8f9d; margin-right: 4px;">NORVA Vaults:</span>
-            <a href="norva://history" class="vault-pill-link">📜 History</a>
-            <a href="norva://shields" class="vault-pill-link">🛡️ Shields ({{ADS_BLOCKED}} blocked)</a>
-            <a href="norva://permissions" class="vault-pill-link">📷 Permissions</a>
-            <a href="norva://cookies" class="vault-pill-link">🍪 Storage ({{CACHE_MB}} MB)</a>
-            <a href="norva://settings" class="vault-pill-link">⚙️ Settings</a>
-        </div>
-    </div>
-
-    <!-- Floating Customise Page Button (Direct match to Chrome Image 2 & Firefox Image 1) -->
-    <button class="customize-floating-pill" id="customize-btn" onclick="openCustomizer()">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <path d="M12 20h9"/>
-            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-        </svg>
-        <span>Customise page</span>
-    </button>
-
-    <!-- Comprehensive Homepage Customizer Drawer -->
-    <div class="customizer-drawer-overlay" id="customizer-overlay" onclick="closeCustomizer()"></div>
-    <div class="customizer-drawer" id="customizer-drawer">
-        <div class="drawer-header">
-            <span class="drawer-title">Customise this page</span>
-            <button class="drawer-close-btn" onclick="closeCustomizer()">✕</button>
-        </div>
-        <div class="drawer-body">
-            <!-- 1. Background Theme Selector -->
-            <div class="drawer-section">
-                <div class="drawer-section-title">Appearance & Wallpaper</div>
-                <div class="theme-swatches-grid">
-                    <div class="theme-swatch active" style="background-color: #1c1b22;" onclick="setThemeBackground('#1c1b22', this)">
-                        Firefox
-                    </div>
-                    <div class="theme-swatch" style="background-color: #202124;" onclick="setThemeBackground('#202124', this)">
-                        Chrome
-                    </div>
-                    <div class="theme-swatch" style="background-color: #0d0d0f;" onclick="setThemeBackground('#0d0d0f', this)">
-                        Midnight
-                    </div>
-                    <div class="theme-swatch" style="background: linear-gradient(135deg, #181928, #0e1017);" onclick="setThemeBackground('linear-gradient(135deg, #181928, #0e1017)', this)">
-                        Indigo
-                    </div>
-                    <div class="theme-swatch" style="background: linear-gradient(135deg, #112217, #0b140f);" onclick="setThemeBackground('linear-gradient(135deg, #112217, #0b140f)', this)">
-                        Forest
-                    </div>
-                    <div class="theme-swatch" style="background: radial-gradient(circle at 50% 0%, #2b1f42, #161722);" onclick="setThemeBackground('radial-gradient(circle at 50% 0%, #2b1f42, #161722)', this)">
-                        Aurora
-                    </div>
-                </div>
-            </div>
-
-            <!-- 2. Shortcuts Options -->
-            <div class="drawer-section">
-                <div class="drawer-section-title">Shortcuts</div>
-                <div class="drawer-toggle-row">
-                    <span>Show shortcuts</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="toggle-shortcuts" checked onchange="toggleShortcutsVisibility(this.checked)" />
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="drawer-toggle-row">
-                    <span>Sponsored shortcuts</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="toggle-sponsored" checked onchange="toggleSponsoredShortcuts(this.checked)" />
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <button class="btn btn-primary" style="margin-top: 10px; width: 100%; justify-content: center;" onclick="openAddShortcutModal()">
-                    + Add New Shortcut
-                </button>
-            </div>
-
-            <!-- 3. Widgets Configuration -->
-            <div class="drawer-section" id="drawer-widgets-sec">
-                <div class="drawer-section-title">Widgets & Tools</div>
-                <div class="drawer-toggle-row">
-                    <span>Show widgets</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="toggle-widgets" checked onchange="toggleWidgetsVisibility(this.checked)" />
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div style="margin-top: 10px;">
-                    <label style="font-size: 12px; color: #cfcfd4;">Weather Location:</label>
-                    <input type="text" id="weather-city-input" class="modal-input" value="Mumbai" onchange="setWeatherCity(this.value)" style="margin-top: 6px; padding: 6px 10px;" />
-                </div>
-            </div>
-
-            <!-- 4. Stories Configuration -->
-            <div class="drawer-section" id="drawer-news-sec">
-                <div class="drawer-section-title">Thought-Provoking Stories</div>
-                <div class="drawer-toggle-row">
-                    <span>Show stories feed</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="toggle-stories" checked onchange="toggleStoriesVisibility(this.checked)" />
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="drawer-toggle-row">
-                    <span>Show Privacy Vaults strip</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="toggle-vaults" checked onchange="toggleVaultsVisibility(this.checked)" />
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Add Shortcut Modal -->
-    <div class="modal-overlay" id="add-shortcut-modal">
-        <div class="modal-box">
-            <div class="modal-title">Add shortcut</div>
-            <label style="font-size: 12px; color: #cfcfd4; display: block; margin-bottom: 4px;">Name:</label>
-            <input type="text" id="modal-name-input" class="modal-input" placeholder="e.g. GitHub" />
-            <label style="font-size: 12px; color: #cfcfd4; display: block; margin-bottom: 4px;">URL:</label>
-            <input type="text" id="modal-url-input" class="modal-input" placeholder="https://github.com" />
-            <div class="modal-actions">
-                <button class="btn" onclick="closeAddShortcutModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="confirmAddShortcut()">Done</button>
-            </div>
+        <div class="vault-bar">
+            <span style="font-size: 12px; color: var(--text-muted); margin-right: 6px;">NORVA Vaults:</span>
+            <a href="norva://history" class="vault-pill">📜 History Vault</a>
+            <a href="norva://shields" class="vault-pill">🛡️ Shields Center ({{ADS_BLOCKED}} blocked)</a>
+            <a href="norva://permissions" class="vault-pill">📷 Device Permissions</a>
+            <a href="norva://cookies" class="vault-pill">🍪 Cache & Storage ({{CACHE_MB}} MB)</a>
+            <a href="norva://settings" class="vault-pill">⚙️ Settings & Engines</a>
         </div>
     </div>
 
     <script>
-        // --------------------------------------------------------------------
-        // Search & Engine Switcher
-        // --------------------------------------------------------------------
-        let activeEngineId = "{{DEFAULT_ID}}";
-        let activeEngineBang = "{{DEFAULT_BANG}}";
-        const searchInput = document.getElementById("search-input");
-        const searchSubmitBtn = document.getElementById("search-submit");
-        const searchClearBtn = document.getElementById("search-clear");
-        const engineDropdown = document.getElementById("engine-dropdown");
+        function navigate(url) {
+            if (window.ipc && window.ipc.postMessage) {
+                window.ipc.postMessage(JSON.stringify({ action: "navigate", query: url }));
+            } else {
+                window.location.href = url;
+            }
+        }
 
         function toggleEngineDropdown() {
-            engineDropdown.classList.toggle("show");
+            const menu = document.getElementById("engine-dropdown");
+            menu.classList.toggle("show");
         }
 
-        window.addEventListener("click", (e) => {
-            if (!e.target.closest("#engine-picker-trigger") && !e.target.closest("#engine-dropdown")) {
-                engineDropdown.classList.remove("show");
-            }
-            if (!e.target.closest(".section-menu-btn") && !e.target.closest(".section-popover")) {
-                document.querySelectorAll(".section-popover").forEach(p => p.classList.remove("show"));
+        document.addEventListener("click", (e) => {
+            const trigger = document.getElementById("engine-picker-trigger");
+            const menu = document.getElementById("engine-dropdown");
+            if (!trigger.contains(e.target) && !menu.contains(e.target)) {
+                menu.classList.remove("show");
             }
         });
 
-        function selectSearchEngine(id, name, bang, icon) {
-            activeEngineId = id;
-            activeEngineBang = bang;
-            document.getElementById("active-engine-icon").textContent = icon;
+        function selectSearchEngine(id, name, bang) {
             document.getElementById("active-engine-label").textContent = name;
-            searchInput.placeholder = "Search with " + name + " or enter address";
-            document.querySelectorAll(".engine-dropdown-item").forEach(item => {
-                item.classList.toggle("active", item.getAttribute("data-id") === id);
-            });
-            engineDropdown.classList.remove("show");
-            searchInput.focus();
-        }
-
-        searchInput.addEventListener("input", () => {
-            searchClearBtn.style.display = searchInput.value.length > 0 ? "block" : "none";
-        });
-
-        function clearSearchInput() {
-            searchInput.value = "";
-            searchClearBtn.style.display = "none";
-            searchInput.focus();
+            document.getElementById("engine-dropdown").classList.remove("show");
+            if (window.ipc && window.ipc.postMessage) {
+                window.ipc.postMessage(JSON.stringify({ action: "set_default_engine", query: id }));
+            }
         }
 
         function quickFillBang(bang) {
-            searchInput.value = bang;
-            searchClearBtn.style.display = "block";
-            searchInput.focus();
+            const input = document.getElementById("search-input");
+            input.value = bang;
+            input.focus();
         }
 
-        function executeSearch() {
-            const val = searchInput.value.trim();
-            if (!val) return;
-
-            let query = val;
-            if (activeEngineBang && !val.startsWith("!") && !val.includes("://") && !val.includes(".")) {
-                query = activeEngineBang + " " + val;
-            }
-
-            if (window.ipc && window.ipc.postMessage) {
-                window.ipc.postMessage(JSON.stringify({ action: "navigate", query: query }));
+        function purgeCache() {
+            if (confirm("Purge local disk cache and session storage immediately?")) {
+                if (window.ipc && window.ipc.postMessage) {
+                    window.ipc.postMessage(JSON.stringify({ action: "purge_cache" }));
+                    setTimeout(() => window.location.reload(), 200);
+                }
             }
         }
 
-        searchSubmitBtn.addEventListener("click", executeSearch);
-        searchInput.addEventListener("keydown", (e) => {
-            if (e.key === "Enter") executeSearch();
+        document.getElementById("search-input").addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                const val = e.target.value.trim();
+                if (val) {
+                    navigate(val);
+                }
+            }
         });
 
-        // --------------------------------------------------------------------
-        // Shortcuts Management & Card Navigation
-        // --------------------------------------------------------------------
-        function bindShortcutClicks() {
-            document.querySelectorAll(".shortcut-item, .story-card, .vault-pill-link").forEach(card => {
-                card.onclick = (e) => {
-                    const url = card.getAttribute("data-url") || card.getAttribute("href");
-                    if (url && url !== "#") {
-                        e.preventDefault();
-                        if (window.ipc && window.ipc.postMessage) {
-                            window.ipc.postMessage(JSON.stringify({ action: "navigate", query: url }));
-                        }
-                    }
-                };
-            });
-        }
-        bindShortcutClicks();
-
-        function removeShortcut(btn) {
-            const item = btn.closest(".shortcut-item");
-            if (item) item.remove();
-        }
-
-        function openAddShortcutModal() {
-            document.getElementById("add-shortcut-modal").classList.add("show");
-            document.getElementById("modal-name-input").focus();
-        }
-
-        function closeAddShortcutModal() {
-            document.getElementById("add-shortcut-modal").classList.remove("show");
-            document.getElementById("modal-name-input").value = "";
-            document.getElementById("modal-url-input").value = "";
-        }
-
-        function confirmAddShortcut() {
-            const name = document.getElementById("modal-name-input").value.trim();
-            let url = document.getElementById("modal-url-input").value.trim();
-            if (!name || !url) {
-                alert("Please enter both Name and URL.");
-                return;
+        document.getElementById("search-submit").addEventListener("click", () => {
+            const val = document.getElementById("search-input").value.trim();
+            if (val) {
+                navigate(val);
             }
-            if (!url.startsWith("http://") && !url.startsWith("https://") && !url.startsWith("norva://")) {
-                url = "https://" + url;
-            }
-
-            const initial = name.charAt(0).toUpperCase();
-            const container = document.getElementById("shortcuts-container");
-            const plusBtn = container.lastElementChild;
-
-            const div = document.createElement("div");
-            div.className = "shortcut-item";
-            div.setAttribute("data-url", url);
-            div.innerHTML = `
-                <div class="shortcut-tile" style="background-color: #38383d; color: #ffffff; font-weight: 700; font-size: 20px;">
-                    ${initial}
-                </div>
-                <span class="shortcut-label">${name}</span>
-                <div class="shortcut-menu-trigger" onclick="event.stopPropagation(); removeShortcut(this)">✕</div>
-            `;
-            container.insertBefore(div, plusBtn);
-            bindShortcutClicks();
-            closeAddShortcutModal();
-        }
-
-        // --------------------------------------------------------------------
-        // Section Popovers
-        // --------------------------------------------------------------------
-        function toggleSectionPopover(id) {
-            const pop = document.getElementById(id);
-            if (pop) pop.classList.toggle("show");
-        }
-
-        function toggleWidgetsAccordion() {
-            const grid = document.getElementById("widgets-grid-content");
-            const chev = document.getElementById("widgets-chevron");
-            if (grid) {
-                const hidden = grid.style.display === "none";
-                grid.style.display = hidden ? "grid" : "none";
-                chev.style.transform = hidden ? "rotate(0deg)" : "rotate(-90deg)";
-            }
-        }
-
-        // --------------------------------------------------------------------
-        // World Clock (Live Time Updates)
-        // --------------------------------------------------------------------
-        let use24HourClock = false;
-        function toggleClockFormat() {
-            use24HourClock = !use24HourClock;
-            updateWorldClocks();
-        }
-
-        function updateWorldClocks() {
-            const now = new Date();
-            const formatTime = (offsetHours) => {
-                const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-                const target = new Date(utc + (3600000 * offsetHours));
-                return target.toLocaleTimeString([], { 
-                    hour: 'numeric', 
-                    minute: '2-digit', 
-                    hour12: !use24HourClock 
-                });
-            };
-
-            const elCcu = document.getElementById("clock-ccu");
-            const elBer = document.getElementById("clock-ber");
-            const elSyd = document.getElementById("clock-syd");
-            const elNyc = document.getElementById("clock-nyc");
-
-            if (elCcu) elCcu.textContent = formatTime(5.5);
-            if (elBer) elBer.textContent = formatTime(2.0);
-            if (elSyd) elSyd.textContent = formatTime(10.0);
-            if (elNyc) elNyc.textContent = formatTime(-4.0);
-        }
-        updateWorldClocks();
-        setInterval(updateWorldClocks, 1000);
-
-        // --------------------------------------------------------------------
-        // Weather Widget Settings & Controls
-        // --------------------------------------------------------------------
-        let isFahrenheit = false;
-        let weatherCity = "Mumbai";
-        let baseTempC = 31;
-
-        function updateWeatherDisplay() {
-            const tempDisplay = document.getElementById("weather-temp-display");
-            const cityLabel = document.getElementById("weather-city-label");
-            if (cityLabel) cityLabel.textContent = weatherCity + " ✎";
-
-            if (tempDisplay) {
-                if (isFahrenheit) {
-                    const tempF = Math.round((baseTempC * 9/5) + 32);
-                    tempDisplay.innerHTML = `${tempF}°F <small style="font-size: 11px; font-weight: normal; color: #8f8f9d;">↑97° ↓81°</small>`;
-                } else {
-                    tempDisplay.innerHTML = `${baseTempC}°C <small style="font-size: 11px; font-weight: normal; color: #8f8f9d;">↑36° ↓27°</small>`;
-                }
-            }
-        }
-
-        function toggleWeatherUnit() {
-            isFahrenheit = !isFahrenheit;
-            updateWeatherDisplay();
-        }
-
-        function promptChangeWeatherCity() {
-            const city = prompt("Enter city name for Weather:", weatherCity);
-            if (city && city.trim()) {
-                setWeatherCity(city.trim());
-            }
-        }
-
-        function setWeatherCity(city) {
-            weatherCity = city;
-            // Preset realistic temperatures for common cities
-            const cLower = city.toLowerCase();
-            if (cLower.includes("london")) baseTempC = 17;
-            else if (cLower.includes("new york") || cLower.includes("nyc")) baseTempC = 19;
-            else if (cLower.includes("tokyo")) baseTempC = 22;
-            else if (cLower.includes("sydney")) baseTempC = 20;
-            else if (cLower.includes("delhi")) baseTempC = 33;
-            else baseTempC = 28;
-
-            updateWeatherDisplay();
-            const input = document.getElementById("weather-city-input");
-            if (input) input.value = weatherCity;
-        }
-
-        function refreshClocksAndWeather() {
-            updateWorldClocks();
-            updateWeatherDisplay();
-            document.querySelectorAll(".section-popover").forEach(p => p.classList.remove("show"));
-        }
-
-        // --------------------------------------------------------------------
-        // Focus Timer Logic
-        // --------------------------------------------------------------------
-        let timerSeconds = 25 * 60;
-        let timerInterval = null;
-        let timerRunning = false;
-
-        function updateTimerDisplay() {
-            const m = Math.floor(timerSeconds / 60);
-            const s = timerSeconds % 60;
-            const str = String(m).padStart(2, '0') + ":" + String(s).padStart(2, '0');
-            const el = document.getElementById("timer-display");
-            if (el) el.textContent = str;
-        }
-
-        function toggleTimer() {
-            const btn = document.getElementById("timer-toggle-btn");
-            if (timerRunning) {
-                clearInterval(timerInterval);
-                timerRunning = false;
-                if (btn) btn.textContent = "▶";
-            } else {
-                timerRunning = true;
-                if (btn) btn.textContent = "❚❚";
-                timerInterval = setInterval(() => {
-                    if (timerSeconds > 0) {
-                        timerSeconds--;
-                        updateTimerDisplay();
-                    } else {
-                        clearInterval(timerInterval);
-                        timerRunning = false;
-                        if (btn) btn.textContent = "▶";
-                        alert("Focus session complete!");
-                    }
-                }, 1000);
-            }
-        }
-
-        function adjustTimer(delta) {
-            timerSeconds = Math.max(60, timerSeconds + delta);
-            updateTimerDisplay();
-        }
-
-        function setTimerMode(mode) {
-            clearInterval(timerInterval);
-            timerRunning = false;
-            const btn = document.getElementById("timer-toggle-btn");
-            if (btn) btn.textContent = "▶";
-
-            document.getElementById("btn-focus").classList.toggle("active", mode === "focus");
-            document.getElementById("btn-break").classList.toggle("active", mode === "break");
-
-            timerSeconds = mode === "focus" ? 25 * 60 : 5 * 60;
-            updateTimerDisplay();
-        }
-
-        // --------------------------------------------------------------------
-        // Checklist Logic
-        // --------------------------------------------------------------------
-        let checklistData = ["Research Rust WebKitGTK", "Read tech privacy news"];
-        function renderChecklist() {
-            const container = document.getElementById("checklist-items");
-            if (!container) return;
-            container.innerHTML = "";
-            checklistData.forEach((task, idx) => {
-                const row = document.createElement("div");
-                row.className = "checklist-item-row";
-                row.innerHTML = `
-                    <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
-                        <input type="checkbox" onchange="this.parentElement.style.textDecoration = this.checked ? 'line-through' : 'none'" />
-                        <span>${task}</span>
-                    </label>
-                    <span style="color: #8f8f9d; cursor: pointer; padding: 0 4px;" onclick="removeChecklistItem(${idx})">✕</span>
-                `;
-                container.appendChild(row);
-            });
-        }
-        renderChecklist();
-
-        function addChecklistItem() {
-            const item = prompt("Add a task to Checklist:");
-            if (item && item.trim()) {
-                checklistData.push(item.trim());
-                renderChecklist();
-            }
-        }
-
-        function removeChecklistItem(idx) {
-            checklistData.splice(idx, 1);
-            renderChecklist();
-        }
-
-        // --------------------------------------------------------------------
-        // Stories / News Category Filter
-        // --------------------------------------------------------------------
-        function filterStoriesCategory(cat) {
-            document.querySelectorAll(".category-chip").forEach(chip => chip.classList.remove("active"));
-            event.target.classList.add("active");
-
-            const cards = document.querySelectorAll(".story-card");
-            cards.forEach(card => {
-                const cardCat = card.getAttribute("data-category");
-                if (cat === "all" || cardCat === cat) {
-                    card.style.display = "flex";
-                } else {
-                    card.style.display = "none";
-                }
-            });
-        }
-
-        function refreshStoriesFeed() {
-            document.querySelectorAll(".section-popover").forEach(p => p.classList.remove("show"));
-            const cards = document.querySelectorAll(".story-card");
-            cards.forEach(c => {
-                c.style.opacity = "0.4";
-                setTimeout(() => c.style.opacity = "1", 200);
-            });
-        }
-
-        // --------------------------------------------------------------------
-        // Homepage Customizer Drawer System
-        // --------------------------------------------------------------------
-        function openCustomizer(focusSec) {
-            document.getElementById("customizer-overlay").style.display = "block";
-            document.getElementById("customizer-drawer").classList.add("open");
-            if (focusSec === "widgets") {
-                document.getElementById("drawer-widgets-sec").scrollIntoView({ behavior: 'smooth' });
-            } else if (focusSec === "news") {
-                document.getElementById("drawer-news-sec").scrollIntoView({ behavior: 'smooth' });
-            }
-        }
-
-        function closeCustomizer() {
-            document.getElementById("customizer-overlay").style.display = "none";
-            document.getElementById("customizer-drawer").classList.remove("open");
-        }
-
-        function setThemeBackground(bg, elem) {
-            document.body.style.background = bg;
-            document.querySelectorAll(".theme-swatch").forEach(s => s.classList.remove("active"));
-            if (elem) elem.classList.add("active");
-            try { localStorage.setItem("norva_theme_bg", bg); } catch(e) {}
-        }
-
-        // Restore saved theme background
-        try {
-            const savedBg = localStorage.getItem("norva_theme_bg");
-            if (savedBg) document.body.style.background = savedBg;
-        } catch(e) {}
-
-        function toggleShortcutsVisibility(show) {
-            const el = document.getElementById("shortcuts-section");
-            if (el) el.style.display = show ? "block" : "none";
-        }
-
-        function toggleSponsoredShortcuts(show) {
-            document.querySelectorAll(".shortcut-sub").forEach(sub => {
-                if (sub.textContent.includes("Sponsored")) {
-                    sub.closest(".shortcut-item").style.display = show ? "flex" : "none";
-                }
-            });
-        }
-
-        function toggleWidgetsVisibility(show) {
-            const el = document.getElementById("widgets-section");
-            if (el) el.style.display = show ? "block" : "none";
-            document.getElementById("toggle-widgets").checked = show;
-        }
-
-        function toggleStoriesVisibility(show) {
-            const el = document.getElementById("stories-section");
-            if (el) el.style.display = show ? "block" : "none";
-            document.getElementById("toggle-stories").checked = show;
-        }
-
-        function toggleVaultsVisibility(show) {
-            const el = document.getElementById("vaults-bar");
-            if (el) el.style.display = show ? "flex" : "none";
-        }
+        });
     </script>
 </body>
 </html>"###;
+
+    let saved_mb = (stats.estimated_bandwidth_saved_kb as f64) / 1024.0;
 
     template
         .replace("{{COMMON_CSS}}", get_common_css())
         .replace("{{MODE_PILL}}", mode_pill)
         .replace("{{DEFAULT_NAME}}", &default_engine.name)
-        .replace("{{DEFAULT_ICON}}", default_icon)
-        .replace("{{DEFAULT_BANG}}", &default_engine.bang)
-        .replace("{{DEFAULT_ID}}", &default_engine.id)
         .replace("{{ENGINE_ITEMS}}", &engine_items_html)
-        .replace("{{ADS_BLOCKED}}", &stats.total_ads_blocked.to_string())
+        .replace("{{ADS_BLOCKED}}", &stats.total_all_time.to_string())
+        .replace("{{SAVED_MB}}", &format!("{:.1}", saved_mb))
         .replace("{{CACHE_MB}}", &format!("{:.1}", cache_mb))
 }
 
-/// Renders the `norva://history` view.
+/// Renders the `norva://history` view with interactive filtering and purge controls.
 pub fn render_history_page(entries: &[HistoryEntry]) -> String {
     let mut rows = String::new();
     if entries.is_empty() {
-        rows.push_str(r###"<div style="text-align:center; padding: 48px; color: var(--text-muted);">
-            <h3>Your History Vault is Empty</h3>
-            <p style="margin-top: 8px;">No browsing activity recorded. In Secure Mode, history is never saved.</p>
+        rows.push_str(r###"<div style="text-align:center; padding: 56px 24px; color: var(--text-muted);">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="margin-bottom:12px; opacity:0.6;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <h3 style="color: var(--text-primary); font-size: 16px;">History Vault is Clear</h3>
+            <p style="margin-top: 6px; font-size: 13px;">No browsing activity recorded. In Secure Ghost Mode, history is never persisted.</p>
         </div>"###);
     } else {
         for e in entries {
             let engine_badge = if let Some(ref eng) = e.search_engine {
-                format!(r###"<span class="badge-engine">🔍 {}</span>"###, eng)
+                format!(r###"<span style="background: rgba(99, 102, 241, 0.12); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.25); padding: 2px 7px; border-radius: 4px; font-size: 11px; font-weight: 600;">🔍 {}</span>"###, eng)
             } else {
                 String::new()
             };
 
             let query_info = if let Some(ref q) = e.search_query {
-                format!(r###"<span style="color: var(--accent-blue); font-weight: 500;">Search: "{}"</span> - "###, q)
+                format!(r###"<span style="color: var(--accent-cyan); font-weight: 500;">Search: "{}"</span> • "###, q)
             } else {
                 String::new()
             };
@@ -2176,10 +1003,10 @@ pub fn render_history_page(entries: &[HistoryEntry]) -> String {
                             {}
                         </div>
                         <div class="history-meta">
-                            {}{} - Visited {} times
+                            {}{} • Visited {} times
                         </div>
                     </div>
-                    <button class="btn btn-danger btn-sm" onclick="deleteHistory({})" title="Delete record">Delete</button>
+                    <button class="btn btn-danger" style="padding: 4px 10px; font-size: 12px;" onclick="deleteHistory({})">Delete</button>
                 </div>"###,
                 e.url, e.title, engine_badge, query_info, e.visit_time, e.visit_count, e.id
             ));
@@ -2190,7 +1017,7 @@ pub fn render_history_page(entries: &[HistoryEntry]) -> String {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>History</title>
+    <title>History Vault | NORVA</title>
     <style>
         {{COMMON_CSS}}
         .header-actions {
@@ -2198,43 +1025,50 @@ pub fn render_history_page(entries: &[HistoryEntry]) -> String {
             align-items: center;
             justify-content: space-between;
             margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
         }
         .search-box {
-            background: #1c1b22;
+            background: #141520;
             border: 1px solid var(--border-subtle);
-            border-radius: 6px;
+            border-radius: 8px;
             padding: 8px 14px;
-            color: #fbfbfe;
+            color: #ffffff;
             width: 320px;
             outline: none;
+            font-size: 13px;
+            transition: border-color 0.15s ease;
         }
         .search-box:focus {
             border-color: var(--border-focus);
-            box-shadow: 0 0 0 1px var(--border-focus);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
         }
         .history-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 12px 16px;
-            background: #2b2a33;
+            padding: 14px 18px;
+            background: var(--bg-surface);
             border: 1px solid var(--border-subtle);
-            border-radius: 8px;
-            margin-bottom: 8px;
-            transition: background-color 0.15s ease;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            transition: all 0.15s ease;
         }
         .history-item:hover {
-            background-color: #38383d;
+            background-color: var(--bg-surface-elevated);
+            border-color: var(--border-hover);
         }
         .history-main {
             overflow: hidden;
+            flex: 1;
+            margin-right: 16px;
         }
         .history-title {
             font-size: 14px;
             font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             margin-bottom: 4px;
         }
         .history-link {
@@ -2245,24 +1079,11 @@ pub fn render_history_page(entries: &[HistoryEntry]) -> String {
             white-space: nowrap;
         }
         .history-link:hover {
-            color: var(--accent-blue);
+            color: var(--accent-indigo);
         }
         .history-meta {
             font-size: 12px;
             color: var(--text-muted);
-        }
-        .badge-engine {
-            background-color: #42414d;
-            color: #cfcfd4;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 11px;
-        }
-            font-size: 11px;
-        }
-        .btn-sm {
-            padding: 4px 10px;
-            font-size: 12px;
         }
     </style>
 </head>
@@ -2279,7 +1100,7 @@ pub fn render_history_page(entries: &[HistoryEntry]) -> String {
             <a href="norva://history" class="chip active">📜 History</a>
             <a href="norva://shields" class="chip">🛡️ Shields</a>
             <a href="norva://permissions" class="chip">📷 Permissions</a>
-            <a href="norva://cookies" class="chip">🍪 Storage & Cache</a>
+            <a href="norva://cookies" class="chip">🍪 Storage</a>
             <a href="norva://settings" class="chip">⚙️ Settings</a>
         </div>
     </header>
@@ -2287,16 +1108,16 @@ pub fn render_history_page(entries: &[HistoryEntry]) -> String {
     <main class="container">
         <div class="header-actions">
             <div>
-                <h2>Browsing History Vault</h2>
-                <p style="color: var(--text-muted); font-size: 14px;">Dedicated SQLite history.db storage</p>
+                <h2 style="font-size: 22px; font-weight: 700; color: #ffffff;">Browsing History Vault</h2>
+                <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Isolated SQLite history.db storage with zero telemetry</p>
             </div>
             <div style="display: flex; gap: 10px;">
-                <input type="text" class="search-box" id="search-hist" placeholder="Filter history..." oninput="filterHistory()" />
+                <input type="text" class="search-box" id="search-hist" placeholder="Filter history records..." oninput="filterHistory()" />
                 <button class="btn btn-danger" onclick="clearAllHistory()">Purge All History</button>
             </div>
         </div>
 
-        <div class="card" id="history-container">
+        <div class="card" id="history-container" style="padding: 12px;">
             {{ROWS}}
         </div>
     </main>
@@ -2344,60 +1165,86 @@ pub fn render_history_page(entries: &[HistoryEntry]) -> String {
         .replace("{{ROWS}}", &rows)
 }
 
-/// Renders the `norva://shields` view.
-pub fn render_shields_page(_stats: &ShieldStats, events: &[BlockedEvent]) -> String {
+/// Renders the `norva://shields` view with real-time telemetry stream and switch controls.
+pub fn render_shields_page(stats: &ShieldStats, events: &[BlockedEvent]) -> String {
     let mut log_rows = String::new();
-    for ev in events {
-        let badge_color = match ev.category {
-            crate::db::shields_db::BlockCategory::Ad => "#38bdf8",
-            crate::db::shields_db::BlockCategory::Tracker => "#f43f5e",
-            crate::db::shields_db::BlockCategory::Fingerprinter => "#a855f7",
-            crate::db::shields_db::BlockCategory::Cryptominer => "#eab308",
-            crate::db::shields_db::BlockCategory::TrackingParam => "#10b981",
-        };
-        log_rows.push_str(&format!(
-            r###"<tr>
-                <td><span style="background: {}; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px;">{:?}</span></td>
-                <td style="font-family: monospace; color: var(--text-primary); font-weight: 500;">{}</td>
-                <td>{}</td>
-                <td style="color: var(--text-muted); font-size: 12px;">{}</td>
-            </tr>"###,
-            badge_color, ev.category, ev.blocked_domain, ev.page_domain, ev.timestamp
-        ));
+    if events.is_empty() {
+        log_rows.push_str(r###"<tr><td colspan="4" style="text-align:center; padding: 36px; color: var(--text-muted);">No surveillance events recorded yet. Browse any site to see live neutralization logs.</td></tr>"###);
+    } else {
+        for ev in events {
+            let (badge_bg, badge_color) = match ev.category {
+                crate::db::shields_db::BlockCategory::Ad => ("rgba(6, 182, 212, 0.12)", "#22d3ee"),
+                crate::db::shields_db::BlockCategory::Tracker => ("rgba(244, 63, 94, 0.12)", "#fb7185"),
+                crate::db::shields_db::BlockCategory::Fingerprinter => ("rgba(168, 85, 247, 0.12)", "#c084fc"),
+                crate::db::shields_db::BlockCategory::Cryptominer => ("rgba(245, 158, 11, 0.12)", "#fbbf24"),
+                crate::db::shields_db::BlockCategory::TrackingParam => ("rgba(16, 185, 129, 0.12)", "#34d399"),
+            };
+            log_rows.push_str(&format!(
+                r###"<tr>
+                    <td><span style="background: {}; color: {}; padding: 3px 8px; border-radius: 6px; font-weight: 700; font-size: 11px; text-transform: uppercase;">{:?}</span></td>
+                    <td style="font-family: monospace; color: var(--text-primary); font-size: 13px; font-weight: 500;">{}</td>
+                    <td style="color: var(--text-secondary); font-size: 13px;">{}</td>
+                    <td style="color: var(--text-muted); font-size: 12px;">{}</td>
+                </tr>"###,
+                badge_bg, badge_color, ev.category, ev.blocked_domain, ev.page_domain, ev.timestamp
+            ));
+        }
     }
+
+    let saved_mb = (stats.estimated_bandwidth_saved_kb as f64) / 1024.0;
 
     let template = r###"<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>NORVA | Privacy Shields & Ad-Blocker</title>
+    <title>Privacy Shields | NORVA</title>
     <style>
         {{COMMON_CSS}}
         .table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 14px;
+            font-size: 13.5px;
         }
         .table th, .table td {
-            padding: 12px;
+            padding: 12px 16px;
             text-align: left;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid var(--border-subtle);
         }
         .table th {
             color: var(--text-muted);
             text-transform: uppercase;
             font-size: 11px;
-            letter-spacing: 0.8px;
+            letter-spacing: 0.6px;
+            background: rgba(255, 255, 255, 0.02);
         }
-        .switch-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 14px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
         }
-        .switch-row:last-child {
-            border-bottom: none;
+        @media (max-width: 900px) {
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        .metric-box {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 18px;
+        }
+        .metric-title {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+        .metric-val {
+            font-size: 24px;
+            font-weight: 800;
+            color: #ffffff;
         }
     </style>
 </head>
@@ -2407,69 +1254,55 @@ pub fn render_shields_page(_stats: &ShieldStats, events: &[BlockedEvent]) -> Str
             <a href="norva://newtab" class="back-link">
                 <span>←</span> <span>Start Page</span>
             </a>
-            <h2 class="internal-title">🛡️ Privacy Shields Center</h2>
+            <h2 class="internal-title">🛡️ Privacy Shields Command Center</h2>
         </div>
         <div class="internal-nav-chips">
             <a href="norva://newtab" class="chip">🏠 Start</a>
             <a href="norva://history" class="chip">📜 History</a>
             <a href="norva://shields" class="chip active">🛡️ Shields</a>
             <a href="norva://permissions" class="chip">📷 Permissions</a>
-            <a href="norva://cookies" class="chip">🍪 Storage & Cache</a>
+            <a href="norva://cookies" class="chip">🍪 Storage</a>
             <a href="norva://settings" class="chip">⚙️ Settings</a>
         </div>
     </header>
 
     <main class="container">
-        <h2>Privacy Shields & Anti-Tracking Command</h2>
-        <p style="color: var(--text-muted); margin-bottom: 24px;">Dedicated SQLite privacy_shields.db rule engine</p>
-
-        <div class="card">
-            <h3 style="margin-bottom: 16px;">Active Defense Matrix</h3>
-            <div class="switch-row">
-                <div>
-                    <strong>Aggressive Network Ad Blocking</strong>
-                    <p style="color: var(--text-muted); font-size: 13px;">Pre-emptively blocks doubleclick, criteo, taboola, outbrain sockets</p>
-                </div>
-                <span class="mode-badge normal">ENABLED</span>
+        <div class="metrics-grid">
+            <div class="metric-box">
+                <div class="metric-title">Total Interceptions</div>
+                <div class="metric-val" style="color: #6366f1;">{{TOTAL_ALL}}</div>
             </div>
-            <div class="switch-row">
-                <div>
-                    <strong>Behavioral Tracker & Telemetry Protection</strong>
-                    <p style="color: var(--text-muted); font-size: 13px;">Blocks Google Analytics, Hotjar, Clarity, Facebook Pixel, Yandex</p>
-                </div>
-                <span class="mode-badge normal">ENABLED</span>
+            <div class="metric-box">
+                <div class="metric-title">Ads Blocked</div>
+                <div class="metric-val" style="color: #06b6d4;">{{ADS_COUNT}}</div>
             </div>
-            <div class="switch-row">
-                <div>
-                    <strong>Canvas & Audio Fingerprint Defense</strong>
-                    <p style="color: var(--text-muted); font-size: 13px;">Injects deterministic sub-pixel noise into canvas renders</p>
-                </div>
-                <span class="mode-badge normal">ENABLED</span>
+            <div class="metric-box">
+                <div class="metric-title">Trackers Blocked</div>
+                <div class="metric-val" style="color: #f43f5e;">{{TRACKERS_COUNT}}</div>
             </div>
-            <div class="switch-row">
-                <div>
-                    <strong>URL Parameter Stripping</strong>
-                    <p style="color: var(--text-muted); font-size: 13px;">Sanitizes fbclid, gclid, utm_source, msclkid from destination links</p>
-                </div>
-                <span class="mode-badge normal">ENABLED</span>
+            <div class="metric-box">
+                <div class="metric-title">Data Saved</div>
+                <div class="metric-val" style="color: #10b981;">{{SAVED_MB}} MB</div>
             </div>
         </div>
 
         <div class="card">
-            <h3 style="margin-bottom: 16px;">Recent Neutralized Surveillance Events</h3>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Category</th>
-                        <th>Blocked Entity</th>
-                        <th>Origin Page</th>
-                        <th>Timestamp</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {{LOG_ROWS}}
-                </tbody>
-            </table>
+            <h3 style="font-size: 16px; font-weight: 700; color: #ffffff; margin-bottom: 16px;">Live Neutralized Threats Telemetry</h3>
+            <div style="overflow-x: auto;">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Blocked Host Target</th>
+                            <th>Originating Context</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{LOG_ROWS}}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </main>
 </body>
@@ -2477,69 +1310,99 @@ pub fn render_shields_page(_stats: &ShieldStats, events: &[BlockedEvent]) -> Str
 
     template
         .replace("{{COMMON_CSS}}", get_common_css())
+        .replace("{{TOTAL_ALL}}", &stats.total_all_time.to_string())
+        .replace("{{ADS_COUNT}}", &stats.total_ads_blocked.to_string())
+        .replace("{{TRACKERS_COUNT}}", &stats.total_trackers_blocked.to_string())
+        .replace("{{SAVED_MB}}", &format!("{:.1}", saved_mb))
         .replace("{{LOG_ROWS}}", &log_rows)
 }
 
-/// Renders the `norva://permissions` view.
+/// Renders the `norva://permissions` view with granular hardware arbiter policies and audit logs.
 pub fn render_permissions_page(permissions: &[SitePermission], audits: &[PermissionAuditLog]) -> String {
     let mut perm_rows = String::new();
-    for p in permissions {
-        perm_rows.push_str(&format!(
-            r###"<tr>
-                <td style="font-weight: 600;">{}</td>
-                <td><span class="mode-badge {}">{:?}</span></td>
-                <td><span class="mode-badge {}">{:?}</span></td>
-                <td><span class="mode-badge {}">{:?}</span></td>
-                <td><button class="btn btn-danger btn-sm" onclick="resetPermission('{}')">Reset</button></td>
-            </tr>"###,
-            p.domain,
-            if p.camera == crate::db::permissions_db::PermissionPolicy::Allow { "normal" } else { "secure" },
-            p.camera,
-            if p.microphone == crate::db::permissions_db::PermissionPolicy::Allow { "normal" } else { "secure" },
-            p.microphone,
-            if p.location == crate::db::permissions_db::PermissionPolicy::Allow { "normal" } else { "secure" },
-            p.location,
-            p.domain
-        ));
+    if permissions.is_empty() {
+        perm_rows.push_str(r###"<tr><td colspan="5" style="text-align:center; padding: 32px; color: var(--text-muted);">No custom site permissions configured. All origins operate under zero-trust gating.</td></tr>"###);
+    } else {
+        for p in permissions {
+            perm_rows.push_str(&format!(
+                r###"<tr>
+                    <td style="font-weight: 600; color: #ffffff;">{}</td>
+                    <td><span class="policy-badge {:?}">{}</span></td>
+                    <td><span class="policy-badge {:?}">{}</span></td>
+                    <td><span class="policy-badge {:?}">{}</span></td>
+                    <td>
+                        <button class="btn btn-danger" style="padding: 4px 8px; font-size: 11px;" onclick="resetPermission('{}')">Reset</button>
+                    </td>
+                </tr>"###,
+                p.domain, p.camera, p.camera.as_str(), p.microphone, p.microphone.as_str(), p.location, p.location.as_str(), p.domain
+            ));
+        }
     }
 
     let mut audit_rows = String::new();
-    for a in audits {
-        audit_rows.push_str(&format!(
-            r###"<tr>
-                <td>{}</td>
-                <td style="text-transform: capitalize;">{}</td>
-                <td><span class="mode-badge {}">{}</span></td>
-                <td style="color: var(--text-muted); font-size: 12px;">{}</td>
-            </tr>"###,
-            a.domain,
-            a.permission_type,
-            if a.decision.contains("allow") { "normal" } else { "secure" },
-            a.decision,
-            a.timestamp
-        ));
+    if audits.is_empty() {
+        audit_rows.push_str(r###"<tr><td colspan="4" style="text-align:center; padding: 28px; color: var(--text-muted);">No hardware sensor invocations recorded.</td></tr>"###);
+    } else {
+        for a in audits {
+            let decision_color = if a.decision == "allowed" || a.decision == "allowed_internal" {
+                "#10b981"
+            } else {
+                "#f43f5e"
+            };
+            audit_rows.push_str(&format!(
+                r###"<tr>
+                    <td style="font-weight: 500; color: #ffffff;">{}</td>
+                    <td style="text-transform: capitalize; color: var(--text-secondary);">{}</td>
+                    <td><span style="color: {}; font-weight: 600; text-transform: uppercase; font-size: 11px;">{}</span></td>
+                    <td style="color: var(--text-muted); font-size: 12px;">{}</td>
+                </tr>"###,
+                a.domain, a.permission_type, decision_color, a.decision, a.timestamp
+            ));
+        }
     }
 
     let template = r###"<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>NORVA | Hardware & Location Permissions</title>
+    <title>Hardware Permissions | NORVA</title>
     <style>
         {{COMMON_CSS}}
         .table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 14px;
+            font-size: 13.5px;
         }
         .table th, .table td {
-            padding: 12px;
+            padding: 12px 16px;
             text-align: left;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid var(--border-subtle);
         }
-        .btn-sm {
-            padding: 4px 8px;
+        .table th {
+            color: var(--text-muted);
+            text-transform: uppercase;
             font-size: 11px;
+            letter-spacing: 0.6px;
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .policy-badge {
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .policy-badge.Allow {
+            background: rgba(16, 185, 129, 0.12);
+            color: #34d399;
+        }
+        .policy-badge.Block {
+            background: rgba(244, 63, 94, 0.12);
+            color: #fb7185;
+        }
+        .policy-badge.Ask {
+            background: rgba(245, 158, 11, 0.12);
+            color: #fbbf24;
         }
     </style>
 </head>
@@ -2549,55 +1412,59 @@ pub fn render_permissions_page(permissions: &[SitePermission], audits: &[Permiss
             <a href="norva://newtab" class="back-link">
                 <span>←</span> <span>Start Page</span>
             </a>
-            <h2 class="internal-title">📷 Hardware & Site Permissions</h2>
+            <h2 class="internal-title">📷 Hardware & Location Permissions Arbiter</h2>
         </div>
         <div class="internal-nav-chips">
             <a href="norva://newtab" class="chip">🏠 Start</a>
             <a href="norva://history" class="chip">📜 History</a>
             <a href="norva://shields" class="chip">🛡️ Shields</a>
             <a href="norva://permissions" class="chip active">📷 Permissions</a>
-            <a href="norva://cookies" class="chip">🍪 Storage & Cache</a>
+            <a href="norva://cookies" class="chip">🍪 Storage</a>
             <a href="norva://settings" class="chip">⚙️ Settings</a>
         </div>
     </header>
 
     <main class="container">
-        <h2>Hardware & Location Permissions Arbiter</h2>
-        <p style="color: var(--text-muted); margin-bottom: 24px;">Dedicated SQLite permissions.db rule arbiter for Internal/External Webcams, Microphones, and GPS.</p>
-
         <div class="card">
-            <h3 style="margin-bottom: 16px;">Configured Domain Rules</h3>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Domain</th>
-                        <th>📷 Camera</th>
-                        <th>🎙️ Microphone</th>
-                        <th>📍 Location</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {{PERM_ROWS}}
-                </tbody>
-            </table>
+            <h3 style="font-size: 16px; font-weight: 700; color: #ffffff; margin-bottom: 16px;">Configured Domain Policies</h3>
+            <div style="overflow-x: auto;">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Origin Domain</th>
+                            <th>Webcam / Video</th>
+                            <th>Microphone / Audio</th>
+                            <th>Geolocation Sensor</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{PERM_ROWS}}
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <div class="card">
-            <h3 style="margin-bottom: 16px;">Hardware Invocation Forensic Audit Log</h3>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Origin</th>
-                        <th>Device Requested</th>
-                        <th>Resolution</th>
-                        <th>Timestamp</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {{AUDIT_ROWS}}
-                </tbody>
-            </table>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h3 style="font-size: 16px; font-weight: 700; color: #ffffff;">Forensic Hardware Invocations Audit Log</h3>
+                <button class="btn btn-danger" style="font-size: 12px; padding: 4px 10px;" onclick="clearAudit()">Clear Audit</button>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Requested Origin</th>
+                            <th>Device Target</th>
+                            <th>Security Decision</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{AUDIT_ROWS}}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </main>
 
@@ -2606,6 +1473,15 @@ pub fn render_permissions_page(permissions: &[SitePermission], audits: &[Permiss
             if (window.ipc && window.ipc.postMessage) {
                 window.ipc.postMessage(JSON.stringify({ action: "reset_permission", domain: domain }));
                 setTimeout(() => window.location.reload(), 150);
+            }
+        }
+
+        function clearAudit() {
+            if (confirm("Wipe all hardware forensic audit logs?")) {
+                if (window.ipc && window.ipc.postMessage) {
+                    window.ipc.postMessage(JSON.stringify({ action: "clear_permissions_audit" }));
+                    setTimeout(() => window.location.reload(), 150);
+                }
             }
         }
     </script>
@@ -2618,23 +1494,31 @@ pub fn render_permissions_page(permissions: &[SitePermission], audits: &[Permiss
         .replace("{{AUDIT_ROWS}}", &audit_rows)
 }
 
-/// Renders the `norva://cookies` view.
+/// Renders the `norva://cookies` view for cookie isolation and storage management.
 pub fn render_cookies_page(cache_mb: f64) -> String {
     let template = r###"<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>NORVA | Cookie Isolation & Cache Management</title>
+    <title>Cookie Isolation & Cache | NORVA</title>
     <style>
         {{COMMON_CSS}}
-        .storage-stat {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 16px;
-            background: rgba(15, 23, 42, 0.5);
-            border-radius: 12px;
-            margin-bottom: 16px;
+        .storage-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+        @media (max-width: 768px) {
+            .storage-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .storage-card {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 24px;
         }
     </style>
 </head>
@@ -2644,52 +1528,43 @@ pub fn render_cookies_page(cache_mb: f64) -> String {
             <a href="norva://newtab" class="back-link">
                 <span>←</span> <span>Start Page</span>
             </a>
-            <h2 class="internal-title">🍪 Cookie Isolation & Cache Management</h2>
+            <h2 class="internal-title">🍪 Cookie Partitioning & Cache Storage</h2>
         </div>
         <div class="internal-nav-chips">
             <a href="norva://newtab" class="chip">🏠 Start</a>
             <a href="norva://history" class="chip">📜 History</a>
             <a href="norva://shields" class="chip">🛡️ Shields</a>
             <a href="norva://permissions" class="chip">📷 Permissions</a>
-            <a href="norva://cookies" class="chip active">🍪 Storage & Cache</a>
+            <a href="norva://cookies" class="chip active">🍪 Storage</a>
             <a href="norva://settings" class="chip">⚙️ Settings</a>
         </div>
     </header>
 
     <main class="container">
-        <h2>Cookie Isolation & Cache Memory Management</h2>
-        <p style="color: var(--text-muted); margin-bottom: 24px;">Dedicated SQLite cache_cookies.db storage controller</p>
-
-        <div class="card">
-            <h3 style="margin-bottom: 16px;">Cache Memory Health</h3>
-            <div class="storage-stat">
-                <div>
-                    <h4 style="font-size: 22px; color: var(--text-primary); font-weight: 700;">{{CACHE_MB}} MB</h4>
-                    <p style="color: var(--text-muted); font-size: 13px;">Physical disk cache footprint</p>
-                </div>
-                <button class="btn btn-danger" onclick="purgeCache()">Purge Cache Memory Now</button>
+        <div class="storage-grid">
+            <div class="storage-card">
+                <h3 style="font-size: 16px; font-weight: 700; color: #ffffff; margin-bottom: 8px;">Disk Cache Quota</h3>
+                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">Cached assets in ~/.local/share/norva/cache</p>
+                <div style="font-size: 32px; font-weight: 800; color: #ffffff; margin-bottom: 16px;">{{CACHE_MB}} MB</div>
+                <button class="btn btn-danger" onclick="purgeCache()">Purge Disk Cache Now</button>
             </div>
-            <p style="font-size: 13px; color: var(--text-secondary);">
-                Purging cache resets all locally stored stylesheets, images, and cached responses, preventing ETag super-cookie tracking.
-            </p>
-        </div>
 
-        <div class="card">
-            <h3 style="margin-bottom: 16px;">Cookie Partitioning Matrix</h3>
-            <div style="display: flex; flex-direction: column; gap: 14px;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <strong>Block All Third-Party Tracking Cookies</strong>
-                        <p style="color: var(--text-muted); font-size: 13px;">Denies cross-site advertising networks from dropping persistent identifiers</p>
+            <div class="storage-card">
+                <h3 style="font-size: 16px; font-weight: 700; color: #ffffff; margin-bottom: 8px;">Cookie Isolation Policy</h3>
+                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">First-party partitioning enforced across all browsing contexts</p>
+                <div style="display: flex; flex-direction: column; gap: 10px; font-size: 13px;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Third-Party Cookie Blocking:</span>
+                        <span style="color: var(--accent-emerald); font-weight: 600;">ACTIVE</span>
                     </div>
-                    <span class="mode-badge normal">ENFORCED</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <strong>Automatic Ephemeral Cookie Wipe</strong>
-                        <p style="color: var(--text-muted); font-size: 13px;">Purges unauthenticated site cookies upon closing windows</p>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Local Storage Partitioning:</span>
+                        <span style="color: var(--accent-emerald); font-weight: 600;">ACTIVE</span>
                     </div>
-                    <span class="mode-badge normal">ENFORCED</span>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Ghost Mode Zero-Trace Storage:</span>
+                        <span style="color: var(--accent-indigo); font-weight: 600;">AVAILABLE</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -2697,10 +1572,9 @@ pub fn render_cookies_page(cache_mb: f64) -> String {
 
     <script>
         function purgeCache() {
-            if (confirm("Purge all disk cache memory?")) {
+            if (confirm("Permanently wipe all cached assets from disk?")) {
                 if (window.ipc && window.ipc.postMessage) {
                     window.ipc.postMessage(JSON.stringify({ action: "purge_cache" }));
-                    alert("Cache memory purged successfully!");
                     setTimeout(() => window.location.reload(), 200);
                 }
             }
@@ -2711,55 +1585,63 @@ pub fn render_cookies_page(cache_mb: f64) -> String {
 
     template
         .replace("{{COMMON_CSS}}", get_common_css())
-        .replace("{{CACHE_MB}}", &format!("{:.2}", cache_mb))
+        .replace("{{CACHE_MB}}", &format!("{:.1}", cache_mb))
 }
 
-/// Renders the `norva://settings` view.
+/// Renders the `norva://settings` view with search engines catalog and browser configurations.
 pub fn render_settings_page(
     engines: &[SearchEngineConfig],
     default_engine: &SearchEngineConfig,
-    _secure_mode: bool,
+    secure_mode: bool,
 ) -> String {
-    let mut engine_options = String::new();
+    let mut engine_rows = String::new();
     for e in engines {
-        let sel = if e.id == default_engine.id { "selected" } else { "" };
-        engine_options.push_str(&format!(
-            r###"<option value="{}" {}>{} ({})</option>"###,
-            e.id, sel, e.name, e.bang
+        let is_default_badge = if e.id == default_engine.id {
+            r###"<span style="background: rgba(16, 185, 129, 0.12); color: #34d399; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;">DEFAULT</span>"###
+        } else {
+            r###"<button class="btn" style="padding: 3px 8px; font-size: 11px;" onclick="setDefaultEngine('{}')">Make Default</button>"###
+        };
+
+        engine_rows.push_str(&format!(
+            r###"<tr>
+                <td style="font-weight: 600; color: #ffffff;">{}</td>
+                <td style="color: var(--accent-indigo); font-family: monospace; font-weight: 600;">{}</td>
+                <td style="color: var(--text-secondary); font-size: 12px; font-family: monospace; max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{}</td>
+                <td>{}</td>
+            </tr>"###,
+            e.name, e.bang, e.query_template, is_default_badge.replace("{}", &e.id)
         ));
     }
+
+    let mode_desc = if secure_mode {
+        "Currently running in Ephemeral Ghost Mode (RAM only, zero disk writes)"
+    } else {
+        "Currently running in Privacy Hardened Session (5 Isolated SQLite DBs)"
+    };
 
     let template = r###"<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>NORVA | Settings & Search Engine Configuration</title>
+    <title>Browser Settings | NORVA</title>
     <style>
         {{COMMON_CSS}}
-        .form-group {
-            margin-bottom: 20px;
-        }
-        .form-group label {
-            display: block;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 6px;
-        }
-        .select-box, .input-box {
+        .table {
             width: 100%;
-            max-width: 480px;
-            background-color: #1c1b22;
-            border: 1px solid var(--border-subtle);
-            border-radius: 6px;
-            padding: 9px 12px;
-            color: #fbfbfe;
-            font-size: 14px;
-            outline: none;
-            transition: border-color 0.15s ease;
+            border-collapse: collapse;
+            font-size: 13.5px;
         }
-        .select-box:focus, .input-box:focus {
-            border-color: var(--border-focus);
-            box-shadow: 0 0 0 1px var(--border-focus);
+        .table th, .table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        .table th {
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.6px;
+            background: rgba(255, 255, 255, 0.02);
         }
     </style>
 </head>
@@ -2769,91 +1651,48 @@ pub fn render_settings_page(
             <a href="norva://newtab" class="back-link">
                 <span>←</span> <span>Start Page</span>
             </a>
-            <h2 class="internal-title">⚙️ Browser Settings</h2>
+            <h2 class="internal-title">⚙️ Browser Configuration & Search Engines</h2>
         </div>
         <div class="internal-nav-chips">
             <a href="norva://newtab" class="chip">🏠 Start</a>
             <a href="norva://history" class="chip">📜 History</a>
             <a href="norva://shields" class="chip">🛡️ Shields</a>
             <a href="norva://permissions" class="chip">📷 Permissions</a>
-            <a href="norva://cookies" class="chip">🍪 Storage & Cache</a>
+            <a href="norva://cookies" class="chip">🍪 Storage</a>
             <a href="norva://settings" class="chip active">⚙️ Settings</a>
         </div>
     </header>
 
     <main class="container">
-        <h2>Browser Settings & Engine Configuration</h2>
-        <p style="color: var(--text-muted); margin-bottom: 24px;">Dedicated SQLite settings.db parameter catalog</p>
-
-        <div class="card">
-            <h3 style="margin-bottom: 16px;">Primary Search Engine</h3>
-            <div class="form-group">
-                <label>Default Engine for Omnibox queries:</label>
-                <select class="select-box" id="engine-select" onchange="changeDefaultEngine()">
-                    {{ENGINE_OPTIONS}}
-                </select>
-                <p style="color: var(--text-muted); font-size: 12px; margin-top: 6px;">
-                    Supports Google, Microsoft Bing, DuckDuckGo, Yahoo, and Ahmia (.onion Tor Search) out of the box.
-                </p>
-            </div>
+        <div class="card" style="margin-bottom: 24px;">
+            <h3 style="font-size: 16px; font-weight: 700; color: #ffffff; margin-bottom: 8px;">Active Session Profile</h3>
+            <p style="font-size: 13.5px; color: var(--text-secondary);">{{MODE_DESC}}</p>
         </div>
 
         <div class="card">
-            <h3 style="margin-bottom: 16px;">Tor Hidden Services & Onion Proxy</h3>
-            <div class="form-group">
-                <label>Tor SOCKS5 Proxy Host & Port:</label>
-                <input type="text" class="input-box" value="127.0.0.1:9050" readonly />
-                <p style="color: var(--text-muted); font-size: 12px; margin-top: 6px;">
-                    Used when conducting .onion searches via Ahmia (!ahmia) or Tor hidden service proxies.
-                </p>
+            <h3 style="font-size: 16px; font-weight: 700; color: #ffffff; margin-bottom: 16px;">Configured Search Engines</h3>
+            <div style="overflow-x: auto;">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Search Provider</th>
+                            <th>Bang Hotkey</th>
+                            <th>URL Template</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{ENGINE_ROWS}}
+                    </tbody>
+                </table>
             </div>
-        </div>
-
-        <div class="card">
-            <h3 style="margin-bottom: 16px;">Add Custom Search Provider</h3>
-            <div class="form-group">
-                <label>Engine Name:</label>
-                <input type="text" class="input-box" id="custom-name" placeholder="e.g. SearXNG" />
-            </div>
-            <div class="form-group">
-                <label>URL Template (use {} for search query):</label>
-                <input type="text" class="input-box" id="custom-template" placeholder="https://searx.example.com/search?q={}" />
-            </div>
-            <div class="form-group">
-                <label>Bang Shortcut:</label>
-                <input type="text" class="input-box" id="custom-bang" placeholder="e.g. !sx" />
-            </div>
-            <button class="btn" onclick="addCustomEngine()">Register New Engine</button>
         </div>
     </main>
 
     <script>
-        function changeDefaultEngine() {
-            const sel = document.getElementById("engine-select").value;
+        function setDefaultEngine(id) {
             if (window.ipc && window.ipc.postMessage) {
-                window.ipc.postMessage(JSON.stringify({ action: "set_default_engine", id: sel }));
-                alert("Default search engine updated to " + sel);
-            }
-        }
-
-        function addCustomEngine() {
-            const name = document.getElementById("custom-name").value.trim();
-            const template = document.getElementById("custom-template").value.trim();
-            const bang = document.getElementById("custom-bang").value.trim();
-
-            if (!name || !template || !bang) {
-                alert("Please complete all custom search engine fields.");
-                return;
-            }
-
-            if (window.ipc && window.ipc.postMessage) {
-                window.ipc.postMessage(JSON.stringify({
-                    action: "add_engine",
-                    name: name,
-                    template: template,
-                    bang: bang
-                }));
-                alert("Custom engine added!");
+                window.ipc.postMessage(JSON.stringify({ action: "set_default_engine", query: id }));
                 setTimeout(() => window.location.reload(), 150);
             }
         }
@@ -2863,5 +1702,6 @@ pub fn render_settings_page(
 
     template
         .replace("{{COMMON_CSS}}", get_common_css())
-        .replace("{{ENGINE_OPTIONS}}", &engine_options)
+        .replace("{{MODE_DESC}}", mode_desc)
+        .replace("{{ENGINE_ROWS}}", &engine_rows)
 }

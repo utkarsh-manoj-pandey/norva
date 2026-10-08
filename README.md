@@ -11,7 +11,7 @@
   High-Security • Anti-Tracking • Hardware Isolated • Multi-Engine
 ```
 
-**NORVA** is a high-performance, lightweight, uncompromising privacy web browser built entirely in **Rust**. Engineered from the ground up to neutralize surveillance capitalism, NORVA gives you total sovereignty over your online presence with zero telemetry, dedicated SQLite data vaults for every subsystem, hardware zero-trust control, and seamless support for clearnet and darknet (.onion) search engines.
+**NORVA** is a high-performance, lightweight, uncompromising privacy web browser built entirely in **Rust**. Engineered from the ground up to neutralize surveillance capitalism, NORVA gives you total sovereignty over your online presence with zero telemetry, dedicated SQLite data vaults for every subsystem, hardware zero-trust control, lock-free atomic telemetry counters, and seamless support for clearnet and darknet (.onion) search engines.
 
 ---
 
@@ -19,69 +19,71 @@
 
 | Layer | Technology | Key Capabilities |
 | :--- | :--- | :--- |
-| **Backend** | **Rust 2024 Edition** | Zero-cost abstractions, memory safety, thread safety, humanly written architectural rationales. |
-| **Browser Chrome** | **Native GTK-3 (Custom)** | Authentic desktop browser layout: dedicated multi-tab strip at top, navigation toolbar (Back/Forward/Reload/Home), centered Omnibox with live search engine switcher, Privacy Shield counter, hardware zero-trust indicators, 3-dots menu, and Bookmarks bar. |
-| **Web Engine** | **Tao + Wry (WebKitGTK)** | Hardware-accelerated web viewport seamlessly attached below the native chrome, running across both Wayland and X11 without distortion or window handle errors. |
-| **Database** | **SQLite (Multi-Vault)** | **A dedicated database for every usecase** with Write-Ahead Logging (WAL) and memory-only Secure Mode. |
+| **Backend** | **Rust 2024 Edition** | Zero-cost abstractions, memory safety, thread safety, humanly written architectural rationales across every module. |
+| **Browser Chrome** | **Native GTK-3 (Executive Dark)** | Authentic desktop browser layout: dedicated multi-tab strip at top, navigation toolbar (Back/Forward/Reload/Home), centered Omnibox with live search engine switcher, Privacy Shield counter, hardware zero-trust indicators, 3-dots menu, and Bookmarks bar. |
+| **Web Engine** | **Tao + Wry (WebKitGTK)** | Hardware-accelerated web viewport seamlessly attached below the native chrome, running across Wayland and X11 without distortion. |
+| **Database** | **SQLite (Multi-Vault)** | **5 dedicated, isolated database files** with Write-Ahead Logging (WAL), 64MB memory caches, busy timeouts, and in-memory Secure Mode. |
+| **Performance** | **Lock-Free Atomic Caches** | Zero-allocation subdomain matching, atomic telemetry counters, and asynchronous background cache calculations eliminating browser freezes. |
 
 ---
 
-## 🖥️ Authentic Desktop Browser Interface & Layout
+## 🖥️ Executive Desktop Browser Interface & Layout
 
-NORVA looks, feels, and functions like an authentic, premium desktop web browser:
+NORVA features an authentic, executive-grade cyber-dark interface free of childish widgets or amateurish clutter:
 
 1. **Top Tab Bar**:
    - Dedicated tab strip anchored at the very top of the window.
-   - Interactive rounded tabs with favicons, document title truncation, and `✕` close buttons.
-   - Seamless active tab highlighting physically connected to the toolbar below.
+   - Interactive tabs with document title truncation, status glyphs, and `✕` close buttons.
+   - Active tab indicator physically connected to the toolbar below.
    - Instant `+` button to open new tabs.
-   - Dynamic tab title and favicon synchronization as web pages load.
-   - Real-time Session Status Pill (`🔒 GHOST MODE` or `🛡️ PRIVACY HARDENED`).
+   - Real-time Session Status Pill (`🔒 GHOST MODE` or `● PRIVACY HARDENED`).
 
 2. **Navigation Toolbar & Centered Omnibox**:
-   - Standard browser controls: Back (`‹`), Forward (`›`), Reload (`↻`), and Home (`⌂`).
-   - Centered Omnibox (address bar) with rounded capsule styling and glowing focus ring.
-   - **Connection Security Badge (`🛡️` / `🔒`)**: Click to inspect HTTPS encryption, hardware isolation, and tracking status.
-   - **Search Engine Selector Pill (`🦆 DDG ▼`, `🔍 Google ▼`, `⚡ Bing ▼`, `🟣 Yahoo ▼`, `🧅 Ahmia ▼`)**: Click to switch your default search provider on the fly.
-   - **Full URL / Search Entry**: Type any URL, domain name, search query, or bang shortcut (`!g`, `!b`, `!ddg`, `!y`, `!ahmia`) and press `Enter` to navigate.
-   - **Bookmark Star Button (`★`)**: One-click bookmarking of active URLs directly into the bookmarks bar.
+   - Standard browser controls: Back (`←`), Forward (`→`), Reload (`↻`), and Home (`⌂`).
+   - Centered Omnibox capsule with focus illumination and security badge.
+   - **Search Engine Selector Pill (`DDG ▼`, `Google ▼`, `Bing ▼`, `Yahoo ▼`, `Ahmia ▼`, `GitHub ▼`, `Wiki ▼`)**: Click to switch search providers on the fly.
+   - **Full URL / Search Entry**: Type any URL, domain name, search query, or bang shortcut (`!g`, `!b`, `!ddg`, `!y`, `!ahmia`, `!gh`, `!w`) and press `Enter` to navigate.
+   - **Bookmark Star Button (`☆`)**: One-click bookmarking of active URLs directly into the bookmarks bar.
 
 3. **Status Clusters & Browser Menu**:
    - **Live Privacy Shield Counter (`🛡️ X Blocked`)**: Increments dynamically as ads and trackers are neutralized. Click to open the Shields dashboard popover.
    - **Hardware Indicators Cluster (`📷 🎙️ 📍`)**: Instant popovers showing zero-trust status for webcams, microphones, and geolocation sensors, with quick navigation to `norva://permissions`.
    - **3-Dots Menu (`⋮`)**: Instant access to New Tab, History Vault, Privacy Shields, Site Permissions, Storage & Cache Purge, and Settings.
 
-4. **Bookmarks Bar (Speed Dial)**:
-   - Dedicated speed bar below the toolbar providing instant 1-click access to top privacy and search destinations: DuckDuckGo, Google, Bing, Yahoo, Ahmia .onion Tor, Rust Lang, EFF Privacy, Tor Project, History, and Shields.
+4. **Bookmarks Bar (Speed Bar)**:
+   - Dedicated speed bar below the toolbar providing instant 1-click access to top privacy and search destinations: DuckDuckGo, Ahmia Tor, EFF Privacy, Tor Project, Wikipedia, Rust Lang, Shields Center, and History Vault.
 
 5. **Start Page (`norva://newtab`)**:
-   - Clean, centered hero layout without redundant top navbars.
-   - Live Search Box with instant search engine selector tabs.
-   - Speed dial cards, real-time privacy metrics grid, hardware status strip, and internal command vault shortcuts.
+   - Clean, centered executive layout.
+   - Live Search Box with instant search engine selector tabs and Bang chips.
+   - **Real Threat Telemetry Cards**: Threats Neutralized matrix, Zero-Trust Hardware status, Bandwidth Saved metrics, and Storage Quota.
+   - **Developer & Privacy Speed Dial Placecards**: Real vector-styled destinations (GitHub, DuckDuckGo, Tor Project, EFF, Rust Lang, Hacker News, Wikipedia, Ahmia, Privacy Guides, Startpage).
+   - Instant Vault links to History, Shields, Permissions, Storage, and Settings.
 
 ---
 
 ## 🗄️ Multi-Database Architecture: "A New DB for Every Use Case"
 
-Unlike traditional browsers that lump your bookmarks, history, telemetry, and site storage into one giant fragile file, NORVA enforces strict architectural compartmentalization:
+Unlike traditional browsers that lump bookmarks, history, telemetry, and site storage into one giant fragile file, NORVA enforces strict architectural compartmentalization:
 
 1. **`history.db`** (Browsing History Vault):
    - Stores URLs, page titles, search engine queries, timestamps, and visit counts.
    - Indexed for instantaneous chronological lookups and instant substring searches.
    - Deduplicates sequential visits to prevent database bloat.
-   - Completely swapped for `:memory:` in Secure Ghost Mode (zero disk writes).
+   - Swapped for `:memory:` in Secure Ghost Mode (zero disk writes).
 
 2. **`permissions.db`** (Hardware & Geolocation Arbiter):
    - Stores per-origin permission rules (`Allow`, `Block`, `Ask`) for **Internal & External Cameras**, **Internal & External Microphones**, and **Geolocation sensors**.
-   - Maintains an immutable audit log of every device activation attempt.
+   - Maintains a tamper-evident audit log of every device activation attempt.
 
 3. **`privacy_shields.db`** (Anti-Tracking & Adblock Matrix):
    - Tracks neutralized advertising domains, telemetry beacons, fingerprinters, and cryptominers.
    - Stores custom domain rules (blocklist/whitelist) and real-time bandwidth savings metrics.
+   - Equipped with in-memory lock-free atomic counters for zero-latency retrieval.
 
 4. **`settings.db`** (Search Engines & Configuration):
    - Houses the search engine catalog, bang shortcuts, and user preferences.
-   - Keeps your search settings safe even if history is purged.
+   - Keeps search settings safe even if history is purged.
 
 5. **`cache_cookies.db`** (Storage & Cookie Isolation):
    - Controls per-domain storage policies, ephemeral cookie wipes, third-party cookie blocking, and cache cleanup audits.
@@ -90,19 +92,21 @@ Unlike traditional browsers that lump your bookmarks, history, telemetry, and si
 
 ## 🔍 First-Class Search Engine Integration
 
-NORVA provides native, out-of-the-box support for all major search engines, including Tor-style .onion searches:
+NORVA provides native, out-of-the-box support for 9 major search engines, including Tor-style .onion searches:
 
 | Engine | Bang Hotkey | Search URL Template | Description |
 | :--- | :--- | :--- | :--- |
 | **DuckDuckGo** | `!ddg` | `https://duckduckgo.com/?q={}` | Default privacy search engine (no tracking) |
-| **Google Search** | `!g` | `https://www.google.com/search?q={}` | Ubiquitous web search index |
+| **Google Search** | `!g` | `https://www.google.com/search?q={}` | Global web search index |
 | **Microsoft Bing** | `!b` | `https://www.bing.com/search?q={}` | Microsoft web search index |
 | **Yahoo Search** | `!y` | `https://search.yahoo.com/search?p={}` | Yahoo search directory |
 | **Ahmia (.onion)** | `!ahmia` / `!onion` | `https://ahmia.fi/search/?q={}` | **Tor .onion hidden services search engine** |
-| **Startpage** | `!sp` | `https://www.startpage.com/sp/search?query={}` | Google search results with total privacy protection |
+| **Startpage** | `!sp` | `https://www.startpage.com/sp/search?query={}` | Google results served with total European privacy |
 | **Brave Search** | `!brave` | `https://search.brave.com/search?q={}` | Independent privacy search index |
+| **GitHub** | `!gh` | `https://github.com/search?q={}` | Open-source repositories and code search |
+| **Wikipedia** | `!w` | `https://en.wikipedia.org/wiki/Special:Search?search={}` | Free encyclopedia and open knowledge |
 
-*You can also register custom search providers (such as SearXNG or internal corporate indices) directly from `norva://settings`.*
+*You can also register custom search providers directly from `norva://settings`.*
 
 ---
 
@@ -110,7 +114,7 @@ NORVA provides native, out-of-the-box support for all major search engines, incl
 
 - **Internal & External Webcams**: Supports laptop cameras, USB webcams, and DSLR video capture cards.
 - **Internal & External Microphones**: Supports built-in laptop mics, USB podcast mics, and XLR audio interfaces.
-- **Geolocation Protection**: Sites must request permission before obtaining coordinates; rogue attempts are logged to `permissions.db`.
+- **Geolocation Protection**: Sites must request permission before obtaining coordinates; rogue attempts are blocked and logged to `permissions.db`.
 - **Granular Controls**: Inspect and toggle site policies (`Allow` / `Block` / `Ask`) anytime at `norva://permissions`.
 
 ---
@@ -118,9 +122,9 @@ NORVA provides native, out-of-the-box support for all major search engines, incl
 ## 🛡️ Anti-Tracking & Ad-Blocking Matrix
 
 NORVA operates an active, multi-layered shield that stops trackers before they touch your computer:
-1. **Socket-Level Ad Blocking**: Pre-emptively severs outgoing connections to Google DoubleClick, Criteo, Taboola, Outbrain, etc.
-2. **Behavioral Telemetry Neutralization**: Blocks Google Analytics, Hotjar, Facebook Pixel, Microsoft Clarity, Yandex Metrika, and telemetry beacons.
-3. **URL Parameter Sanitization**: Automatically strips surveillance click tokens (`fbclid`, `gclid`, `utm_source`, `utm_campaign`, `msclkid`, `zanpid`, etc.) when navigating or following links.
+1. **Socket-Level Ad Blocking**: Pre-emptively severs outgoing connections to DoubleClick, Criteo, Taboola, Outbrain, etc. (200+ surveillance endpoints).
+2. **Behavioral Telemetry Neutralization**: Blocks Google Analytics, Hotjar, Facebook Pixel, Microsoft Clarity, Yandex Metrika, Datadog, NewRelic, and telemetry beacons.
+3. **URL Parameter Sanitization**: Automatically strips 30+ surveillance click tokens (`fbclid`, `gclid`, `gbraid`, `wbraid`, `utm_*`, `msclkid`, `twclid`, `ttclid`, `zanpid`, etc.) when following links.
 4. **Canvas & Audio Anti-Fingerprinting**: Injects microscopic deterministic noise into HTML5 Canvas and AudioContext decoders, rendering fingerprinting useless.
 5. **Cosmetic Ad Collapsing**: Collapses empty banner containers (`.adsbygoogle`, `[id^="google_ads"]`) without disrupting page layout.
 
@@ -139,7 +143,7 @@ Launch NORVA with `--secure` or `-s` to enter **Secure Ghost Mode**:
 ## 💻 Building and Running
 
 ### Prerequisites
-- Linux with GTK3/4 and WebKitGTK (`webkit2gtk-4.1` or `webkitgtk-6.0`)
+- Linux with GTK-3 and WebKitGTK (`webkit2gtk-4.1` or `webkitgtk-6.0`)
 - Rust 1.80+ (`cargo`)
 
 ### Development Build & Run
@@ -150,29 +154,11 @@ cargo run
 # Launch in ephemeral Secure Ghost Mode
 cargo run -- --secure
 
-# Direct navigation to a destination
+# Launch with initial target URL
 cargo run -- https://duckduckgo.com
-cargo run -- !ahmia privacy tools
 ```
 
-### Run Integration Tests
+### Running Test Suite
 ```bash
 cargo test
 ```
-
-### Production Build
-```bash
-cargo build --release
-./target/release/norva
-```
-
----
-
-## 🧭 Internal `norva://` Navigation Pages
-
-- `norva://newtab` - Cyber Privacy Dashboard with instant search switcher and live shield stats
-- `norva://history` - Searchable History Vault with single-entry deletion and full purge
-- `norva://shields` - Anti-Tracking & Ad-Blocker command center and real-time block log
-- `norva://permissions` - Camera, Microphone, and Location hardware arbiter
-- `norva://cookies` - Cookie partitioner and 1-click Cache Memory Purge
-- `norva://settings` - Default search engine selector and custom engine manager

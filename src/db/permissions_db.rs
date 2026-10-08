@@ -10,7 +10,12 @@ use serde::{Deserialize, Serialize};
 use std::path::Path;
 use std::sync::{Arc, Mutex};
 
-/// Permission decision state.
+/// Permission decision state for hardware and sensor access.
+///
+/// I have written this enum to cleanly classify access policies:
+/// - `Allow`: Explicitly trusted to access the physical sensor.
+/// - `Block`: Explicitly blocked to protect hardware privacy.
+/// - `Ask`: Zero-trust default; must prompt the user before activating the device.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum PermissionPolicy {
@@ -20,6 +25,7 @@ pub enum PermissionPolicy {
 }
 
 impl PermissionPolicy {
+    /// Returns the static lowercase string representation of this policy.
     pub fn as_str(&self) -> &'static str {
         match self {
             PermissionPolicy::Allow => "allow",
@@ -28,6 +34,7 @@ impl PermissionPolicy {
         }
     }
 
+    /// Parses a string into a PermissionPolicy variant with a safe fallback to Ask.
     pub fn from_str(s: &str) -> Self {
         match s.to_lowercase().as_str() {
             "allow" => PermissionPolicy::Allow,
@@ -37,9 +44,9 @@ impl PermissionPolicy {
     }
 }
 
-/// Domain permission configuration.
+/// Domain permission configuration capturing hardware access rules per origin.
 ///
-/// I am writing this struct because users must be able to audit and control
+/// I have written this struct because users must be able to audit and control
 /// exactly which websites have access to their internal or external cameras,
 /// audio microphones, and physical location coordinates.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -53,6 +60,10 @@ pub struct SitePermission {
 }
 
 /// Audit log record for hardware & location requests.
+///
+/// I have written this audit structure to give users complete forensic transparency:
+/// whenever a website calls WebRTC or Geolocation APIs, NORVA logs the exact domain,
+/// the requested hardware device, the security decision, and the exact timestamp.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PermissionAuditLog {
     pub id: i64,
@@ -64,10 +75,11 @@ pub struct PermissionAuditLog {
 
 /// Dedicated Permissions Database Manager.
 ///
-/// I have written this dedicated SQLite database manager because hardware security
-/// (webcam, mic, GPS sensor) is the highest risk vector for user privacy on the modern web.
-/// By storing permissions in an isolated, tamper-evident database (`permissions.db`),
-/// we guarantee that no malicious site script can spoof or tamper with device access rules.
+/// I have upgraded this dedicated database manager with high-speed WAL mode, memory temp
+/// storage, and busy timeouts. I wrote this architecture because hardware device access
+/// (internal webcams, external USB capture cards, XLR microphones, GPS sensors) represents
+/// the highest physical security risk. Isolating these rules in `permissions.db` guarantees
+/// that web scripts cannot bypass or corrupt hardware access arbiter rules.
 #[derive(Clone)]
 pub struct PermissionsDatabase {
     conn: Arc<Mutex<Connection>>,
@@ -76,18 +88,22 @@ pub struct PermissionsDatabase {
 impl PermissionsDatabase {
     /// Opens or initializes the permissions database.
     ///
-    /// I am writing this initialization routine to enforce WAL mode and initialize
-    /// both the site rules table and the security audit log table.
+    /// I have written this initialization routine to enforce WAL mode and setup tables
+    /// for persistent origin policies and forensic invocation audit trails.
     pub fn new(path: &Path) -> Result<Self> {
         let conn = Connection::open(path)?;
 
+        // High-performance SQLite tuning: WAL mode, memory temp store, 64MB cache
         conn.execute_batch(
             "PRAGMA journal_mode = WAL;
              PRAGMA synchronous = NORMAL;
-             PRAGMA foreign_keys = ON;"
+             PRAGMA foreign_keys = ON;
+             PRAGMA temp_store = MEMORY;
+             PRAGMA cache_size = -64000;
+             PRAGMA busy_timeout = 5000;"
         )?;
 
-        // I have written this table to maintain persistent rules per origin domain.
+        // Persistent per-origin hardware permissions
         conn.execute(
             "CREATE TABLE IF NOT EXISTS site_permissions (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -100,8 +116,7 @@ impl PermissionsDatabase {
             [],
         )?;
 
-        // I am creating this audit table so users have full forensic visibility
-        // into every single time a website attempted to invoke their mic, cam, or GPS.
+        // Forensic audit log of device activation requests
         conn.execute(
             "CREATE TABLE IF NOT EXISTS permission_audit (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -118,12 +133,17 @@ impl PermissionsDatabase {
             [],
         )?;
 
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_audit_time ON permission_audit(timestamp DESC);",
+            [],
+        )?;
+
         Ok(Self {
             conn: Arc::new(Mutex::new(conn)),
         })
     }
 
-    /// Evaluates or retrieves the permission policy for a specific domain.
+    /// Evaluates or retrieves the permission policy for a specific origin domain.
     ///
     /// I have written this lookup function because whenever WebKit triggers a media
     /// capture or geolocation request, we must instantaneously determine if the user
@@ -155,10 +175,10 @@ impl PermissionsDatabase {
         }
     }
 
-    /// Sets or updates a permission rule for a domain.
+    /// Sets or updates the permission policy for a specific origin domain.
     ///
-    /// I am writing this update function using an UPSERT pattern so that
-    /// the user can toggle permissions in the NORVA dashboard with atomic certainty.
+    /// I have written this upsert method so users can seamlessly update Camera,
+    /// Microphone, and Location access with an atomic SQL statement.
     pub fn set_policy(
         &self,
         domain: &str,
@@ -171,7 +191,7 @@ impl PermissionsDatabase {
 
         conn.execute(
             "INSERT INTO site_permissions (domain, camera, microphone, location, last_updated)
-             VALUES (?1, ?2, ?3, ?4, ?5)
+             VALUES (?, ?, ?, ?, ?)
              ON CONFLICT(domain) DO UPDATE SET
                 camera = excluded.camera,
                 microphone = excluded.microphone,
@@ -183,24 +203,7 @@ impl PermissionsDatabase {
         Ok(())
     }
 
-    /// Records an audit log entry when a hardware or location check occurs.
-    ///
-    /// I have written this audit logger because zero-trust architecture requires
-    /// an immutable record of device activation attempts.
-    pub fn log_audit(&self, domain: &str, permission_type: &str, decision: &str) -> Result<()> {
-        let conn = self.conn.lock().unwrap();
-        let now = Utc::now().to_rfc3339();
-
-        conn.execute(
-            "INSERT INTO permission_audit (domain, permission_type, decision, timestamp)
-             VALUES (?, ?, ?, ?)",
-            params![domain, permission_type, decision, now],
-        )?;
-
-        Ok(())
-    }
-
-    /// Retrieves all configured site permissions for the dashboard.
+    /// Retrieves all registered site permissions for management on the dashboard.
     pub fn get_all_permissions(&self) -> Result<Vec<SitePermission>> {
         let conn = self.conn.lock().unwrap();
         let mut stmt = conn.prepare(
@@ -224,23 +227,39 @@ impl PermissionsDatabase {
             })
         })?;
 
-        let mut list = Vec::new();
-        for item in rows {
-            if let Ok(p) = item {
-                list.push(p);
-            }
+        let mut perms = Vec::new();
+        for r in rows {
+            perms.push(r?);
         }
-        Ok(list)
+
+        Ok(perms)
     }
 
-    /// Deletes a domain rule, resetting it to default prompt.
+    /// Deletes a domain's custom permission policy, reverting it to zero-trust defaults.
     pub fn delete_domain(&self, domain: &str) -> Result<()> {
         let conn = self.conn.lock().unwrap();
         conn.execute("DELETE FROM site_permissions WHERE domain = ?", [domain])?;
         Ok(())
     }
 
-    /// Retrieves recent permission audit records.
+    /// Logs an access request to the forensic audit log.
+    ///
+    /// I have written this logging function so users have a verifiable record of when
+    /// webcams, audio inputs, or GPS coordinates were requested or blocked.
+    pub fn log_audit(&self, domain: &str, perm_type: &str, decision: &str) -> Result<()> {
+        let conn = self.conn.lock().unwrap();
+        let now = Utc::now().to_rfc3339();
+
+        conn.execute(
+            "INSERT INTO permission_audit (domain, permission_type, decision, timestamp)
+             VALUES (?, ?, ?, ?)",
+            params![domain, perm_type, decision, now],
+        )?;
+
+        Ok(())
+    }
+
+    /// Retrieves recent forensic audit records.
     pub fn get_recent_audits(&self, limit: usize) -> Result<Vec<PermissionAuditLog>> {
         let conn = self.conn.lock().unwrap();
         let mut stmt = conn.prepare(
@@ -260,12 +279,18 @@ impl PermissionsDatabase {
             })
         })?;
 
-        let mut list = Vec::new();
-        for item in rows {
-            if let Ok(l) = item {
-                list.push(l);
-            }
+        let mut audits = Vec::new();
+        for r in rows {
+            audits.push(r?);
         }
-        Ok(list)
+
+        Ok(audits)
+    }
+
+    /// Clears all historical forensic audit logs.
+    pub fn clear_audits(&self) -> Result<()> {
+        let conn = self.conn.lock().unwrap();
+        conn.execute("DELETE FROM permission_audit;", [])?;
+        Ok(())
     }
 }

@@ -13,6 +13,10 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 /// Represents a single browser tab in the native GTK tab bar.
+///
+/// I have written this struct to track the state of individual tabs in the native
+/// desktop header: its unique integer ID, active title, destination URL, favicon glyph,
+/// and references to the GTK labels so we can update them without reallocating widgets.
 #[derive(Clone)]
 pub struct ChromeTab {
     pub id: usize,
@@ -26,11 +30,11 @@ pub struct ChromeTab {
 
 /// The Native GTK Browser Chrome controller.
 ///
-/// I am writing this native GTK chrome component because a web browser MUST have
-/// an unmistakable, authentic desktop browser appearance:
-/// 1. A dedicated Tab strip at the very top with interactive rounded tab pills and close buttons.
-/// 2. A navigation toolbar with Back, Forward, Reload, Home, and a centered Omnibox.
-/// 3. A live Privacy Shield badge, Hardware zero-trust indicators (Camera, Mic, GPS), and Menu.
+/// I have upgraded this native GTK chrome component because an executive-tier web browser
+/// must have an unmistakable, authentic desktop browser appearance:
+/// 1. A dedicated Tab strip at the top with interactive tabs and smooth close buttons.
+/// 2. A navigation toolbar with Back, Forward, Reload, Home, and a centered Omnibox capsule.
+/// 3. A live Privacy Shield counter, Hardware zero-trust indicators (Camera, Mic, GPS), and Menu.
 /// 4. A bookmarks bar for instantaneous privacy access.
 ///
 /// By rendering this in native GTK rather than an injected page script, the browser chrome
@@ -64,6 +68,10 @@ pub struct NorvaGtkChrome {
 
 impl NorvaGtkChrome {
     /// Constructs and styles the complete native browser chrome.
+    ///
+    /// I have written this constructor to cleanly partition the chrome into three rows:
+    /// the tab bar at the top, the main navigation & omnibox toolbar in the middle, and the
+    /// bookmarks bar directly beneath, styled with our executive cyber-dark CSS theme.
     pub fn new(secure_mode: bool) -> Self {
         // Apply custom modern dark-mode CSS to the application screen
         Self::apply_theme_css();
@@ -72,7 +80,7 @@ impl NorvaGtkChrome {
         root.style_context().add_class("norva-chrome-root");
 
         // --------------------------------------------------------------------
-        // 1. TOP TAB BAR ROW (Firefox Proton style)
+        // 1. TOP TAB BAR ROW
         // --------------------------------------------------------------------
         let tab_bar = Box::new(Orientation::Horizontal, 0);
         tab_bar.style_context().add_class("norva-tab-bar");
@@ -146,7 +154,7 @@ impl NorvaGtkChrome {
         let engine_btn = Button::new();
         engine_btn.style_context().add_class("norva-engine-pill");
         engine_btn.set_tooltip_text(Some("Switch Search Engine"));
-        let engine_label = Label::new(Some("🦆 DDG ▼"));
+        let engine_label = Label::new(Some("DDG ▼"));
         engine_btn.add(&engine_label);
 
         let omnibox = Entry::new();
@@ -239,14 +247,14 @@ impl NorvaGtkChrome {
         F: Fn(&str) + 'static + Clone,
     {
         let bookmarks = [
-            ("🦆 DuckDuckGo", "https://duckduckgo.com"),
-            ("🧅 Ahmia (.onion)", "https://ahmia.fi"),
-            ("🗽 EFF Privacy", "https://www.eff.org"),
-            ("🧅 Tor Project", "https://www.torproject.org"),
-            ("📚 Wikipedia", "https://www.wikipedia.org"),
-            ("🦀 Rust Lang", "https://www.rust-lang.org"),
-            ("🛡️ Shields Center", "norva://shields"),
-            ("📜 History Vault", "norva://history"),
+            ("DuckDuckGo", "https://duckduckgo.com"),
+            ("Ahmia Tor", "https://ahmia.fi"),
+            ("EFF Privacy", "https://www.eff.org"),
+            ("Tor Project", "https://www.torproject.org"),
+            ("Wikipedia", "https://www.wikipedia.org"),
+            ("Rust Lang", "https://www.rust-lang.org"),
+            ("Shields Center", "norva://shields"),
+            ("History Vault", "norva://history"),
         ];
 
         for (label, url) in bookmarks {
@@ -483,13 +491,15 @@ impl NorvaGtkChrome {
         pbox.pack_start(&title, false, false, 4);
 
         let engines = [
-            ("duckduckgo", "🦆 DuckDuckGo (Default)"),
-            ("google", "🔍 Google Search"),
-            ("bing", "⚡ Microsoft Bing"),
-            ("yahoo", "🟣 Yahoo Search"),
-            ("ahmia", "🧅 Ahmia (.onion Tor Search)"),
-            ("startpage", "🛡️ Startpage"),
-            ("brave", "🦁 Brave Search"),
+            ("duckduckgo", "DuckDuckGo (Default)"),
+            ("google", "Google Search"),
+            ("bing", "Microsoft Bing"),
+            ("yahoo", "Yahoo Search"),
+            ("ahmia", "Ahmia (.onion Tor Search)"),
+            ("startpage", "Startpage"),
+            ("brave", "Brave Search"),
+            ("github", "GitHub"),
+            ("wikipedia", "Wikipedia"),
         ];
 
         let engine_label_clone = self.engine_label.clone();
@@ -505,13 +515,16 @@ impl NorvaGtkChrome {
 
             btn.connect_clicked(move |_| {
                 let short_name = match id {
-                    "duckduckgo" => "🦆 DDG ▼",
-                    "google" => "🔍 Google ▼",
-                    "bing" => "⚡ Bing ▼",
-                    "yahoo" => "🟣 Yahoo ▼",
-                    "ahmia" => "🧅 Ahmia ▼",
-                    "startpage" => "🛡️ Startpage ▼",
-                    _ => "🌐 Search ▼",
+                    "duckduckgo" => "DDG ▼",
+                    "google" => "Google ▼",
+                    "bing" => "Bing ▼",
+                    "yahoo" => "Yahoo ▼",
+                    "ahmia" => "Ahmia ▼",
+                    "startpage" => "Startpage ▼",
+                    "brave" => "Brave ▼",
+                    "github" => "GitHub ▼",
+                    "wikipedia" => "Wiki ▼",
+                    _ => "Search ▼",
                 };
                 lbl.set_text(short_name);
                 *sel_eng.borrow_mut() = id.to_string();
@@ -689,20 +702,19 @@ impl NorvaGtkChrome {
 
     /// Applies rich, modern browser-quality GTK CSS to the entire application window.
     ///
-    /// This CSS is carefully designed to replicate the visual polish of Arc Browser,
-    /// Firefox Proton, and modern Chromium — with proper sizing, spacing, depth,
-    /// smooth transitions, and a refined dark color palette.
+    /// I have upgraded this stylesheet to create an executive obsidian appearance
+    /// matching our new web dashboard: deep #0a0b10 tones, crisp tab active borders,
+    /// smooth hover states, and cohesive popovers.
     fn apply_theme_css() {
         let css = r###"
-
         /* ================================================================
-           NORVA — Premium Modern Browser Chrome (Arc / Firefox Proton / Brave)
+           NORVA — Executive Modern Cyber-Dark Browser Chrome
            ================================================================ */
 
         /* ---- GLOBAL RESET & BASE THEME ---- */
         window, .background {
-            background-color: #16171b;
-            color: #ededf2;
+            background-color: #0a0b10;
+            color: #f8fafc;
         }
 
         * {
@@ -751,15 +763,15 @@ impl NorvaGtkChrome {
         }
 
         .norva-chrome-root {
-            background-color: #16171b;
+            background-color: #0a0b10;
         }
 
         /* ================================================================
-           1. TAB STRIP (Authentic Floating / Connected Tabs)
+           1. TAB STRIP
            ================================================================ */
         .norva-tab-bar {
-            background-color: #16171b;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background-color: #0a0b10;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
             padding: 4px 10px 0 10px;
             min-height: 38px;
         }
@@ -771,11 +783,11 @@ impl NorvaGtkChrome {
         .norva-tab {
             background-color: transparent;
             border-radius: 8px 8px 0 0;
-            min-width: 150px;
+            min-width: 160px;
             min-height: 34px;
-            margin-right: 1px;
+            margin-right: 2px;
             border-top: 2px solid transparent;
-            border-right: 1px solid rgba(255, 255, 255, 0.07);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .norva-tab:hover {
@@ -783,9 +795,9 @@ impl NorvaGtkChrome {
         }
 
         .norva-tab.active-tab {
-            background-color: #212228;
+            background-color: #12131c;
             border-right: 1px solid transparent;
-            border-top: 2px solid #5884ff;
+            border-top: 2px solid #6366f1;
         }
 
         .norva-tab-inner {
@@ -806,7 +818,7 @@ impl NorvaGtkChrome {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
             font-size: 12px;
             font-weight: 500;
-            color: #92929e;
+            color: #94a3b8;
         }
 
         .active-tab .norva-tab-title {
@@ -818,7 +830,7 @@ impl NorvaGtkChrome {
             background-color: transparent;
             border: none;
             box-shadow: none;
-            color: #72727e;
+            color: #64748b;
             border-radius: 50%;
             padding: 0;
             font-size: 11px;
@@ -844,7 +856,7 @@ impl NorvaGtkChrome {
             background-color: transparent;
             border: none;
             box-shadow: none;
-            color: #8c8c9a;
+            color: #94a3b8;
             border-radius: 50%;
             min-width: 28px;
             min-height: 28px;
@@ -861,9 +873,9 @@ impl NorvaGtkChrome {
         }
 
         .norva-badge-normal {
-            background-color: rgba(80, 200, 120, 0.08);
-            border: 1px solid rgba(80, 200, 120, 0.2);
-            color: #50c878;
+            background-color: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            color: #34d399;
             padding: 3px 10px;
             border-radius: 12px;
             font-family: 'Inter', system-ui, sans-serif;
@@ -875,9 +887,9 @@ impl NorvaGtkChrome {
         }
 
         .norva-badge-secure {
-            background-color: rgba(255, 82, 82, 0.1);
-            border: 1px solid rgba(255, 82, 82, 0.25);
-            color: #ff6b6b;
+            background-color: rgba(244, 63, 94, 0.12);
+            border: 1px solid rgba(244, 63, 94, 0.3);
+            color: #fb7185;
             padding: 3px 10px;
             border-radius: 12px;
             font-family: 'Inter', system-ui, sans-serif;
@@ -892,8 +904,8 @@ impl NorvaGtkChrome {
            2. MAIN TOOLBAR & OMNIBOX
            ================================================================ */
         .norva-toolbar {
-            background-color: #212228;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            background-color: #12131c;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             padding: 4px 10px;
             min-height: 42px;
         }
@@ -902,7 +914,7 @@ impl NorvaGtkChrome {
             background-color: transparent;
             border: none;
             box-shadow: none;
-            color: #9d9da8;
+            color: #94a3b8;
             border-radius: 50%;
             min-width: 32px;
             min-height: 32px;
@@ -919,13 +931,13 @@ impl NorvaGtkChrome {
 
         .norva-nav-btn:active {
             background-color: rgba(255, 255, 255, 0.14);
-            color: #5884ff;
+            color: #6366f1;
         }
 
         /* Omnibox Capsule Frame */
         .norva-omnibox-frame {
-            background-color: #16171b;
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background-color: #0a0b10;
+            border: 1px solid rgba(255, 255, 255, 0.09);
             border-radius: 20px;
             padding: 0 10px;
             min-height: 34px;
@@ -933,16 +945,16 @@ impl NorvaGtkChrome {
         }
 
         .norva-omnibox-frame:focus-within {
-            border-color: #5884ff;
-            box-shadow: 0 0 0 2px rgba(88, 132, 255, 0.25);
-            background-color: #18191f;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.25);
+            background-color: #0e0f17;
         }
 
         .norva-btn-flat {
             background-color: transparent;
             border: none;
             box-shadow: none;
-            color: #50c878;
+            color: #10b981;
             padding: 0 4px;
             font-size: 13px;
             border-radius: 50%;
@@ -951,13 +963,13 @@ impl NorvaGtkChrome {
         }
 
         .norva-btn-flat:hover {
-            background-color: rgba(80, 200, 120, 0.12);
+            background-color: rgba(16, 185, 129, 0.14);
         }
 
         .norva-engine-pill {
             background-color: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.07);
-            color: #b0b0bb;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #cbd5e1;
             border-radius: 12px;
             padding: 2px 8px;
             font-family: 'Inter', system-ui, sans-serif;
@@ -968,8 +980,8 @@ impl NorvaGtkChrome {
         }
 
         .norva-engine-pill:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.14);
+            background-color: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.16);
             color: #ffffff;
         }
 
@@ -977,18 +989,18 @@ impl NorvaGtkChrome {
             background-color: transparent;
             border: none;
             box-shadow: none;
-            color: #ededf2;
+            color: #f8fafc;
             font-family: 'Inter', -apple-system, 'Segoe UI', system-ui, sans-serif;
             font-size: 13px;
             padding: 4px 6px;
-            caret-color: #5884ff;
+            caret-color: #6366f1;
         }
 
         .norva-bookmark-star {
             background-color: transparent;
             border: none;
             box-shadow: none;
-            color: #7e7e8c;
+            color: #64748b;
             border-radius: 50%;
             min-width: 26px;
             min-height: 26px;
@@ -997,15 +1009,15 @@ impl NorvaGtkChrome {
         }
 
         .norva-bookmark-star:hover {
-            color: #ffca3a;
-            background-color: rgba(255, 202, 58, 0.12);
+            color: #f59e0b;
+            background-color: rgba(245, 158, 11, 0.14);
         }
 
         /* Privacy Shields Badge */
         .norva-shield-btn {
-            background-color: rgba(80, 200, 120, 0.08);
-            border: 1px solid rgba(80, 200, 120, 0.2);
-            color: #50c878;
+            background-color: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.25);
+            color: #818cf8;
             border-radius: 14px;
             padding: 3px 12px;
             font-family: 'Inter', system-ui, sans-serif;
@@ -1016,13 +1028,14 @@ impl NorvaGtkChrome {
         }
 
         .norva-shield-btn:hover {
-            background-color: rgba(80, 200, 120, 0.16);
-            border-color: rgba(80, 200, 120, 0.35);
+            background-color: rgba(99, 102, 241, 0.2);
+            border-color: rgba(99, 102, 241, 0.4);
+            color: #ffffff;
         }
 
         /* Hardware Cluster */
         .norva-hw-cluster {
-            background-color: rgba(255, 255, 255, 0.03);
+            background-color: rgba(255, 255, 255, 0.04);
             border-radius: 12px;
             padding: 2px 4px;
             margin: 0 3px;
@@ -1034,7 +1047,7 @@ impl NorvaGtkChrome {
             box-shadow: none;
             font-size: 13px;
             padding: 0;
-            opacity: 0.55;
+            opacity: 0.6;
             border-radius: 6px;
             min-width: 26px;
             min-height: 26px;
@@ -1046,11 +1059,11 @@ impl NorvaGtkChrome {
         }
 
         /* ================================================================
-           3. BOOKMARKS BAR (Unified with Toolbar)
+           3. BOOKMARKS BAR
            ================================================================ */
         .norva-bookmarks-bar {
-            background-color: #212228;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            background-color: #12131c;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             padding: 2px 10px;
             min-height: 28px;
         }
@@ -1059,7 +1072,7 @@ impl NorvaGtkChrome {
             background-color: transparent;
             border: none;
             box-shadow: none;
-            color: #92929e;
+            color: #94a3b8;
             border-radius: 6px;
             padding: 3px 8px;
             font-family: 'Inter', system-ui, sans-serif;
@@ -1071,19 +1084,19 @@ impl NorvaGtkChrome {
 
         .norva-bookmark-pill:hover {
             background-color: rgba(255, 255, 255, 0.08);
-            color: #ededf2;
+            color: #f8fafc;
         }
 
         /* ================================================================
-           4. POPOVERS (Floating Glass Cards)
+           4. POPOVERS
            ================================================================ */
         .norva-popover {
-            background-color: #24252d;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background-color: #181926;
+            border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 12px;
-            color: #ededf2;
+            color: #f8fafc;
             padding: 6px;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), 0 2px 8px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 16px 44px rgba(0, 0, 0, 0.7);
         }
 
         .norva-popover-title {
@@ -1099,7 +1112,7 @@ impl NorvaGtkChrome {
             background-color: transparent;
             border: none;
             box-shadow: none;
-            color: #b0b0bc;
+            color: #94a3b8;
             border-radius: 8px;
             padding: 8px 12px;
             font-family: 'Inter', system-ui, sans-serif;
@@ -1109,12 +1122,12 @@ impl NorvaGtkChrome {
         }
 
         .norva-popover-item:hover {
-            background-color: rgba(88, 132, 255, 0.14);
+            background-color: rgba(99, 102, 241, 0.16);
             color: #ffffff;
         }
 
         .norva-btn-primary {
-            background-color: #5884ff;
+            background-color: #6366f1;
             border: none;
             box-shadow: none;
             color: #ffffff;
@@ -1127,23 +1140,16 @@ impl NorvaGtkChrome {
         }
 
         .norva-btn-primary:hover {
-            background-color: #4875f7;
-        }
-
-        .norva-btn-primary:active {
-            background-color: #3b66e3;
+            background-color: #4f46e5;
         }
 
         .norva-status-green {
-            color: #50c878;
+            color: #10b981;
             font-family: 'Inter', system-ui, sans-serif;
             font-size: 12px;
             font-weight: 600;
         }
 
-        /* ================================================================
-           5. SCROLLBAR
-           ================================================================ */
         scrollbar {
             background-color: transparent;
         }
@@ -1156,7 +1162,6 @@ impl NorvaGtkChrome {
         scrollbar slider:hover {
             background-color: rgba(255, 255, 255, 0.22);
         }
-
         "###;
 
         let provider = CssProvider::new();

@@ -4,10 +4,10 @@
 // Description: Injected Cyber Chrome HUD toolbar providing ubiquitous browser controls.
 // ============================================================================
 
-/// Returns the JavaScript code injected into every document to render the NORVA Floating Cyber HUD.
+/// Returns the JavaScript code injected into documents to render the NORVA Floating Cyber HUD.
 ///
-/// I am writing this injected HUD because when users navigate to external websites like
-/// Google, Wikipedia, or Ahmia, they still need instantaneous access to their address bar,
+/// I have written this injected HUD because when users navigate to external websites like
+/// Wikipedia or DuckDuckGo, they still need instantaneous access to their address bar,
 /// search engine switcher, privacy shield tracker counts, and hardware indicators without
 /// sacrificing screen real estate.
 pub fn get_hud_injection_script() -> &'static str {
@@ -38,25 +38,25 @@ pub fn get_hud_injection_script() -> &'static str {
                 transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             }
             .hud-bar {
-                background: rgba(13, 17, 26, 0.88);
+                background: rgba(10, 11, 16, 0.92);
                 backdrop-filter: blur(20px) saturate(180%);
                 -webkit-backdrop-filter: blur(20px) saturate(180%);
-                border: 1px solid rgba(0, 242, 254, 0.25);
-                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 15px rgba(0, 242, 254, 0.15);
+                border: 1px solid rgba(99, 102, 241, 0.3);
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7), 0 0 15px rgba(99, 102, 241, 0.15);
                 border-radius: 9999px;
                 padding: 6px 14px;
                 display: flex;
                 align-items: center;
                 gap: 10px;
-                color: #e2e8f0;
+                color: #f8fafc;
                 font-size: 13px;
                 cursor: default;
                 user-select: none;
                 transition: all 0.25s ease;
             }
             .hud-bar:hover {
-                border-color: rgba(0, 242, 254, 0.5);
-                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.75), 0 0 25px rgba(0, 242, 254, 0.25);
+                border-color: rgba(99, 102, 241, 0.6);
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.85), 0 0 25px rgba(99, 102, 241, 0.25);
             }
             .brand-badge {
                 display: flex;
@@ -64,18 +64,13 @@ pub fn get_hud_injection_script() -> &'static str {
                 gap: 6px;
                 font-weight: 800;
                 letter-spacing: 0.8px;
-                background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
+                color: #ffffff;
                 cursor: pointer;
-            }
-            .brand-badge:hover {
-                opacity: 0.85;
             }
             .btn {
                 background: rgba(255, 255, 255, 0.08);
                 border: 1px solid rgba(255, 255, 255, 0.12);
-                color: #e2e8f0;
+                color: #f8fafc;
                 border-radius: 6px;
                 padding: 4px 8px;
                 font-size: 12px;
@@ -86,8 +81,8 @@ pub fn get_hud_injection_script() -> &'static str {
                 gap: 4px;
             }
             .btn:hover {
-                background: rgba(0, 242, 254, 0.2);
-                border-color: rgba(0, 242, 254, 0.4);
+                background: rgba(99, 102, 241, 0.25);
+                border-color: rgba(99, 102, 241, 0.5);
                 color: #ffffff;
             }
             .omnibox-input {
@@ -103,13 +98,13 @@ pub fn get_hud_injection_script() -> &'static str {
             }
             .omnibox-input:focus {
                 width: 380px;
-                border-color: #00f2fe;
-                box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);
+                border-color: #6366f1;
+                box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
             }
             .shield-badge {
-                background: rgba(0, 230, 118, 0.15);
-                border: 1px solid rgba(0, 230, 118, 0.3);
-                color: #00e676;
+                background: rgba(16, 185, 129, 0.15);
+                border: 1px solid rgba(16, 185, 129, 0.3);
+                color: #10b981;
                 padding: 3px 8px;
                 border-radius: 9999px;
                 font-size: 11px;
@@ -119,28 +114,12 @@ pub fn get_hud_injection_script() -> &'static str {
                 gap: 4px;
                 cursor: pointer;
             }
-            .shield-badge:hover {
-                background: rgba(0, 230, 118, 0.25);
-            }
-            .hw-indicator {
-                font-size: 12px;
-                opacity: 0.75;
-                transition: opacity 0.2s ease;
-            }
-            .hw-indicator:hover {
-                opacity: 1;
-            }
         `;
 
         const hud = document.createElement('div');
         hud.className = 'hud-bar';
         hud.innerHTML = `
             <div class="brand-badge" id="hud-home" title="NORVA Start Page">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <circle cx="12" cy="12" r="10"/>
-                    <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/>
-                    <path d="M2 12h20"/>
-                </svg>
                 NORVA
             </div>
             <button class="btn" id="hud-back" title="Back">‹</button>
@@ -151,23 +130,18 @@ pub fn get_hud_injection_script() -> &'static str {
                 <span>🛡️</span>
                 <span>Shields</span>
             </div>
-            <span class="hw-indicator" title="Camera Privacy Guard">📷</span>
-            <span class="hw-indicator" title="Microphone Privacy Guard">🎙️</span>
-            <span class="hw-indicator" title="Location Privacy Guard">📍</span>
             <button class="btn" id="hud-history" title="History">📜</button>
         `;
 
         shadow.appendChild(style);
         shadow.appendChild(hud);
 
-        // Safe DOM insertion
         if (document.body) {
             document.body.appendChild(hudContainer);
         } else {
             window.addEventListener('DOMContentLoaded', () => document.body.appendChild(hudContainer));
         }
 
-        // Omnibox current URL reflection
         const input = shadow.getElementById('hud-omnibox');
         input.value = window.location.href;
 

@@ -9,7 +9,7 @@ use std::sync::Arc;
 
 /// Cookie & Storage Management Controller.
 ///
-/// I am writing this manager because cookies remain the most prevalent mechanism for
+/// I have written this manager because cookies remain the most prevalent mechanism for
 /// cross-site user re-identification. While essential for session authentication (like
 /// staying logged into an account), third-party tracking cookies serve solely to build
 /// surveillance profiles. NORVA enforces strict first-party partitioning and provides
@@ -37,7 +37,7 @@ impl CookieManager {
     /// Generates a client-side JavaScript snippet to purge document cookies for the active domain.
     ///
     /// I have written this helper because WebKit's DOM context allows instantaneous
-    /// neutralization of active session cookies from within the webview.
+    /// neutralization of active session cookies, local storage, and session storage from within the webview.
     pub fn get_cookie_wipe_script() -> &'static str {
         r#"
         (function() {
