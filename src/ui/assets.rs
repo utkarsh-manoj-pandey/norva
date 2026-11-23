@@ -1,7 +1,8 @@
 // ============================================================================
 // NORVA: Native Open-source Rust-based Virtual Access
 // File: src/ui/assets.rs
-// Description: Executive Cyber-Dark UI Pages for internal norva:// views.
+// Description: Executive Minimalist Dark UI System for internal norva:// views.
+//              Designed with authentic, Linear/Arc/Safari-inspired aesthetics.
 // ============================================================================
 
 use crate::db::bookmarks_db::BookmarkEntry;
@@ -12,30 +13,24 @@ use crate::db::permissions_db::{PermissionAuditLog, SitePermission};
 use crate::db::settings_db::SearchEngineConfig;
 use crate::db::shields_db::{BlockedEvent, ShieldStats};
 
-/// Shared CSS styling providing an executive, modern cyber-dark design system.
-///
-/// I have completely overhauled this design system to eliminate the previous amateurish,
-/// kiddish aesthetic. I wrote this theme inspired by high-end developer and privacy tools
-/// like Linear, Brave Shields, and Proton: deep obsidian tones, subtle 1px border glows,
-/// fine typography, and razor-sharp SVG vector iconography instead of crude emoji overload.
+/// Shared CSS providing an executive, minimalist dark design system.
 pub fn get_common_css() -> &'static str {
     r###"
     :root {
-        --bg-primary: #0a0b10;
-        --bg-surface: #12131c;
-        --bg-surface-elevated: #181a26;
-        --bg-surface-hover: #1f2130;
-        --border-subtle: rgba(255, 255, 255, 0.08);
-        --border-hover: rgba(255, 255, 255, 0.16);
+        --bg-primary: #0b0c10;
+        --bg-surface: #12131b;
+        --bg-surface-elevated: #181924;
+        --bg-surface-hover: #1f202e;
+        --border-subtle: rgba(255, 255, 255, 0.07);
+        --border-hover: rgba(255, 255, 255, 0.14);
         --border-focus: #6366f1;
-        --accent-indigo: #6366f1;
-        --accent-cyan: #06b6d4;
+        --accent: #6366f1;
         --accent-emerald: #10b981;
         --accent-rose: #f43f5e;
         --accent-amber: #f59e0b;
-        --text-primary: #f8fafc;
-        --text-secondary: #94a3b8;
-        --text-muted: #64748b;
+        --text-primary: #f4f4f5;
+        --text-secondary: #a1a1aa;
+        --text-muted: #71717a;
     }
     * {
         box-sizing: border-box;
@@ -43,17 +38,16 @@ pub fn get_common_css() -> &'static str {
         padding: 0;
     }
     body {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         background-color: var(--bg-primary);
         color: var(--text-primary);
         min-height: 100vh;
         overflow-x: hidden;
-        padding-bottom: 50px;
+        padding-bottom: 40px;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
     }
 
-    /* Polished Minimalist Scrollbars */
     ::-webkit-scrollbar {
         width: 6px;
         height: 6px;
@@ -62,20 +56,19 @@ pub fn get_common_css() -> &'static str {
         background: transparent;
     }
     ::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.1);
         border-radius: 999px;
     }
     ::-webkit-scrollbar-thumb:hover {
-        background: rgba(255, 255, 255, 0.22);
+        background: rgba(255, 255, 255, 0.2);
     }
 
-    /* Executive Internal Header */
     .internal-header {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 14px 32px;
-        background-color: rgba(18, 19, 28, 0.85);
+        padding: 12px 28px;
+        background-color: rgba(18, 19, 27, 0.88);
         border-bottom: 1px solid var(--border-subtle);
         position: sticky;
         top: 0;
@@ -83,198 +76,212 @@ pub fn get_common_css() -> &'static str {
         backdrop-filter: blur(16px);
         -webkit-backdrop-filter: blur(16px);
         flex-wrap: wrap;
-        gap: 16px;
+        gap: 14px;
     }
     .internal-header-left {
         display: flex;
         align-items: center;
-        gap: 16px;
+        gap: 14px;
     }
     .back-link {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
-        background-color: rgba(255, 255, 255, 0.05);
+        gap: 6px;
+        background-color: rgba(255, 255, 255, 0.04);
         border: 1px solid var(--border-subtle);
         color: var(--text-secondary);
-        padding: 6px 14px;
-        border-radius: 8px;
+        padding: 5px 12px;
+        border-radius: 6px;
         text-decoration: none;
-        font-size: 13px;
+        font-size: 12.5px;
         font-weight: 500;
-        transition: all 0.15s ease;
+        transition: all 0.12s ease;
     }
     .back-link:hover {
-        background-color: rgba(255, 255, 255, 0.1);
+        background-color: rgba(255, 255, 255, 0.08);
         border-color: var(--border-hover);
         color: #ffffff;
     }
     .internal-title {
-        font-size: 17px;
-        font-weight: 700;
-        letter-spacing: -0.4px;
+        font-size: 15.5px;
+        font-weight: 600;
+        letter-spacing: -0.3px;
         color: var(--text-primary);
-        display: flex;
-        align-items: center;
-        gap: 10px;
     }
     .internal-nav-chips {
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 4px;
         flex-wrap: wrap;
     }
     .chip {
         color: var(--text-secondary);
         text-decoration: none;
-        padding: 6px 14px;
-        border-radius: 8px;
-        font-size: 13px;
-        font-weight: 500;
-        transition: all 0.15s ease;
+        padding: 5px 11px;
+        border-radius: 6px;
+        font-size: 12.5px;
+        font-weight: 450;
+        transition: all 0.12s ease;
         background: transparent;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
     }
     .chip:hover {
-        background-color: rgba(255, 255, 255, 0.06);
+        background-color: rgba(255, 255, 255, 0.05);
         color: #ffffff;
     }
     .chip.active {
-        background-color: rgba(99, 102, 241, 0.16);
-        border: 1px solid rgba(99, 102, 241, 0.35);
+        background-color: rgba(255, 255, 255, 0.08);
+        border: 1px solid var(--border-hover);
         color: #ffffff;
-        font-weight: 600;
+        font-weight: 550;
     }
+
     .container {
-        max-width: 1180px;
+        max-width: 1040px;
         margin: 0 auto;
-        padding: 32px 24px;
+        padding: 28px 20px;
     }
     .btn {
-        background-color: rgba(255, 255, 255, 0.06);
+        background-color: rgba(255, 255, 255, 0.05);
         border: 1px solid var(--border-subtle);
         color: var(--text-primary);
-        border-radius: 8px;
-        padding: 8px 16px;
-        font-size: 13px;
+        border-radius: 6px;
+        padding: 6px 14px;
+        font-size: 12.5px;
         font-weight: 500;
         cursor: pointer;
-        transition: all 0.15s ease;
+        transition: all 0.12s ease;
         display: inline-flex;
         align-items: center;
         gap: 6px;
+        text-decoration: none;
     }
     .btn:hover {
-        background-color: rgba(255, 255, 255, 0.12);
+        background-color: rgba(255, 255, 255, 0.1);
         border-color: var(--border-hover);
     }
     .btn-primary {
-        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-        border: none;
+        background: #6366f1;
+        border: 1px solid #6366f1;
         color: #ffffff;
-        font-weight: 600;
+        font-weight: 550;
     }
     .btn-primary:hover {
-        background: linear-gradient(135deg, #7c7eff 0%, #6366f1 100%);
-        box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+        background: #4f46e5;
+        border-color: #4f46e5;
     }
     .btn-danger {
-        background-color: rgba(244, 63, 94, 0.12);
-        border: 1px solid rgba(244, 63, 94, 0.3);
+        background-color: rgba(244, 63, 94, 0.08);
+        border: 1px solid rgba(244, 63, 94, 0.25);
         color: #fb7185;
     }
     .btn-danger:hover {
-        background-color: rgba(244, 63, 94, 0.22);
-        border-color: rgba(244, 63, 94, 0.5);
+        background-color: rgba(244, 63, 94, 0.18);
+        border-color: rgba(244, 63, 94, 0.4);
     }
+
     .card {
         background-color: var(--bg-surface);
         border: 1px solid var(--border-subtle);
-        border-radius: 14px;
-        padding: 24px;
-        margin-bottom: 24px;
-        transition: border-color 0.15s ease, box-shadow 0.15s ease;
-        position: relative;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+        transition: border-color 0.12s ease;
     }
     .card:hover {
         border-color: var(--border-hover);
     }
-    .mode-badge {
-        padding: 4px 14px;
-        border-radius: 20px;
-        font-size: 11.5px;
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+    .table th, .table td {
+        padding: 10px 14px;
+        text-align: left;
+        border-bottom: 1px solid var(--border-subtle);
+    }
+    .table th {
+        color: var(--text-muted);
+        text-transform: uppercase;
+        font-size: 10.5px;
         font-weight: 600;
-        letter-spacing: 0.4px;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
+        letter-spacing: 0.5px;
+        background: rgba(255, 255, 255, 0.015);
     }
-    .mode-badge.secure {
-        background: rgba(244, 63, 94, 0.12);
-        color: #fb7185;
-        border: 1px solid rgba(244, 63, 94, 0.3);
+
+    .form-input {
+        background: #090a0f;
+        border: 1px solid var(--border-subtle);
+        border-radius: 6px;
+        color: #ffffff;
+        padding: 7px 12px;
+        font-size: 13px;
+        font-family: inherit;
+        outline: none;
+        transition: border-color 0.12s ease;
     }
-    .mode-badge.normal {
-        background: rgba(16, 185, 129, 0.1);
-        color: #34d399;
-        border: 1px solid rgba(16, 185, 129, 0.25);
+    .form-input:focus {
+        border-color: var(--accent);
     }
     "###
 }
 
-/// Renders the primary `norva://newtab` executive dashboard.
-///
-/// I have completely rewritten this start page to replace all childish placecards,
-/// fake Bollywood news, and crude emojis with executive-grade cyber-threat analytics:
-/// - Real Threat Shield Matrix with category breakdown and bandwidth saved
-/// - Zero-Trust Hardware Monitor (Camera, Mic, Location)
-/// - Clean developer & privacy speed dial tiles with vector icons
-/// - Omnibox with smart Bang command chips
-/// - Live stream of neutralized tracker beacons
-pub fn render_newtab_page(
-    stats: &ShieldStats,
-    engines: &[SearchEngineConfig],
-    default_engine: &SearchEngineConfig,
-    secure_mode: bool,
-    cache_mb: f64,
-) -> String {
-    let mut engine_items_html = String::new();
-    for e in engines {
-        let is_sel = if e.id == default_engine.id { "active" } else { "" };
-        let engine_badge_label = match e.id.as_str() {
-            "duckduckgo" => "DDG",
-            "google" => "Google",
-            "bing" => "Bing",
-            "yahoo" => "Yahoo",
-            "ahmia" => "Ahmia (.onion)",
-            "startpage" => "Startpage",
-            "brave" => "Brave",
-            "github" => "GitHub",
-            "wikipedia" => "Wikipedia",
-            _ => "Web",
-        };
-        engine_items_html.push_str(&format!(
-            r###"<div class="engine-dropdown-item {}" data-id="{}" data-name="{}" data-bang="{}" onclick="selectSearchEngine('{}', '{}', '{}')">
-                <span class="engine-item-name">{}</span>
-                <span class="engine-item-bang">{}</span>
-            </div>"###,
-            is_sel, e.id, e.name, e.bang, e.id, e.name, e.bang, engine_badge_label, e.bang
+/// Helper function to render a clean, consistent top header across internal subsystem pages.
+fn render_internal_header(active: &str, title: &str) -> String {
+    let pages = [
+        ("newtab", "Start", "norva://newtab"),
+        ("history", "History", "norva://history"),
+        ("bookmarks", "Bookmarks", "norva://bookmarks"),
+        ("downloads", "Downloads", "norva://downloads"),
+        ("passwords", "Passwords", "norva://passwords"),
+        ("shields", "Shields", "norva://shields"),
+        ("permissions", "Permissions", "norva://permissions"),
+        ("cookies", "Storage", "norva://cookies"),
+        ("settings", "Settings", "norva://settings"),
+    ];
+
+    let mut chips = String::new();
+    for (id, label, url) in pages {
+        let is_active = if id == active { " active" } else { "" };
+        chips.push_str(&format!(
+            r###"<a href="{}" class="chip{}">{}</a>"###,
+            url, is_active, label
         ));
     }
 
+    format!(
+        r###"<header class="internal-header">
+        <div class="internal-header-left">
+            <a href="norva://newtab" class="back-link">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                <span>Start Page</span>
+            </a>
+            <h2 class="internal-title">{}</h2>
+        </div>
+        <div class="internal-nav-chips">
+            {}
+        </div>
+    </header>"###,
+        title, chips
+    )
+}
+
+/// Renders the primary `norva://newtab` executive start page.
+pub fn render_newtab_page(
+    stats: &ShieldStats,
+    _engines: &[SearchEngineConfig],
+    default_engine: &SearchEngineConfig,
+    secure_mode: bool,
+    _cache_mb: f64,
+) -> String {
     let mode_pill = if secure_mode {
-        r###"<span class="mode-badge secure">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            Zero-Trace Volatile Ghost Session
-        </span>"###
+        r###"<span class="session-badge secure"><span class="dot"></span>Private Mode</span>"###
     } else {
-        r###"<span class="mode-badge normal">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            Active Privacy Hardened Session
-        </span>"###
+        r###"<span class="session-badge normal"><span class="dot"></span>Hardened Mode</span>"###
     };
+
+    let saved_mb = (stats.estimated_bandwidth_saved_kb as f64) / 1024.0;
 
     let template = r###"<!DOCTYPE html>
 <html lang="en">
@@ -284,625 +291,378 @@ pub fn render_newtab_page(
     <style>
         {{COMMON_CSS}}
 
-        /* Modern Executive Canvas */
         .nt-canvas {
-            max-width: 1240px;
+            max-width: 1040px;
             margin: 0 auto;
-            padding: 36px 32px 64px;
+            padding: 24px 24px 48px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
-        /* Top Brand Header */
         .nt-topbar {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 36px;
+            margin-bottom: 24px;
         }
+
         .nt-brand {
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 10px;
             text-decoration: none;
             color: inherit;
         }
         .nt-brand-text {
-            font-size: 26px;
-            font-weight: 800;
-            letter-spacing: -0.8px;
+            font-size: 19px;
+            font-weight: 700;
+            letter-spacing: -0.6px;
             color: #ffffff;
         }
-        .nt-brand-sub {
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.8px;
-            text-transform: uppercase;
-            color: var(--accent-cyan);
-            background: rgba(6, 182, 212, 0.1);
-            border: 1px solid rgba(6, 182, 212, 0.25);
-            padding: 2px 8px;
-            border-radius: 6px;
+
+        .nt-nav-links {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+        .nt-nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            transition: color 0.12s ease;
+        }
+        .nt-nav-links a:hover {
+            color: #ffffff;
         }
 
-        /* Centered Sleek Search Capsule */
-        .nt-search-container {
-            max-width: 720px;
-            margin: 0 auto 44px;
+        .session-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
         }
+        .session-badge .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #10b981;
+        }
+        .session-badge.secure .dot {
+            background: #818cf8;
+        }
+
+        /* Hero: Clock & Search */
+        .nt-hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 10px;
+            margin-bottom: 40px;
+        }
+        .nt-clock {
+            font-size: 76px;
+            font-weight: 200;
+            letter-spacing: -3px;
+            color: #ffffff;
+            line-height: 1;
+            margin-bottom: 6px;
+            user-select: none;
+        }
+        .nt-date {
+            font-size: 11.5px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 32px;
+            user-select: none;
+        }
+
         .nt-search-box {
             display: flex;
             align-items: center;
-            background-color: #161724;
-            border: 1.5px solid rgba(255, 255, 255, 0.09);
-            border-radius: 28px;
-            height: 52px;
-            padding: 0 18px;
-            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-            position: relative;
+            width: 100%;
+            max-width: 620px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            border-radius: 24px;
+            padding: 0 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+            transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .nt-search-box:focus-within {
             border-color: rgba(99, 102, 241, 0.6);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15), 0 10px 32px rgba(0, 0, 0, 0.5);
-            background-color: #1a1c2c;
-        }
-        .engine-picker-btn {
-            display: flex;
-            align-items: center;
-            gap: 6px;
             background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 18px;
-            padding: 5px 12px;
-            color: var(--text-primary);
-            cursor: pointer;
-            font-size: 12.5px;
-            font-weight: 500;
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2), 0 12px 36px rgba(0, 0, 0, 0.5);
+        }
+        .nt-search-icon {
+            color: var(--text-muted);
             margin-right: 12px;
-            transition: all 0.15s ease;
-            user-select: none;
-        }
-        .engine-picker-btn:hover {
-            background: rgba(255, 255, 255, 0.12);
-        }
-        .engine-dropdown-menu {
-            display: none;
-            position: absolute;
-            top: 60px;
-            left: 12px;
-            width: 270px;
-            background-color: #181926;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 14px;
-            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65);
-            z-index: 200;
-            overflow: hidden;
-            padding: 6px;
-        }
-        .engine-dropdown-menu.show {
-            display: block;
-        }
-        .engine-dropdown-item {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            padding: 9px 12px;
-            border-radius: 8px;
-            color: var(--text-secondary);
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.15s ease;
-        }
-        .engine-dropdown-item:hover, .engine-dropdown-item.active {
-            background-color: rgba(99, 102, 241, 0.14);
-            color: #ffffff;
-        }
-        .engine-item-name {
-            font-weight: 500;
-        }
-        .engine-item-bang {
-            font-size: 11px;
-            color: var(--text-muted);
-            background: rgba(0, 0, 0, 0.3);
-            padding: 2px 6px;
-            border-radius: 4px;
+            flex-shrink: 0;
         }
         .nt-search-input {
             flex: 1;
             background: transparent;
             border: none;
             color: #ffffff;
-            font-size: 15px;
+            font-size: 14.5px;
+            font-family: inherit;
             outline: none;
         }
         .nt-search-input::placeholder {
             color: var(--text-muted);
         }
-        .nt-search-btn {
+        .nt-submit-btn {
             background: transparent;
             border: none;
-            color: var(--text-secondary);
+            color: var(--text-muted);
             cursor: pointer;
             padding: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 50%;
-            transition: color 0.15s ease;
+            transition: color 0.12s ease;
         }
-        .nt-search-btn:hover {
-            color: var(--accent-indigo);
+        .nt-submit-btn:hover {
+            color: #ffffff;
         }
 
-        /* Quick Bang Shortcuts Bar */
-        .search-chips-row {
+        /* Speed Dials Grid */
+        .nt-dials-grid {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            margin-top: 12px;
+            gap: 24px;
             flex-wrap: wrap;
+            max-width: 680px;
+            margin: 0 auto 40px;
         }
-        .search-chip {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.07);
-            border-radius: 14px;
-            padding: 4px 12px;
-            font-size: 11.5px;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.15s ease;
-            text-decoration: none;
-        }
-        .search-chip:hover {
-            background: rgba(99, 102, 241, 0.12);
-            color: #ffffff;
-            border-color: rgba(99, 102, 241, 0.3);
-        }
-
-        /* Threat Telemetry & Security Placecards Grid (Replaces toy widgets) */
-        .telemetry-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 18px;
-            margin-bottom: 40px;
-        }
-        @media (max-width: 1024px) {
-            .telemetry-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-        @media (max-width: 640px) {
-            .telemetry-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-        .stat-card {
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0) 100%), var(--bg-surface);
-            border: 1px solid var(--border-subtle);
-            border-radius: 14px;
-            padding: 20px;
+        .dial-tile {
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            transition: all 0.15s ease;
-        }
-        .stat-card:hover {
-            border-color: var(--border-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
-        }
-        .stat-header {
-            display: flex;
             align-items: center;
-            justify-content: space-between;
-            margin-bottom: 12px;
-        }
-        .stat-label {
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.6px;
-            color: var(--text-muted);
-        }
-        .stat-icon {
-            color: var(--accent-indigo);
-        }
-        .stat-number {
-            font-size: 28px;
-            font-weight: 800;
-            color: #ffffff;
-            letter-spacing: -0.8px;
-            margin-bottom: 4px;
-        }
-        .stat-subtext {
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-        .stat-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--accent-emerald);
-            background: rgba(16, 185, 129, 0.1);
-            padding: 2px 8px;
-            border-radius: 4px;
-            width: fit-content;
-            margin-top: 8px;
-        }
-
-        /* Developer & Privacy Speed Dial Grid (Placecards) */
-        .section-header-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 18px;
-        }
-        .section-heading {
-            font-size: 15px;
-            font-weight: 700;
-            color: var(--text-primary);
-            letter-spacing: -0.3px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .speeddial-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 16px;
-            margin-bottom: 44px;
-        }
-        @media (max-width: 1024px) {
-            .speeddial-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-        @media (max-width: 640px) {
-            .speeddial-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-        .dial-card {
-            background-color: var(--bg-surface);
-            border: 1px solid var(--border-subtle);
-            border-radius: 12px;
-            padding: 16px;
             text-decoration: none;
             color: inherit;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            transition: all 0.15s ease;
+            gap: 8px;
             cursor: pointer;
+            transition: transform 0.12s ease;
+            width: 68px;
         }
-        .dial-card:hover {
-            border-color: var(--border-hover);
-            background-color: var(--bg-surface-elevated);
+        .dial-tile:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
         }
-        .dial-icon-wrap {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            background-color: rgba(255, 255, 255, 0.05);
+        .dial-squircle {
+            width: 52px;
+            height: 52px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-shrink: 0;
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: #d4d4d8;
+            transition: all 0.12s ease;
         }
-        .dial-info {
-            overflow: hidden;
-        }
-        .dial-title {
-            font-size: 13.5px;
-            font-weight: 600;
+        .dial-tile:hover .dial-squircle {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--border-hover);
             color: #ffffff;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
         }
-        .dial-desc {
-            font-size: 11px;
-            color: var(--text-muted);
+        .dial-label {
+            font-size: 11.5px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            text-align: center;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            margin-top: 2px;
+            max-width: 68px;
+            transition: color 0.12s ease;
+        }
+        .dial-tile:hover .dial-label {
+            color: #ffffff;
         }
 
-        /* Vault Navigation Quick Bar */
-        .vault-bar {
+        /* Bottom Status Pill */
+        .nt-footer {
             display: flex;
-            align-items: center;
             justify-content: center;
-            gap: 12px;
-            flex-wrap: wrap;
-            padding: 18px 0;
-            border-top: 1px solid var(--border-subtle);
+            margin-top: auto;
         }
-        .vault-pill {
-            background-color: rgba(255, 255, 255, 0.04);
-            border: 1px solid var(--border-subtle);
-            color: var(--text-secondary);
-            text-decoration: none;
-            padding: 7px 16px;
-            border-radius: 20px;
-            font-size: 12.5px;
-            font-weight: 500;
-            transition: all 0.15s ease;
+        .status-pill {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
+            padding: 5px 14px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 11.5px;
+            font-weight: 450;
+            transition: all 0.12s ease;
         }
-        .vault-pill:hover {
-            background-color: rgba(99, 102, 241, 0.12);
-            border-color: rgba(99, 102, 241, 0.3);
-            color: #ffffff;
+        .status-pill:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: var(--border-hover);
+            color: var(--text-secondary);
+        }
+        .status-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: #10b981;
+        }
+        .status-sep {
+            color: rgba(255, 255, 255, 0.12);
         }
     </style>
 </head>
 <body>
     <div class="nt-canvas">
-        <!-- Topbar (Brand + Header Actions) -->
-        <div class="nt-topbar">
+        <header class="nt-topbar">
             <a href="norva://newtab" class="nt-brand">
-                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                    <circle cx="12" cy="11" r="3"/>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+                    <polyline points="2 17 12 22 22 17"/>
+                    <polyline points="2 12 12 17 22 12"/>
                 </svg>
-                <div>
-                    <div class="nt-brand-text">norva</div>
-                </div>
-                <span class="nt-brand-sub">CORE v0.1</span>
+                <span class="nt-brand-text">norva</span>
             </a>
-            <div style="display: flex; align-items: center; gap: 12px;">
+
+            <nav class="nt-nav-links">
+                <a href="norva://history">History</a>
+                <a href="norva://bookmarks">Bookmarks</a>
+                <a href="norva://downloads">Downloads</a>
+                <a href="norva://passwords">Passwords</a>
+                <a href="norva://shields">Shields</a>
+                <a href="norva://settings">Settings</a>
+            </nav>
+
+            <div>
                 {{MODE_PILL}}
             </div>
-        </div>
+        </header>
 
-        <!-- Centered Modern Search Bar -->
-        <div class="nt-search-container">
+        <main class="nt-hero">
+            <div id="nt-clock" class="nt-clock">12:00</div>
+            <div id="nt-date" class="nt-date">MONDAY, NOVEMBER 23</div>
+
             <div class="nt-search-box">
-                <!-- Search Engine Picker Trigger -->
-                <div class="engine-picker-btn" id="engine-picker-trigger" onclick="toggleEngineDropdown()">
-                    <span id="active-engine-label">{{DEFAULT_NAME}}</span>
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                        <polyline points="6 9 12 15 18 9"/>
+                <div class="nt-search-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <circle cx="11" cy="11" r="8"/>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
                     </svg>
                 </div>
-
-                <!-- Floating Engine Dropdown -->
-                <div class="engine-dropdown-menu" id="engine-dropdown">
-                    {{ENGINE_ITEMS}}
-                </div>
-
-                <input type="text" class="nt-search-input" id="search-input" 
-                    placeholder="Search with {{DEFAULT_NAME}} or enter address..." autocomplete="off" autofocus />
-                
-                <button class="nt-search-btn" id="search-submit" title="Search">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                        <circle cx="11" cy="11" r="7"/>
-                        <line x1="16.5" y1="16.5" x2="21" y2="21"/>
+                <input type="text" id="nt-search-input" class="nt-search-input" placeholder="Search with {{DEFAULT_NAME}} or enter URL..." autocomplete="off" autofocus />
+                <button class="nt-submit-btn" id="nt-search-btn" title="Search">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <line x1="5" y1="12" x2="19" y2="12"/>
+                        <polyline points="12 5 19 12 12 19"/>
                     </svg>
                 </button>
             </div>
+        </main>
 
-            <!-- Quick Bang Chips -->
-            <div class="search-chips-row">
-                <span class="search-chip" onclick="quickFillBang('!ddg ')">DuckDuckGo (!ddg)</span>
-                <span class="search-chip" onclick="quickFillBang('!g ')">Google (!g)</span>
-                <span class="search-chip" onclick="quickFillBang('!b ')">Bing (!b)</span>
-                <span class="search-chip" onclick="quickFillBang('!ahmia ')">Ahmia Tor (!ahmia)</span>
-                <span class="search-chip" onclick="quickFillBang('!gh ')">GitHub (!gh)</span>
-                <span class="search-chip" onclick="quickFillBang('!w ')">Wikipedia (!w)</span>
-                <span class="search-chip" onclick="quickFillBang('!sp ')">Startpage (!sp)</span>
-                <span class="search-chip" onclick="quickFillBang('!brave ')">Brave (!brave)</span>
-            </div>
-        </div>
+        <section class="nt-dials-grid">
+            <a href="#" class="dial-tile" onclick="navigate('https://duckduckgo.com')">
+                <div class="dial-squircle">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                </div>
+                <span class="dial-label">DuckDuckGo</span>
+            </a>
 
-        <!-- Live Threat Telemetry & Security Placecards Grid -->
-        <div class="telemetry-grid">
-            <!-- 1. Threat Shield Matrix -->
-            <div class="stat-card">
-                <div>
-                    <div class="stat-header">
-                        <span class="stat-label">Threats Neutralized</span>
-                        <svg class="stat-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                    </div>
-                    <div class="stat-number">{{ADS_BLOCKED}}</div>
-                    <div class="stat-subtext">Trackers, ads & telemetry beacons blocked</div>
+            <a href="#" class="dial-tile" onclick="navigate('https://github.com')">
+                <div class="dial-squircle">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
                 </div>
-                <div class="stat-badge">
-                    <span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:#10b981;"></span>
-                    Active Shield Defense
-                </div>
-            </div>
+                <span class="dial-label">GitHub</span>
+            </a>
 
-            <!-- 2. Zero-Trust Hardware Guard -->
-            <div class="stat-card">
-                <div>
-                    <div class="stat-header">
-                        <span class="stat-label">Hardware Arbiter</span>
-                        <svg class="stat-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-                    </div>
-                    <div class="stat-number">3 Devices</div>
-                    <div class="stat-subtext">Camera, Microphone & GPS gated</div>
+            <a href="#" class="dial-tile" onclick="navigate('https://www.wikipedia.org')">
+                <div class="dial-squircle">
+                    <span style="font-family: serif; font-weight: 700; font-size: 20px;">W</span>
                 </div>
-                <div class="stat-badge" style="color: #06b6d4; background: rgba(6, 182, 212, 0.1);">
-                    Zero-Trust Policy
-                </div>
-            </div>
+                <span class="dial-label">Wikipedia</span>
+            </a>
 
-            <!-- 3. Bandwidth & Latency Saved -->
-            <div class="stat-card">
-                <div>
-                    <div class="stat-header">
-                        <span class="stat-label">Data Saved</span>
-                        <svg class="stat-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-                    </div>
-                    <div class="stat-number">{{SAVED_MB}} MB</div>
-                    <div class="stat-subtext">Estimated payload bloat prevented</div>
+            <a href="#" class="dial-tile" onclick="navigate('https://news.ycombinator.com')">
+                <div class="dial-squircle">
+                    <span style="font-weight: 700; font-size: 17px; color: #ff6600;">Y</span>
                 </div>
-                <div class="stat-badge">
-                    ~38% Faster Load Time
-                </div>
-            </div>
+                <span class="dial-label">Hacker News</span>
+            </a>
 
-            <!-- 4. Storage & Cache Isolation -->
-            <div class="stat-card">
-                <div>
-                    <div class="stat-header">
-                        <span class="stat-label">Storage Footprint</span>
-                        <svg class="stat-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                    </div>
-                    <div class="stat-number">{{CACHE_MB}} MB</div>
-                    <div class="stat-subtext">Partitioned cache & cookie storage</div>
+            <a href="#" class="dial-tile" onclick="navigate('https://www.reddit.com')">
+                <div class="dial-squircle">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="9" cy="10" r="1.5" fill="currentColor"/><circle cx="15" cy="10" r="1.5" fill="currentColor"/><path d="M8 15s1.5 2 4 2 4-2 4-2"/></svg>
                 </div>
-                <button class="btn" style="margin-top: 8px; font-size: 11px; padding: 4px 10px;" onclick="purgeCache()">
-                    Purge Storage
-                </button>
-            </div>
-        </div>
+                <span class="dial-label">Reddit</span>
+            </a>
 
-        <!-- Developer & Privacy Speed Dial (Real, Professional Placecards) -->
-        <div class="section-header-row">
-            <span class="section-heading">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                Secure Quick Access
-            </span>
-        </div>
+            <a href="#" class="dial-tile" onclick="navigate('https://www.torproject.org')">
+                <div class="dial-squircle">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+                </div>
+                <span class="dial-label">Tor Project</span>
+            </a>
 
-        <div class="speeddial-grid">
-            <!-- 1. GitHub -->
-            <div class="dial-card" onclick="navigate('https://github.com')">
-                <div class="dial-icon-wrap">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="#ffffff"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+            <a href="#" class="dial-tile" onclick="navigate('https://www.rust-lang.org')">
+                <div class="dial-squircle">
+                    <span style="font-weight: 700; font-size: 14px;">Rust</span>
                 </div>
-                <div class="dial-info">
-                    <div class="dial-title">GitHub</div>
-                    <div class="dial-desc">Repositories & code</div>
-                </div>
-            </div>
+                <span class="dial-label">Rust Lang</span>
+            </a>
 
-            <!-- 2. DuckDuckGo -->
-            <div class="dial-card" onclick="navigate('https://duckduckgo.com')">
-                <div class="dial-icon-wrap">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="#de5833"><circle cx="12" cy="12" r="10"/></svg>
+            <a href="norva://shields" class="dial-tile">
+                <div class="dial-squircle">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                 </div>
-                <div class="dial-info">
-                    <div class="dial-title">DuckDuckGo</div>
-                    <div class="dial-desc">Private web search</div>
-                </div>
-            </div>
+                <span class="dial-label">Shields</span>
+            </a>
+        </section>
 
-            <!-- 3. Tor Project -->
-            <div class="dial-card" onclick="navigate('https://www.torproject.org')">
-                <div class="dial-icon-wrap">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7d4698" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
-                </div>
-                <div class="dial-info">
-                    <div class="dial-title">Tor Project</div>
-                    <div class="dial-desc">Online anonymity</div>
-                </div>
-            </div>
-
-            <!-- 4. Electronic Frontier Foundation -->
-            <div class="dial-card" onclick="navigate('https://www.eff.org')">
-                <div class="dial-icon-wrap">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e02424" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                </div>
-                <div class="dial-info">
-                    <div class="dial-title">EFF</div>
-                    <div class="dial-desc">Digital privacy rights</div>
-                </div>
-            </div>
-
-            <!-- 5. Rust Programming -->
-            <div class="dial-card" onclick="navigate('https://www.rust-lang.org')">
-                <div class="dial-icon-wrap">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="3" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="21"/><line x1="3" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="21" y2="12"/></svg>
-                </div>
-                <div class="dial-info">
-                    <div class="dial-title">Rust Lang</div>
-                    <div class="dial-desc">Systems engineering</div>
-                </div>
-            </div>
-
-            <!-- 6. Hacker News -->
-            <div class="dial-card" onclick="navigate('https://news.ycombinator.com')">
-                <div class="dial-icon-wrap">
-                    <span style="font-weight: 800; color: #ff6600; font-size: 16px;">Y</span>
-                </div>
-                <div class="dial-info">
-                    <div class="dial-title">Hacker News</div>
-                    <div class="dial-desc">Tech & cyber briefing</div>
-                </div>
-            </div>
-
-            <!-- 7. Wikipedia -->
-            <div class="dial-card" onclick="navigate('https://www.wikipedia.org')">
-                <div class="dial-icon-wrap">
-                    <span style="font-family: serif; font-weight: 700; color: #ffffff; font-size: 18px;">W</span>
-                </div>
-                <div class="dial-info">
-                    <div class="dial-title">Wikipedia</div>
-                    <div class="dial-desc">Open encyclopedia</div>
-                </div>
-            </div>
-
-            <!-- 8. Ahmia (.onion) -->
-            <div class="dial-card" onclick="navigate('https://ahmia.fi')">
-                <div class="dial-icon-wrap">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9333ea" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/></svg>
-                </div>
-                <div class="dial-info">
-                    <div class="dial-title">Ahmia</div>
-                    <div class="dial-desc">Tor hidden services</div>
-                </div>
-            </div>
-
-            <!-- 9. Privacy Guides -->
-            <div class="dial-card" onclick="navigate('https://www.privacyguides.org')">
-                <div class="dial-icon-wrap">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                </div>
-                <div class="dial-info">
-                    <div class="dial-title">Privacy Guides</div>
-                    <div class="dial-desc">Security recommendations</div>
-                </div>
-            </div>
-
-            <!-- 10. Startpage -->
-            <div class="dial-card" onclick="navigate('https://www.startpage.com')">
-                <div class="dial-icon-wrap">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                </div>
-                <div class="dial-info">
-                    <div class="dial-title">Startpage</div>
-                    <div class="dial-desc">European private search</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Privacy Shields & Internal Command Quick Access -->
-        <div class="vault-bar">
-            <span style="font-size: 12px; color: var(--text-muted); margin-right: 6px;">NORVA Vaults:</span>
-            <a href="norva://history" class="vault-pill">📜 History Vault</a>
-            <a href="norva://bookmarks" class="vault-pill">★ Bookmarks Vault</a>
-            <a href="norva://downloads" class="vault-pill">📥 Downloads</a>
-            <a href="norva://passwords" class="vault-pill">🔑 Passwords Vault</a>
-            <a href="norva://shields" class="vault-pill">🛡️ Shields Center ({{ADS_BLOCKED}} blocked)</a>
-            <a href="norva://permissions" class="vault-pill">📷 Device Permissions</a>
-            <a href="norva://cookies" class="vault-pill">🍪 Cache & Storage ({{CACHE_MB}} MB)</a>
-            <a href="norva://settings" class="vault-pill">⚙️ Settings & Engines</a>
-        </div>
+        <footer class="nt-footer">
+            <a href="norva://shields" class="status-pill">
+                <span class="status-dot"></span>
+                <span>Protected by Norva Shields</span>
+                <span class="status-sep">•</span>
+                <span>{{ADS_BLOCKED}} blocked</span>
+                <span class="status-sep">•</span>
+                <span>{{SAVED_MB}} MB saved</span>
+            </a>
+        </footer>
     </div>
 
     <script>
+        function updateClock() {
+            const clock = document.getElementById("nt-clock");
+            const date = document.getElementById("nt-date");
+            if (!clock || !date) return;
+            const now = new Date();
+            clock.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+            date.textContent = now.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase();
+        }
+        updateClock();
+        setInterval(updateClock, 1000);
+
         function navigate(url) {
             if (window.ipc && window.ipc.postMessage) {
                 window.ipc.postMessage(JSON.stringify({ action: "navigate", query: url }));
@@ -911,92 +671,50 @@ pub fn render_newtab_page(
             }
         }
 
-        function toggleEngineDropdown() {
-            const menu = document.getElementById("engine-dropdown");
-            menu.classList.toggle("show");
-        }
+        const input = document.getElementById("nt-search-input");
+        const submitBtn = document.getElementById("nt-search-btn");
 
-        document.addEventListener("click", (e) => {
-            const trigger = document.getElementById("engine-picker-trigger");
-            const menu = document.getElementById("engine-dropdown");
-            if (!trigger.contains(e.target) && !menu.contains(e.target)) {
-                menu.classList.remove("show");
-            }
-        });
-
-        function selectSearchEngine(id, name, bang) {
-            document.getElementById("active-engine-label").textContent = name;
-            document.getElementById("engine-dropdown").classList.remove("show");
-            if (window.ipc && window.ipc.postMessage) {
-                window.ipc.postMessage(JSON.stringify({ action: "set_default_engine", query: id }));
-            }
-        }
-
-        function quickFillBang(bang) {
-            const input = document.getElementById("search-input");
-            input.value = bang;
-            input.focus();
-        }
-
-        function purgeCache() {
-            if (confirm("Purge local disk cache and session storage immediately?")) {
-                if (window.ipc && window.ipc.postMessage) {
-                    window.ipc.postMessage(JSON.stringify({ action: "purge_cache" }));
-                    setTimeout(() => window.location.reload(), 200);
-                }
-            }
-        }
-
-        document.getElementById("search-input").addEventListener("keydown", (e) => {
+        input.addEventListener("keydown", (e) => {
             if (e.key === "Enter") {
-                const val = e.target.value.trim();
-                if (val) {
-                    navigate(val);
-                }
+                const val = input.value.trim();
+                if (val) navigate(val);
             }
         });
 
-        document.getElementById("search-submit").addEventListener("click", () => {
-            const val = document.getElementById("search-input").value.trim();
-            if (val) {
-                navigate(val);
-            }
+        submitBtn.addEventListener("click", () => {
+            const val = input.value.trim();
+            if (val) navigate(val);
         });
     </script>
 </body>
 </html>"###;
 
-    let saved_mb = (stats.estimated_bandwidth_saved_kb as f64) / 1024.0;
-
     template
         .replace("{{COMMON_CSS}}", get_common_css())
         .replace("{{MODE_PILL}}", mode_pill)
         .replace("{{DEFAULT_NAME}}", &default_engine.name)
-        .replace("{{ENGINE_ITEMS}}", &engine_items_html)
         .replace("{{ADS_BLOCKED}}", &stats.total_all_time.to_string())
         .replace("{{SAVED_MB}}", &format!("{:.1}", saved_mb))
-        .replace("{{CACHE_MB}}", &format!("{:.1}", cache_mb))
 }
 
-/// Renders the `norva://history` view with interactive filtering and purge controls.
+/// Renders the `norva://history` view with filtering and purge controls.
 pub fn render_history_page(entries: &[HistoryEntry]) -> String {
     let mut rows = String::new();
     if entries.is_empty() {
-        rows.push_str(r###"<div style="text-align:center; padding: 56px 24px; color: var(--text-muted);">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="margin-bottom:12px; opacity:0.6;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            <h3 style="color: var(--text-primary); font-size: 16px;">History Vault is Clear</h3>
-            <p style="margin-top: 6px; font-size: 13px;">No browsing activity recorded. In Secure Ghost Mode, history is never persisted.</p>
+        rows.push_str(r###"<div style="text-align:center; padding: 48px 20px; color: var(--text-muted);">
+            <h3 style="color: var(--text-secondary); font-size: 15px; font-weight: 550;">No Browsing History</h3>
+            <p style="margin-top: 4px; font-size: 13px;">Visited pages will appear here. In Private Mode, history is never persisted.</p>
         </div>"###);
     } else {
         for e in entries {
             let engine_badge = if let Some(ref eng) = e.search_engine {
-                format!(r###"<span style="background: rgba(99, 102, 241, 0.12); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.25); padding: 2px 7px; border-radius: 4px; font-size: 11px; font-weight: 600;">🔍 {}</span>"###, eng)
+                format!(r###"<span style="background: rgba(99, 102, 241, 0.1); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.25); padding: 1px 6px; border-radius: 4px; font-size: 11px; font-weight: 550;">{}</span>"###, eng)
             } else {
                 String::new()
             };
 
             let query_info = if let Some(ref q) = e.search_query {
-                format!(r###"<span style="color: var(--accent-cyan); font-weight: 500;">Search: "{}"</span> • "###, q)
+                format!(r###"<span style="color: var(--text-secondary); font-weight: 500;">Search: "{}"</span> • "###, q)
             } else {
                 String::new()
             };
@@ -1009,56 +727,57 @@ pub fn render_history_page(entries: &[HistoryEntry]) -> String {
                             {}
                         </div>
                         <div class="history-meta">
-                            {}{} • Visited {} times
+                            {}{} • {} visits
                         </div>
                     </div>
-                    <button class="btn btn-danger" style="padding: 4px 10px; font-size: 12px;" onclick="deleteHistory({})">Delete</button>
+                    <button class="btn btn-danger" style="padding: 3px 9px; font-size: 11.5px;" onclick="deleteHistory({})">Delete</button>
                 </div>"###,
                 e.url, e.title, engine_badge, query_info, e.visit_time, e.visit_count, e.id
             ));
         }
     }
 
+    let header = render_internal_header("history", "History");
+
     let template = r###"<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>History Vault | NORVA</title>
+    <title>History | NORVA</title>
     <style>
         {{COMMON_CSS}}
         .header-actions {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             flex-wrap: wrap;
-            gap: 16px;
+            gap: 14px;
         }
         .search-box {
-            background: #141520;
+            background: #090a0f;
             border: 1px solid var(--border-subtle);
-            border-radius: 8px;
-            padding: 8px 14px;
+            border-radius: 6px;
+            padding: 7px 12px;
             color: #ffffff;
-            width: 320px;
+            width: 280px;
             outline: none;
             font-size: 13px;
-            transition: border-color 0.15s ease;
+            font-family: inherit;
         }
         .search-box:focus {
             border-color: var(--border-focus);
-            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
         }
         .history-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 14px 18px;
+            padding: 12px 16px;
             background: var(--bg-surface);
             border: 1px solid var(--border-subtle);
-            border-radius: 10px;
-            margin-bottom: 10px;
-            transition: all 0.15s ease;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            transition: all 0.12s ease;
         }
         .history-item:hover {
             background-color: var(--bg-surface-elevated);
@@ -1067,15 +786,15 @@ pub fn render_history_page(entries: &[HistoryEntry]) -> String {
         .history-main {
             overflow: hidden;
             flex: 1;
-            margin-right: 16px;
+            margin-right: 14px;
         }
         .history-title {
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 13.5px;
+            font-weight: 550;
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 4px;
+            gap: 8px;
+            margin-bottom: 3px;
         }
         .history-link {
             color: var(--text-primary);
@@ -1085,48 +804,30 @@ pub fn render_history_page(entries: &[HistoryEntry]) -> String {
             white-space: nowrap;
         }
         .history-link:hover {
-            color: var(--accent-indigo);
+            color: #818cf8;
         }
         .history-meta {
-            font-size: 12px;
+            font-size: 11.5px;
             color: var(--text-muted);
         }
     </style>
 </head>
 <body>
-    <header class="internal-header">
-        <div class="internal-header-left">
-            <a href="norva://newtab" class="back-link">
-                <span>←</span> <span>Start Page</span>
-            </a>
-            <h2 class="internal-title">📜 History Vault</h2>
-        </div>
-        <div class="internal-nav-chips">
-            <a href="norva://newtab" class="chip">🏠 Start</a>
-            <a href="norva://history" class="chip active">📜 History</a>
-            <a href="norva://bookmarks" class="chip">★ Bookmarks</a>
-            <a href="norva://downloads" class="chip">📥 Downloads</a>
-            <a href="norva://passwords" class="chip">🔑 Passwords</a>
-            <a href="norva://shields" class="chip">🛡️ Shields</a>
-            <a href="norva://permissions" class="chip">📷 Permissions</a>
-            <a href="norva://cookies" class="chip">🍪 Storage</a>
-            <a href="norva://settings" class="chip">⚙️ Settings</a>
-        </div>
-    </header>
+    {{HEADER}}
 
     <main class="container">
         <div class="header-actions">
             <div>
-                <h2 style="font-size: 22px; font-weight: 700; color: #ffffff;">Browsing History Vault</h2>
-                <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Isolated SQLite history.db storage with zero telemetry</p>
+                <h3 style="font-size: 17px; font-weight: 600; color: #ffffff;">Browsing History</h3>
+                <p style="color: var(--text-muted); font-size: 12.5px; margin-top: 2px;">Local SQLite database with zero telemetry</p>
             </div>
-            <div style="display: flex; gap: 10px;">
-                <input type="text" class="search-box" id="search-hist" placeholder="Filter history records..." oninput="filterHistory()" />
-                <button class="btn btn-danger" onclick="clearAllHistory()">Purge All History</button>
+            <div style="display: flex; gap: 8px;">
+                <input type="text" class="search-box" id="search-hist" placeholder="Search history..." oninput="filterHistory()" />
+                <button class="btn btn-danger" onclick="clearAllHistory()">Clear History</button>
             </div>
         </div>
 
-        <div class="card" id="history-container" style="padding: 12px;">
+        <div id="history-container">
             {{ROWS}}
         </div>
     </main>
@@ -1150,7 +851,7 @@ pub fn render_history_page(entries: &[HistoryEntry]) -> String {
         }
 
         function clearAllHistory() {
-            if (confirm("Permanently wipe all browsing history from history.db?")) {
+            if (confirm("Clear all browsing history?")) {
                 if (window.ipc && window.ipc.postMessage) {
                     window.ipc.postMessage(JSON.stringify({ action: "clear_history" }));
                     setTimeout(() => window.location.reload(), 200);
@@ -1171,29 +872,30 @@ pub fn render_history_page(entries: &[HistoryEntry]) -> String {
 
     template
         .replace("{{COMMON_CSS}}", get_common_css())
+        .replace("{{HEADER}}", &header)
         .replace("{{ROWS}}", &rows)
 }
 
-/// Renders the `norva://shields` view with real-time telemetry stream and switch controls.
+/// Renders the `norva://shields` view with real-time telemetry and metrics.
 pub fn render_shields_page(stats: &ShieldStats, events: &[BlockedEvent]) -> String {
     let mut log_rows = String::new();
     if events.is_empty() {
-        log_rows.push_str(r###"<tr><td colspan="4" style="text-align:center; padding: 36px; color: var(--text-muted);">No surveillance events recorded yet. Browse any site to see live neutralization logs.</td></tr>"###);
+        log_rows.push_str(r###"<tr><td colspan="4" style="text-align:center; padding: 32px; color: var(--text-muted);">No tracking requests recorded yet. Browse any site to inspect live blocks.</td></tr>"###);
     } else {
         for ev in events {
             let (badge_bg, badge_color) = match ev.category {
-                crate::db::shields_db::BlockCategory::Ad => ("rgba(6, 182, 212, 0.12)", "#22d3ee"),
-                crate::db::shields_db::BlockCategory::Tracker => ("rgba(244, 63, 94, 0.12)", "#fb7185"),
-                crate::db::shields_db::BlockCategory::Fingerprinter => ("rgba(168, 85, 247, 0.12)", "#c084fc"),
-                crate::db::shields_db::BlockCategory::Cryptominer => ("rgba(245, 158, 11, 0.12)", "#fbbf24"),
-                crate::db::shields_db::BlockCategory::TrackingParam => ("rgba(16, 185, 129, 0.12)", "#34d399"),
+                crate::db::shields_db::BlockCategory::Ad => ("rgba(6, 182, 212, 0.1)", "#22d3ee"),
+                crate::db::shields_db::BlockCategory::Tracker => ("rgba(244, 63, 94, 0.1)", "#fb7185"),
+                crate::db::shields_db::BlockCategory::Fingerprinter => ("rgba(168, 85, 247, 0.1)", "#c084fc"),
+                crate::db::shields_db::BlockCategory::Cryptominer => ("rgba(245, 158, 11, 0.1)", "#fbbf24"),
+                crate::db::shields_db::BlockCategory::TrackingParam => ("rgba(16, 185, 129, 0.1)", "#34d399"),
             };
             log_rows.push_str(&format!(
                 r###"<tr>
-                    <td><span style="background: {}; color: {}; padding: 3px 8px; border-radius: 6px; font-weight: 700; font-size: 11px; text-transform: uppercase;">{:?}</span></td>
-                    <td style="font-family: monospace; color: var(--text-primary); font-size: 13px; font-weight: 500;">{}</td>
-                    <td style="color: var(--text-secondary); font-size: 13px;">{}</td>
-                    <td style="color: var(--text-muted); font-size: 12px;">{}</td>
+                    <td><span style="background: {}; color: {}; padding: 2px 7px; border-radius: 4px; font-weight: 600; font-size: 11px; text-transform: uppercase;">{:?}</span></td>
+                    <td style="font-family: monospace; color: var(--text-primary); font-size: 12.5px;">{}</td>
+                    <td style="color: var(--text-secondary); font-size: 12.5px;">{}</td>
+                    <td style="color: var(--text-muted); font-size: 11.5px;">{}</td>
                 </tr>"###,
                 badge_bg, badge_color, ev.category, ev.blocked_domain, ev.page_domain, ev.timestamp
             ));
@@ -1201,6 +903,7 @@ pub fn render_shields_page(stats: &ShieldStats, events: &[BlockedEvent]) -> Stri
     }
 
     let saved_mb = (stats.estimated_bandwidth_saved_kb as f64) / 1024.0;
+    let header = render_internal_header("shields", "Privacy Shields");
 
     let template = r###"<!DOCTYPE html>
 <html lang="en">
@@ -1209,30 +912,13 @@ pub fn render_shields_page(stats: &ShieldStats, events: &[BlockedEvent]) -> Stri
     <title>Privacy Shields | NORVA</title>
     <style>
         {{COMMON_CSS}}
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13.5px;
-        }
-        .table th, .table td {
-            padding: 12px 16px;
-            text-align: left;
-            border-bottom: 1px solid var(--border-subtle);
-        }
-        .table th {
-            color: var(--text-muted);
-            text-transform: uppercase;
-            font-size: 11px;
-            letter-spacing: 0.6px;
-            background: rgba(255, 255, 255, 0.02);
-        }
         .metrics-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
+            gap: 14px;
             margin-bottom: 24px;
         }
-        @media (max-width: 900px) {
+        @media (max-width: 800px) {
             .metrics-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
@@ -1240,73 +926,56 @@ pub fn render_shields_page(stats: &ShieldStats, events: &[BlockedEvent]) -> Stri
         .metric-box {
             background-color: var(--bg-surface);
             border: 1px solid var(--border-subtle);
-            border-radius: 12px;
-            padding: 18px;
+            border-radius: 10px;
+            padding: 16px;
         }
         .metric-title {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            font-weight: 600;
             margin-bottom: 6px;
         }
         .metric-val {
             font-size: 24px;
-            font-weight: 800;
+            font-weight: 700;
             color: #ffffff;
         }
     </style>
 </head>
 <body>
-    <header class="internal-header">
-        <div class="internal-header-left">
-            <a href="norva://newtab" class="back-link">
-                <span>←</span> <span>Start Page</span>
-            </a>
-            <h2 class="internal-title">🛡️ Privacy Shields Command Center</h2>
-        </div>
-        <div class="internal-nav-chips">
-            <a href="norva://newtab" class="chip">🏠 Start</a>
-            <a href="norva://history" class="chip">📜 History</a>
-            <a href="norva://bookmarks" class="chip">★ Bookmarks</a>
-            <a href="norva://downloads" class="chip">📥 Downloads</a>
-            <a href="norva://passwords" class="chip">🔑 Passwords</a>
-            <a href="norva://shields" class="chip active">🛡️ Shields</a>
-            <a href="norva://permissions" class="chip">📷 Permissions</a>
-            <a href="norva://cookies" class="chip">🍪 Storage</a>
-            <a href="norva://settings" class="chip">⚙️ Settings</a>
-        </div>
-    </header>
+    {{HEADER}}
 
     <main class="container">
         <div class="metrics-grid">
             <div class="metric-box">
                 <div class="metric-title">Total Interceptions</div>
-                <div class="metric-val" style="color: #6366f1;">{{TOTAL_ALL}}</div>
+                <div class="metric-val" style="color: #818cf8;">{{TOTAL_ALL}}</div>
             </div>
             <div class="metric-box">
                 <div class="metric-title">Ads Blocked</div>
-                <div class="metric-val" style="color: #06b6d4;">{{ADS_COUNT}}</div>
+                <div class="metric-val" style="color: #22d3ee;">{{ADS_COUNT}}</div>
             </div>
             <div class="metric-box">
                 <div class="metric-title">Trackers Blocked</div>
-                <div class="metric-val" style="color: #f43f5e;">{{TRACKERS_COUNT}}</div>
+                <div class="metric-val" style="color: #fb7185;">{{TRACKERS_COUNT}}</div>
             </div>
             <div class="metric-box">
-                <div class="metric-title">Data Saved</div>
-                <div class="metric-val" style="color: #10b981;">{{SAVED_MB}} MB</div>
+                <div class="metric-title">Bandwidth Saved</div>
+                <div class="metric-val" style="color: #34d399;">{{SAVED_MB}} MB</div>
             </div>
         </div>
 
         <div class="card">
-            <h3 style="font-size: 16px; font-weight: 700; color: #ffffff; margin-bottom: 16px;">Live Neutralized Threats Telemetry</h3>
+            <h3 style="font-size: 15px; font-weight: 600; color: #ffffff; margin-bottom: 14px;">Blocked Requests Log</h3>
             <div style="overflow-x: auto;">
                 <table class="table">
                     <thead>
                         <tr>
                             <th>Category</th>
-                            <th>Blocked Host Target</th>
-                            <th>Originating Context</th>
+                            <th>Blocked Target</th>
+                            <th>Page Context</th>
                             <th>Timestamp</th>
                         </tr>
                     </thead>
@@ -1322,6 +991,7 @@ pub fn render_shields_page(stats: &ShieldStats, events: &[BlockedEvent]) -> Stri
 
     template
         .replace("{{COMMON_CSS}}", get_common_css())
+        .replace("{{HEADER}}", &header)
         .replace("{{TOTAL_ALL}}", &stats.total_all_time.to_string())
         .replace("{{ADS_COUNT}}", &stats.total_ads_blocked.to_string())
         .replace("{{TRACKERS_COUNT}}", &stats.total_trackers_blocked.to_string())
@@ -1329,21 +999,21 @@ pub fn render_shields_page(stats: &ShieldStats, events: &[BlockedEvent]) -> Stri
         .replace("{{LOG_ROWS}}", &log_rows)
 }
 
-/// Renders the `norva://permissions` view with granular hardware arbiter policies and audit logs.
+/// Renders the `norva://permissions` view for device policy management.
 pub fn render_permissions_page(permissions: &[SitePermission], audits: &[PermissionAuditLog]) -> String {
     let mut perm_rows = String::new();
     if permissions.is_empty() {
-        perm_rows.push_str(r###"<tr><td colspan="5" style="text-align:center; padding: 32px; color: var(--text-muted);">No custom site permissions configured. All origins operate under zero-trust gating.</td></tr>"###);
+        perm_rows.push_str(r###"<tr><td colspan="5" style="text-align:center; padding: 28px; color: var(--text-muted);">No custom site permissions configured. All origins operate under zero-trust gating.</td></tr>"###);
     } else {
         for p in permissions {
             perm_rows.push_str(&format!(
                 r###"<tr>
-                    <td style="font-weight: 600; color: #ffffff;">{}</td>
+                    <td style="font-weight: 550; color: #ffffff;">{}</td>
                     <td><span class="policy-badge {:?}">{}</span></td>
                     <td><span class="policy-badge {:?}">{}</span></td>
                     <td><span class="policy-badge {:?}">{}</span></td>
                     <td>
-                        <button class="btn btn-danger" style="padding: 4px 8px; font-size: 11px;" onclick="resetPermission('{}')">Reset</button>
+                        <button class="btn btn-danger" style="padding: 3px 8px; font-size: 11px;" onclick="resetPermission('{}')">Reset</button>
                     </td>
                 </tr>"###,
                 p.domain, p.camera, p.camera.as_str(), p.microphone, p.microphone.as_str(), p.location, p.location.as_str(), p.domain
@@ -1353,7 +1023,7 @@ pub fn render_permissions_page(permissions: &[SitePermission], audits: &[Permiss
 
     let mut audit_rows = String::new();
     if audits.is_empty() {
-        audit_rows.push_str(r###"<tr><td colspan="4" style="text-align:center; padding: 28px; color: var(--text-muted);">No hardware sensor invocations recorded.</td></tr>"###);
+        audit_rows.push_str(r###"<tr><td colspan="4" style="text-align:center; padding: 24px; color: var(--text-muted);">No device requests recorded.</td></tr>"###);
     } else {
         for a in audits {
             let decision_color = if a.decision == "allowed" || a.decision == "allowed_internal" {
@@ -1366,90 +1036,57 @@ pub fn render_permissions_page(permissions: &[SitePermission], audits: &[Permiss
                     <td style="font-weight: 500; color: #ffffff;">{}</td>
                     <td style="text-transform: capitalize; color: var(--text-secondary);">{}</td>
                     <td><span style="color: {}; font-weight: 600; text-transform: uppercase; font-size: 11px;">{}</span></td>
-                    <td style="color: var(--text-muted); font-size: 12px;">{}</td>
+                    <td style="color: var(--text-muted); font-size: 11.5px;">{}</td>
                 </tr>"###,
                 a.domain, a.permission_type, decision_color, a.decision, a.timestamp
             ));
         }
     }
 
+    let header = render_internal_header("permissions", "Site Permissions");
+
     let template = r###"<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Hardware Permissions | NORVA</title>
+    <title>Permissions | NORVA</title>
     <style>
         {{COMMON_CSS}}
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13.5px;
-        }
-        .table th, .table td {
-            padding: 12px 16px;
-            text-align: left;
-            border-bottom: 1px solid var(--border-subtle);
-        }
-        .table th {
-            color: var(--text-muted);
-            text-transform: uppercase;
-            font-size: 11px;
-            letter-spacing: 0.6px;
-            background: rgba(255, 255, 255, 0.02);
-        }
         .policy-badge {
-            padding: 3px 8px;
-            border-radius: 6px;
+            padding: 2px 7px;
+            border-radius: 4px;
             font-size: 11px;
-            font-weight: 700;
+            font-weight: 600;
             text-transform: uppercase;
         }
         .policy-badge.Allow {
-            background: rgba(16, 185, 129, 0.12);
+            background: rgba(16, 185, 129, 0.1);
             color: #34d399;
         }
         .policy-badge.Block {
-            background: rgba(244, 63, 94, 0.12);
+            background: rgba(244, 63, 94, 0.1);
             color: #fb7185;
         }
         .policy-badge.Ask {
-            background: rgba(245, 158, 11, 0.12);
+            background: rgba(245, 158, 11, 0.1);
             color: #fbbf24;
         }
     </style>
 </head>
 <body>
-    <header class="internal-header">
-        <div class="internal-header-left">
-            <a href="norva://newtab" class="back-link">
-                <span>←</span> <span>Start Page</span>
-            </a>
-            <h2 class="internal-title">📷 Hardware & Location Permissions Arbiter</h2>
-        </div>
-        <div class="internal-nav-chips">
-            <a href="norva://newtab" class="chip">🏠 Start</a>
-            <a href="norva://history" class="chip">📜 History</a>
-            <a href="norva://bookmarks" class="chip">★ Bookmarks</a>
-            <a href="norva://downloads" class="chip">📥 Downloads</a>
-            <a href="norva://passwords" class="chip">🔑 Passwords</a>
-            <a href="norva://shields" class="chip">🛡️ Shields</a>
-            <a href="norva://permissions" class="chip active">📷 Permissions</a>
-            <a href="norva://cookies" class="chip">🍪 Storage</a>
-            <a href="norva://settings" class="chip">⚙️ Settings</a>
-        </div>
-    </header>
+    {{HEADER}}
 
     <main class="container">
         <div class="card">
-            <h3 style="font-size: 16px; font-weight: 700; color: #ffffff; margin-bottom: 16px;">Configured Domain Policies</h3>
+            <h3 style="font-size: 15px; font-weight: 600; color: #ffffff; margin-bottom: 14px;">Domain Policies</h3>
             <div style="overflow-x: auto;">
                 <table class="table">
                     <thead>
                         <tr>
                             <th>Origin Domain</th>
-                            <th>Webcam / Video</th>
-                            <th>Microphone / Audio</th>
-                            <th>Geolocation Sensor</th>
+                            <th>Camera</th>
+                            <th>Microphone</th>
+                            <th>Location</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -1461,17 +1098,17 @@ pub fn render_permissions_page(permissions: &[SitePermission], audits: &[Permiss
         </div>
 
         <div class="card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                <h3 style="font-size: 16px; font-weight: 700; color: #ffffff;">Forensic Hardware Invocations Audit Log</h3>
-                <button class="btn btn-danger" style="font-size: 12px; padding: 4px 10px;" onclick="clearAudit()">Clear Audit</button>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                <h3 style="font-size: 15px; font-weight: 600; color: #ffffff;">Device Access Audit Log</h3>
+                <button class="btn btn-danger" style="font-size: 11.5px; padding: 3px 9px;" onclick="clearAudit()">Clear Audit</button>
             </div>
             <div style="overflow-x: auto;">
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Requested Origin</th>
-                            <th>Device Target</th>
-                            <th>Security Decision</th>
+                            <th>Domain</th>
+                            <th>Device</th>
+                            <th>Decision</th>
                             <th>Timestamp</th>
                         </tr>
                     </thead>
@@ -1492,7 +1129,7 @@ pub fn render_permissions_page(permissions: &[SitePermission], audits: &[Permiss
         }
 
         function clearAudit() {
-            if (confirm("Wipe all hardware forensic audit logs?")) {
+            if (confirm("Clear all hardware audit records?")) {
                 if (window.ipc && window.ipc.postMessage) {
                     window.ipc.postMessage(JSON.stringify({ action: "clear_permissions_audit" }));
                     setTimeout(() => window.location.reload(), 150);
@@ -1505,83 +1142,62 @@ pub fn render_permissions_page(permissions: &[SitePermission], audits: &[Permiss
 
     template
         .replace("{{COMMON_CSS}}", get_common_css())
+        .replace("{{HEADER}}", &header)
         .replace("{{PERM_ROWS}}", &perm_rows)
         .replace("{{AUDIT_ROWS}}", &audit_rows)
 }
 
-/// Renders the `norva://cookies` view for cookie isolation and storage management.
+/// Renders the `norva://cookies` view for storage management.
 pub fn render_cookies_page(cache_mb: f64) -> String {
+    let header = render_internal_header("cookies", "Storage & Cookies");
+
     let template = r###"<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Cookie Isolation & Cache | NORVA</title>
+    <title>Storage | NORVA</title>
     <style>
         {{COMMON_CSS}}
         .storage-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            margin-bottom: 24px;
+            gap: 16px;
+            margin-bottom: 20px;
         }
-        @media (max-width: 768px) {
+        @media (max-width: 700px) {
             .storage-grid {
                 grid-template-columns: 1fr;
             }
         }
-        .storage-card {
-            background-color: var(--bg-surface);
-            border: 1px solid var(--border-subtle);
-            border-radius: 14px;
-            padding: 24px;
-        }
     </style>
 </head>
 <body>
-    <header class="internal-header">
-        <div class="internal-header-left">
-            <a href="norva://newtab" class="back-link">
-                <span>←</span> <span>Start Page</span>
-            </a>
-            <h2 class="internal-title">🍪 Cookie Partitioning & Cache Storage</h2>
-        </div>
-        <div class="internal-nav-chips">
-            <a href="norva://newtab" class="chip">🏠 Start</a>
-            <a href="norva://history" class="chip">📜 History</a>
-            <a href="norva://bookmarks" class="chip">★ Bookmarks</a>
-            <a href="norva://downloads" class="chip">📥 Downloads</a>
-            <a href="norva://passwords" class="chip">🔑 Passwords</a>
-            <a href="norva://shields" class="chip">🛡️ Shields</a>
-            <a href="norva://permissions" class="chip">📷 Permissions</a>
-            <a href="norva://cookies" class="chip active">🍪 Storage</a>
-            <a href="norva://settings" class="chip">⚙️ Settings</a>
-        </div>
-    </header>
+    {{HEADER}}
 
     <main class="container">
         <div class="storage-grid">
-            <div class="storage-card">
-                <h3 style="font-size: 16px; font-weight: 700; color: #ffffff; margin-bottom: 8px;">Disk Cache Quota</h3>
-                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">Cached assets in ~/.local/share/norva/cache</p>
-                <div style="font-size: 32px; font-weight: 800; color: #ffffff; margin-bottom: 16px;">{{CACHE_MB}} MB</div>
-                <button class="btn btn-danger" onclick="purgeCache()">Purge Disk Cache Now</button>
+            <div class="card">
+                <h3 style="font-size: 15px; font-weight: 600; color: #ffffff; margin-bottom: 6px;">Local Disk Cache</h3>
+                <p style="font-size: 12.5px; color: var(--text-secondary); margin-bottom: 14px;">Cached web resources in isolated directory</p>
+                <div style="font-size: 28px; font-weight: 700; color: #ffffff; margin-bottom: 16px;">{{CACHE_MB}} MB</div>
+                <button class="btn btn-danger" onclick="purgeCache()">Purge Disk Cache</button>
             </div>
 
-            <div class="storage-card">
-                <h3 style="font-size: 16px; font-weight: 700; color: #ffffff; margin-bottom: 8px;">Cookie Isolation Policy</h3>
-                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">First-party partitioning enforced across all browsing contexts</p>
-                <div style="display: flex; flex-direction: column; gap: 10px; font-size: 13px;">
+            <div class="card">
+                <h3 style="font-size: 15px; font-weight: 600; color: #ffffff; margin-bottom: 6px;">Storage Isolation Policy</h3>
+                <p style="font-size: 12.5px; color: var(--text-secondary); margin-bottom: 14px;">Cookie partitioning across browsing origins</p>
+                <div style="display: flex; flex-direction: column; gap: 8px; font-size: 12.5px;">
                     <div style="display: flex; justify-content: space-between;">
-                        <span>Third-Party Cookie Blocking:</span>
-                        <span style="color: var(--accent-emerald); font-weight: 600;">ACTIVE</span>
+                        <span style="color: var(--text-secondary);">Third-Party Cookie Isolation:</span>
+                        <span style="color: #34d399; font-weight: 550;">Enforced</span>
                     </div>
                     <div style="display: flex; justify-content: space-between;">
-                        <span>Local Storage Partitioning:</span>
-                        <span style="color: var(--accent-emerald); font-weight: 600;">ACTIVE</span>
+                        <span style="color: var(--text-secondary);">Local Storage Partitioning:</span>
+                        <span style="color: #34d399; font-weight: 550;">Enforced</span>
                     </div>
                     <div style="display: flex; justify-content: space-between;">
-                        <span>Ghost Mode Zero-Trace Storage:</span>
-                        <span style="color: var(--accent-indigo); font-weight: 600;">AVAILABLE</span>
+                        <span style="color: var(--text-secondary);">Private Ghost Mode:</span>
+                        <span style="color: #818cf8; font-weight: 550;">Available</span>
                     </div>
                 </div>
             </div>
@@ -1590,7 +1206,7 @@ pub fn render_cookies_page(cache_mb: f64) -> String {
 
     <script>
         function purgeCache() {
-            if (confirm("Permanently wipe all cached assets from disk?")) {
+            if (confirm("Purge cached resources from disk?")) {
                 if (window.ipc && window.ipc.postMessage) {
                     window.ipc.postMessage(JSON.stringify({ action: "purge_cache" }));
                     setTimeout(() => window.location.reload(), 200);
@@ -1603,10 +1219,11 @@ pub fn render_cookies_page(cache_mb: f64) -> String {
 
     template
         .replace("{{COMMON_CSS}}", get_common_css())
+        .replace("{{HEADER}}", &header)
         .replace("{{CACHE_MB}}", &format!("{:.1}", cache_mb))
 }
 
-/// Renders the `norva://settings` view with search engines catalog and browser configurations.
+/// Renders the `norva://settings` view for browser search engines and profile.
 pub fn render_settings_page(
     engines: &[SearchEngineConfig],
     default_engine: &SearchEngineConfig,
@@ -1615,16 +1232,16 @@ pub fn render_settings_page(
     let mut engine_rows = String::new();
     for e in engines {
         let is_default_badge = if e.id == default_engine.id {
-            r###"<span style="background: rgba(16, 185, 129, 0.12); color: #34d399; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;">DEFAULT</span>"###
+            r###"<span style="background: rgba(16, 185, 129, 0.1); color: #34d399; padding: 2px 7px; border-radius: 4px; font-size: 11px; font-weight: 600;">DEFAULT</span>"###
         } else {
-            r###"<button class="btn" style="padding: 3px 8px; font-size: 11px;" onclick="setDefaultEngine('{}')">Make Default</button>"###
+            r###"<button class="btn" style="padding: 3px 8px; font-size: 11px;" onclick="setDefaultEngine('{}')">Set Default</button>"###
         };
 
         engine_rows.push_str(&format!(
             r###"<tr>
-                <td style="font-weight: 600; color: #ffffff;">{}</td>
-                <td style="color: var(--accent-indigo); font-family: monospace; font-weight: 600;">{}</td>
-                <td style="color: var(--text-secondary); font-size: 12px; font-family: monospace; max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{}</td>
+                <td style="font-weight: 550; color: #ffffff;">{}</td>
+                <td style="color: #818cf8; font-family: monospace; font-weight: 600;">{}</td>
+                <td style="color: var(--text-secondary); font-size: 12px; font-family: monospace; max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{}</td>
                 <td>{}</td>
             </tr>"###,
             e.name, e.bang, e.query_template, is_default_badge.replace("{}", &e.id)
@@ -1632,73 +1249,40 @@ pub fn render_settings_page(
     }
 
     let mode_desc = if secure_mode {
-        "Currently running in Ephemeral Ghost Mode (RAM only, zero disk writes)"
+        "Private Session: in-memory operation, zero disk persistence"
     } else {
-        "Currently running in Privacy Hardened Session (5 Isolated SQLite DBs)"
+        "Hardened Privacy: dedicated SQLite vaults with local zero-telemetry storage"
     };
+
+    let header = render_internal_header("settings", "Settings");
 
     let template = r###"<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Browser Settings | NORVA</title>
+    <title>Settings | NORVA</title>
     <style>
         {{COMMON_CSS}}
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13.5px;
-        }
-        .table th, .table td {
-            padding: 12px 16px;
-            text-align: left;
-            border-bottom: 1px solid var(--border-subtle);
-        }
-        .table th {
-            color: var(--text-muted);
-            text-transform: uppercase;
-            font-size: 11px;
-            letter-spacing: 0.6px;
-            background: rgba(255, 255, 255, 0.02);
-        }
     </style>
 </head>
 <body>
-    <header class="internal-header">
-        <div class="internal-header-left">
-            <a href="norva://newtab" class="back-link">
-                <span>←</span> <span>Start Page</span>
-            </a>
-            <h2 class="internal-title">⚙️ Browser Configuration & Search Engines</h2>
-        </div>
-        <div class="internal-nav-chips">
-            <a href="norva://newtab" class="chip">🏠 Start</a>
-            <a href="norva://history" class="chip">📜 History</a>
-            <a href="norva://bookmarks" class="chip">★ Bookmarks</a>
-            <a href="norva://downloads" class="chip">📥 Downloads</a>
-            <a href="norva://passwords" class="chip">🔑 Passwords</a>
-            <a href="norva://shields" class="chip">🛡️ Shields</a>
-            <a href="norva://permissions" class="chip">📷 Permissions</a>
-            <a href="norva://cookies" class="chip">🍪 Storage</a>
-            <a href="norva://settings" class="chip active">⚙️ Settings</a>
-        </div>
-    </header>
+    {{HEADER}}
 
     <main class="container">
-        <div class="card" style="margin-bottom: 24px;">
-            <h3 style="font-size: 16px; font-weight: 700; color: #ffffff; margin-bottom: 8px;">Active Session Profile</h3>
-            <p style="font-size: 13.5px; color: var(--text-secondary);">{{MODE_DESC}}</p>
+        <div class="card" style="margin-bottom: 20px;">
+            <h3 style="font-size: 15px; font-weight: 600; color: #ffffff; margin-bottom: 4px;">Session Profile</h3>
+            <p style="font-size: 13px; color: var(--text-secondary);">{{MODE_DESC}}</p>
         </div>
 
         <div class="card">
-            <h3 style="font-size: 16px; font-weight: 700; color: #ffffff; margin-bottom: 16px;">Configured Search Engines</h3>
+            <h3 style="font-size: 15px; font-weight: 600; color: #ffffff; margin-bottom: 14px;">Search Providers</h3>
             <div style="overflow-x: auto;">
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Search Provider</th>
+                            <th>Search Engine</th>
                             <th>Bang Hotkey</th>
-                            <th>URL Template</th>
+                            <th>Query Template</th>
                             <th>Status</th>
                         </tr>
                     </thead>
@@ -1723,6 +1307,7 @@ pub fn render_settings_page(
 
     template
         .replace("{{COMMON_CSS}}", get_common_css())
+        .replace("{{HEADER}}", &header)
         .replace("{{MODE_DESC}}", mode_desc)
         .replace("{{ENGINE_ROWS}}", &engine_rows)
 }
@@ -1732,10 +1317,9 @@ pub fn render_bookmarks_page(bookmarks: &[BookmarkEntry]) -> String {
     let mut bookmark_cards = String::new();
     if bookmarks.is_empty() {
         bookmark_cards.push_str(
-            r###"<div style="text-align: center; padding: 60px 20px; color: var(--text-muted);">
-                <div style="font-size: 40px; margin-bottom: 12px;">★</div>
-                <h3 style="font-size: 16px; color: var(--text-secondary); margin-bottom: 6px;">No Bookmarks Saved</h3>
-                <p style="font-size: 13px;">Save frequently visited pages with Ctrl+D or the star button in the address bar.</p>
+            r###"<div style="text-align: center; padding: 48px 20px; color: var(--text-muted);">
+                <h3 style="font-size: 15px; color: var(--text-secondary); margin-bottom: 4px; font-weight: 550;">No Bookmarks Saved</h3>
+                <p style="font-size: 13px;">Save pages with Ctrl+D or the star button in the address bar.</p>
             </div>"###,
         );
     } else {
@@ -1744,21 +1328,21 @@ pub fn render_bookmarks_page(bookmarks: &[BookmarkEntry]) -> String {
             bookmark_cards.push_str(&format!(
                 r###"<div class="bm-card" data-title="{}" data-url="{}">
                     <div class="bm-card-top">
-                        <span class="bm-icon">{}</span>
                         <div class="bm-info">
                             <div class="bm-title">{}</div>
                             <div class="bm-url">{}</div>
                         </div>
                     </div>
-                    <div class="bm-folder-badge">{}</div>
-                    <div class="bm-actions">
-                        <button class="btn btn-primary" style="padding: 5px 12px; font-size: 12px;" onclick="openUrl('{}')">Open</button>
-                        <button class="btn btn-danger" style="padding: 5px 10px; font-size: 12px;" onclick="deleteBookmark({})">Delete</button>
+                    <div class="bm-footer">
+                        <span class="bm-folder-badge">{}</span>
+                        <div class="bm-actions">
+                            <button class="btn btn-primary" style="padding: 4px 10px; font-size: 11.5px;" onclick="openUrl('{}')">Open</button>
+                            <button class="btn btn-danger" style="padding: 4px 9px; font-size: 11.5px;" onclick="deleteBookmark({})">Delete</button>
+                        </div>
                     </div>
                 </div>"###,
                 bm.title.to_lowercase(),
                 bm.url.to_lowercase(),
-                bm.icon,
                 bm.title,
                 bm.url,
                 bm.folder,
@@ -1769,153 +1353,115 @@ pub fn render_bookmarks_page(bookmarks: &[BookmarkEntry]) -> String {
         bookmark_cards.push_str("</div>");
     }
 
+    let header = render_internal_header("bookmarks", "Bookmarks");
+
     let template = r###"<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Bookmarks Vault | NORVA</title>
+    <title>Bookmarks | NORVA</title>
     <style>
         {{COMMON_CSS}}
         .bm-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 16px;
+            gap: 14px;
         }
         .bm-card {
             background-color: var(--bg-surface);
             border: 1px solid var(--border-subtle);
-            border-radius: 12px;
-            padding: 16px;
+            border-radius: 10px;
+            padding: 14px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             gap: 12px;
-            transition: all 0.15s ease;
+            transition: all 0.12s ease;
         }
         .bm-card:hover {
             border-color: var(--border-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            background-color: var(--bg-surface-elevated);
         }
         .bm-card-top {
             display: flex;
             align-items: flex-start;
-            gap: 12px;
-        }
-        .bm-icon {
-            font-size: 22px;
-            line-height: 1;
-            padding: 6px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
+            gap: 10px;
         }
         .bm-info {
             flex: 1;
             overflow: hidden;
         }
         .bm-title {
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 13.5px;
+            font-weight: 550;
             color: #ffffff;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
         .bm-url {
-            font-size: 12px;
+            font-size: 11.5px;
             color: var(--text-muted);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             margin-top: 2px;
         }
+        .bm-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            padding-top: 8px;
+        }
         .bm-folder-badge {
-            display: inline-block;
-            align-self: flex-start;
-            font-size: 10px;
-            font-weight: 600;
-            color: var(--accent-indigo);
-            background: rgba(99, 102, 241, 0.12);
-            border: 1px solid rgba(99, 102, 241, 0.25);
-            border-radius: 6px;
-            padding: 2px 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            font-size: 10.5px;
+            font-weight: 550;
+            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 4px;
+            padding: 2px 6px;
         }
         .bm-actions {
             display: flex;
-            justify-content: flex-end;
-            gap: 8px;
-            padding-top: 8px;
-            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            gap: 6px;
         }
         .search-bar {
             width: 100%;
             background: #090a0f;
             border: 1px solid var(--border-subtle);
-            border-radius: 10px;
+            border-radius: 8px;
             color: #ffffff;
-            padding: 10px 16px;
-            font-size: 13.5px;
+            padding: 8px 14px;
+            font-size: 13px;
+            font-family: inherit;
             outline: none;
-            margin-bottom: 24px;
         }
         .search-bar:focus {
-            border-color: var(--accent-indigo);
-            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.25);
+            border-color: var(--border-focus);
         }
         .add-form {
             display: none;
-            background: var(--bg-surface-elevated);
+            background: var(--bg-surface);
             border: 1px solid var(--border-subtle);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 24px;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 20px;
         }
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr 120px auto;
-            gap: 12px;
+            gap: 10px;
             align-items: center;
-        }
-        .form-input {
-            background: #090a0f;
-            border: 1px solid var(--border-subtle);
-            border-radius: 8px;
-            color: #ffffff;
-            padding: 8px 12px;
-            font-size: 13px;
-            outline: none;
-        }
-        .form-input:focus {
-            border-color: var(--accent-indigo);
         }
     </style>
 </head>
 <body>
-    <header class="internal-header">
-        <div class="internal-header-left">
-            <a href="norva://newtab" class="back-link">
-                <span>←</span> <span>Start Page</span>
-            </a>
-            <h2 class="internal-title">★ Bookmarks Vault</h2>
-        </div>
-        <div class="internal-nav-chips">
-            <a href="norva://newtab" class="chip">🏠 Start</a>
-            <a href="norva://history" class="chip">📜 History</a>
-            <a href="norva://bookmarks" class="chip active">★ Bookmarks</a>
-            <a href="norva://downloads" class="chip">📥 Downloads</a>
-            <a href="norva://passwords" class="chip">🔑 Passwords</a>
-            <a href="norva://shields" class="chip">🛡️ Shields</a>
-            <a href="norva://permissions" class="chip">📷 Permissions</a>
-            <a href="norva://cookies" class="chip">🍪 Storage</a>
-            <a href="norva://settings" class="chip">⚙️ Settings</a>
-        </div>
-    </header>
+    {{HEADER}}
 
     <main class="container">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-            <input type="text" id="bmSearch" class="search-bar" placeholder="Filter bookmarks by title or URL..." oninput="filterBookmarks()" style="margin-bottom: 0; max-width: 480px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+            <input type="text" id="bmSearch" class="search-bar" placeholder="Filter bookmarks..." oninput="filterBookmarks()" style="max-width: 380px;">
             <div style="display: flex; gap: 8px;">
                 <button class="btn btn-primary" onclick="toggleAddForm()">+ Add Bookmark</button>
                 <button class="btn btn-danger" onclick="clearAllBookmarks()">Clear All</button>
@@ -1923,7 +1469,7 @@ pub fn render_bookmarks_page(bookmarks: &[BookmarkEntry]) -> String {
         </div>
 
         <div id="addForm" class="add-form">
-            <h4 style="margin-bottom: 12px; color: #ffffff;">Add New Bookmark</h4>
+            <h4 style="margin-bottom: 10px; color: #ffffff; font-size: 14px;">Add Bookmark</h4>
             <div class="form-row">
                 <input type="text" id="bmUrl" class="form-input" placeholder="https://example.com">
                 <input type="text" id="bmTitle" class="form-input" placeholder="Site Title">
@@ -1952,7 +1498,7 @@ pub fn render_bookmarks_page(bookmarks: &[BookmarkEntry]) -> String {
             }
         }
         function clearAllBookmarks() {
-            if (confirm("Clear all stored bookmarks? This cannot be undone.")) {
+            if (confirm("Clear all bookmarks?")) {
                 if (window.ipc && window.ipc.postMessage) {
                     window.ipc.postMessage(JSON.stringify({ action: "clear_bookmarks" }));
                     setTimeout(() => window.location.reload(), 150);
@@ -1987,6 +1533,7 @@ pub fn render_bookmarks_page(bookmarks: &[BookmarkEntry]) -> String {
 
     template
         .replace("{{COMMON_CSS}}", get_common_css())
+        .replace("{{HEADER}}", &header)
         .replace("{{BOOKMARK_CARDS}}", &bookmark_cards)
 }
 
@@ -1995,10 +1542,9 @@ pub fn render_downloads_page(downloads: &[DownloadEntry]) -> String {
     let mut download_rows = String::new();
     if downloads.is_empty() {
         download_rows.push_str(
-            r###"<div style="text-align: center; padding: 60px 20px; color: var(--text-muted);">
-                <div style="font-size: 40px; margin-bottom: 12px;">📥</div>
-                <h3 style="font-size: 16px; color: var(--text-secondary); margin-bottom: 6px;">No Downloads Yet</h3>
-                <p style="font-size: 13px;">Files you download will appear here with zero tracking.</p>
+            r###"<div style="text-align: center; padding: 48px 20px; color: var(--text-muted);">
+                <h3 style="font-size: 15px; color: var(--text-secondary); margin-bottom: 4px; font-weight: 550;">No Downloads</h3>
+                <p style="font-size: 13px;">Downloaded files will appear here with zero telemetry.</p>
             </div>"###,
         );
     } else {
@@ -2014,14 +1560,13 @@ pub fn render_downloads_page(downloads: &[DownloadEntry]) -> String {
 
             download_rows.push_str(&format!(
                 r###"<div class="dl-item">
-                    <div class="dl-icon">📄</div>
                     <div class="dl-info">
                         <div class="dl-filename">{}</div>
                         <div class="dl-sub">{} • {} • {}</div>
                     </div>
                     <div class="dl-status">{}</div>
                     <div class="dl-actions">
-                        <button class="btn btn-danger" style="padding: 4px 10px; font-size: 12px;" onclick="deleteDownload({})">Delete</button>
+                        <button class="btn btn-danger" style="padding: 3px 9px; font-size: 11.5px;" onclick="deleteDownload({})">Delete</button>
                     </div>
                 </div>"###,
                 dl.filename,
@@ -2035,93 +1580,70 @@ pub fn render_downloads_page(downloads: &[DownloadEntry]) -> String {
         download_rows.push_str("</div>");
     }
 
+    let header = render_internal_header("downloads", "Downloads");
+
     let template = r###"<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Downloads Manager | NORVA</title>
+    <title>Downloads | NORVA</title>
     <style>
         {{COMMON_CSS}}
         .dl-list {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
         .dl-item {
             background-color: var(--bg-surface);
             border: 1px solid var(--border-subtle);
-            border-radius: 10px;
-            padding: 14px 18px;
+            border-radius: 8px;
+            padding: 12px 16px;
             display: flex;
             align-items: center;
-            gap: 14px;
-            transition: all 0.15s ease;
+            gap: 12px;
+            transition: all 0.12s ease;
         }
         .dl-item:hover {
             border-color: var(--border-hover);
-        }
-        .dl-icon {
-            font-size: 24px;
-            line-height: 1;
-            padding: 8px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
         }
         .dl-info {
             flex: 1;
             overflow: hidden;
         }
         .dl-filename {
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 13.5px;
+            font-weight: 550;
             color: #ffffff;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
         .dl-sub {
-            font-size: 12px;
+            font-size: 11.5px;
             color: var(--text-muted);
-            margin-top: 3px;
+            margin-top: 2px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
         .dl-status {
-            font-size: 11px;
-            font-weight: 700;
+            font-size: 10.5px;
+            font-weight: 600;
             color: #34d399;
-            background: rgba(16, 185, 129, 0.12);
-            padding: 3px 8px;
-            border-radius: 6px;
-            letter-spacing: 0.5px;
+            background: rgba(16, 185, 129, 0.1);
+            padding: 2px 7px;
+            border-radius: 4px;
+            letter-spacing: 0.3px;
         }
     </style>
 </head>
 <body>
-    <header class="internal-header">
-        <div class="internal-header-left">
-            <a href="norva://newtab" class="back-link">
-                <span>←</span> <span>Start Page</span>
-            </a>
-            <h2 class="internal-title">📥 Downloads Manager</h2>
-        </div>
-        <div class="internal-nav-chips">
-            <a href="norva://newtab" class="chip">🏠 Start</a>
-            <a href="norva://history" class="chip">📜 History</a>
-            <a href="norva://bookmarks" class="chip">★ Bookmarks</a>
-            <a href="norva://downloads" class="chip active">📥 Downloads</a>
-            <a href="norva://passwords" class="chip">🔑 Passwords</a>
-            <a href="norva://shields" class="chip">🛡️ Shields</a>
-            <a href="norva://permissions" class="chip">📷 Permissions</a>
-            <a href="norva://cookies" class="chip">🍪 Storage</a>
-            <a href="norva://settings" class="chip">⚙️ Settings</a>
-        </div>
-    </header>
+    {{HEADER}}
 
     <main class="container">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h3 style="font-size: 16px; font-weight: 700; color: #ffffff;">Transfer & Download Logs</h3>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 style="font-size: 16px; font-weight: 600; color: #ffffff;">Download Logs</h3>
             <button class="btn btn-danger" onclick="clearDownloads()">Clear Download History</button>
         </div>
 
@@ -2149,6 +1671,7 @@ pub fn render_downloads_page(downloads: &[DownloadEntry]) -> String {
 
     template
         .replace("{{COMMON_CSS}}", get_common_css())
+        .replace("{{HEADER}}", &header)
         .replace("{{DOWNLOAD_ROWS}}", &download_rows)
 }
 
@@ -2157,9 +1680,8 @@ pub fn render_passwords_page(credentials: &[PasswordEntry]) -> String {
     let mut cred_cards = String::new();
     if credentials.is_empty() {
         cred_cards.push_str(
-            r###"<div style="text-align: center; padding: 60px 20px; color: var(--text-muted);">
-                <div style="font-size: 40px; margin-bottom: 12px;">🔑</div>
-                <h3 style="font-size: 16px; color: var(--text-secondary); margin-bottom: 6px;">Password Vault Empty</h3>
+            r###"<div style="text-align: center; padding: 48px 20px; color: var(--text-muted);">
+                <h3 style="font-size: 15px; color: var(--text-secondary); margin-bottom: 4px; font-weight: 550;">No Passwords Saved</h3>
                 <p style="font-size: 13px;">Save login credentials securely with localized zero-telemetry SQLite storage.</p>
             </div>"###,
         );
@@ -2169,20 +1691,17 @@ pub fn render_passwords_page(credentials: &[PasswordEntry]) -> String {
             cred_cards.push_str(&format!(
                 r###"<div class="cred-card" data-domain="{}" data-user="{}">
                     <div class="cred-top">
-                        <span class="cred-icon">🔒</span>
-                        <div>
-                            <div class="cred-domain">{}</div>
-                            <div class="cred-user">{}</div>
-                        </div>
+                        <div class="cred-domain">{}</div>
+                        <div class="cred-user">{}</div>
                     </div>
                     <div class="cred-pass-box">
                         <input type="password" id="pwd_{}" class="cred-pass-input" value="{}" readonly>
-                        <button class="btn" style="padding: 4px 8px; font-size: 12px;" onclick="togglePwd({})">👁️</button>
-                        <button class="btn btn-primary" style="padding: 4px 10px; font-size: 12px;" onclick="copyPwd('pwd_{}')">Copy</button>
+                        <button class="btn" style="padding: 3px 8px; font-size: 11px;" onclick="togglePwd({})">Show</button>
+                        <button class="btn btn-primary" style="padding: 3px 9px; font-size: 11px;" onclick="copyPwd('pwd_{}')">Copy</button>
                     </div>
                     <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.04); padding-top: 8px;">
                         <span style="font-size: 11px; color: var(--text-muted);">Updated: {}</span>
-                        <button class="btn btn-danger" style="padding: 4px 10px; font-size: 11px;" onclick="deleteCred({})">Delete</button>
+                        <button class="btn btn-danger" style="padding: 3px 8px; font-size: 11px;" onclick="deleteCred({})">Delete</button>
                     </div>
                 </div>"###,
                 cred.domain.to_lowercase(),
@@ -2200,43 +1719,37 @@ pub fn render_passwords_page(credentials: &[PasswordEntry]) -> String {
         cred_cards.push_str("</div>");
     }
 
+    let header = render_internal_header("passwords", "Passwords");
+
     let template = r###"<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Password Vault | NORVA</title>
+    <title>Passwords | NORVA</title>
     <style>
         {{COMMON_CSS}}
         .cred-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 14px;
         }
         .cred-card {
             background-color: var(--bg-surface);
             border: 1px solid var(--border-subtle);
-            border-radius: 12px;
-            padding: 16px;
+            border-radius: 10px;
+            padding: 14px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            transition: all 0.15s ease;
+            gap: 10px;
+            transition: all 0.12s ease;
         }
         .cred-card:hover {
             border-color: var(--border-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
         }
         .cred-top {
             display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .cred-icon {
-            font-size: 18px;
-            padding: 6px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
+            flex-direction: column;
+            gap: 2px;
         }
         .cred-domain {
             font-size: 14px;
@@ -2253,8 +1766,8 @@ pub fn render_passwords_page(credentials: &[PasswordEntry]) -> String {
             gap: 6px;
             background: #090a0f;
             border: 1px solid var(--border-subtle);
-            border-radius: 8px;
-            padding: 4px 6px;
+            border-radius: 6px;
+            padding: 3px 5px;
         }
         .cred-pass-input {
             background: transparent;
@@ -2264,68 +1777,38 @@ pub fn render_passwords_page(credentials: &[PasswordEntry]) -> String {
             font-size: 13px;
             flex: 1;
             outline: none;
-            padding: 4px;
+            padding: 3px 5px;
         }
         .add-modal {
             display: none;
-            background: var(--bg-surface-elevated);
+            background: var(--bg-surface);
             border: 1px solid var(--border-subtle);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 24px;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 20px;
         }
         .form-grid {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr auto;
-            gap: 12px;
+            gap: 10px;
             align-items: center;
-        }
-        .form-input {
-            background: #090a0f;
-            border: 1px solid var(--border-subtle);
-            border-radius: 8px;
-            color: #ffffff;
-            padding: 8px 12px;
-            font-size: 13px;
-            outline: none;
-        }
-        .form-input:focus {
-            border-color: var(--accent-indigo);
         }
     </style>
 </head>
 <body>
-    <header class="internal-header">
-        <div class="internal-header-left">
-            <a href="norva://newtab" class="back-link">
-                <span>←</span> <span>Start Page</span>
-            </a>
-            <h2 class="internal-title">🔑 Passwords & Credentials Vault</h2>
-        </div>
-        <div class="internal-nav-chips">
-            <a href="norva://newtab" class="chip">🏠 Start</a>
-            <a href="norva://history" class="chip">📜 History</a>
-            <a href="norva://bookmarks" class="chip">★ Bookmarks</a>
-            <a href="norva://downloads" class="chip">📥 Downloads</a>
-            <a href="norva://passwords" class="chip active">🔑 Passwords</a>
-            <a href="norva://shields" class="chip">🛡️ Shields</a>
-            <a href="norva://permissions" class="chip">📷 Permissions</a>
-            <a href="norva://cookies" class="chip">🍪 Storage</a>
-            <a href="norva://settings" class="chip">⚙️ Settings</a>
-        </div>
-    </header>
+    {{HEADER}}
 
     <main class="container">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-            <input type="text" id="credSearch" class="form-input" placeholder="Search domain or username..." oninput="filterCreds()" style="max-width: 440px; width: 100%;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+            <input type="text" id="credSearch" class="form-input" placeholder="Search domain or username..." oninput="filterCreds()" style="max-width: 360px; width: 100%;">
             <div style="display: flex; gap: 8px;">
                 <button class="btn btn-primary" onclick="toggleAddModal()">+ Save Login</button>
-                <button class="btn btn-danger" onclick="clearAllCreds()">Purge Vault</button>
+                <button class="btn btn-danger" onclick="clearAllCreds()">Clear Vault</button>
             </div>
         </div>
 
         <div id="addModal" class="add-modal">
-            <h4 style="margin-bottom: 12px; color: #ffffff;">Save New Credentials</h4>
+            <h4 style="margin-bottom: 10px; color: #ffffff; font-size: 14px;">Save Credentials</h4>
             <div class="form-grid">
                 <input type="text" id="domainInput" class="form-input" placeholder="example.com">
                 <input type="text" id="userInput" class="form-input" placeholder="Username / Email">
@@ -2349,7 +1832,7 @@ pub fn render_passwords_page(credentials: &[PasswordEntry]) -> String {
         function copyPwd(id) {
             const inp = document.getElementById(id);
             navigator.clipboard.writeText(inp.value).then(() => {
-                alert("Password copied to clipboard!");
+                alert("Password copied to clipboard.");
             });
         }
         function saveCred() {
@@ -2371,7 +1854,7 @@ pub fn render_passwords_page(credentials: &[PasswordEntry]) -> String {
             }
         }
         function clearAllCreds() {
-            if (confirm("Delete all passwords in vault? This cannot be undone.")) {
+            if (confirm("Clear all passwords in vault?")) {
                 if (window.ipc && window.ipc.postMessage) {
                     window.ipc.postMessage(JSON.stringify({ action: "clear_credentials" }));
                     setTimeout(() => window.location.reload(), 150);
@@ -2392,6 +1875,6 @@ pub fn render_passwords_page(credentials: &[PasswordEntry]) -> String {
 
     template
         .replace("{{COMMON_CSS}}", get_common_css())
+        .replace("{{HEADER}}", &header)
         .replace("{{CRED_CARDS}}", &cred_cards)
 }
-

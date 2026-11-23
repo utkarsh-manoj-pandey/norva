@@ -7,7 +7,7 @@
 
 use gtk::prelude::*;
 use gtk::{
-    Box, Button, CssProvider, Entry, EventBox, Label, Orientation, Popover,
+    Box, Button, CssProvider, Entry, EventBox, IconSize, Image, Label, Orientation, Popover,
     StyleContext, STYLE_PROVIDER_PRIORITY_USER,
 };
 use std::cell::RefCell;
@@ -105,9 +105,11 @@ impl NorvaGtkChrome {
         tab_bar.pack_start(&tabs_scroll, false, false, 0);
 
         // New Tab [+] button
-        let new_tab_btn = Button::with_label("+");
+        let new_tab_icon = Image::from_icon_name(Some("list-add-symbolic"), IconSize::Menu);
+        let new_tab_btn = Button::new();
+        new_tab_btn.set_image(Some(&new_tab_icon));
         new_tab_btn.style_context().add_class("norva-new-tab-btn");
-        new_tab_btn.set_tooltip_text(Some("Open new tab (Ctrl+T)"));
+        new_tab_btn.set_tooltip_text(Some("New tab (Ctrl+T)"));
         tab_bar.pack_start(&new_tab_btn, false, false, 4);
 
         // Flexible spacer
@@ -117,13 +119,13 @@ impl NorvaGtkChrome {
         // Session status pill on far right
         let mode_label = Label::new(None);
         if secure_mode {
-            mode_label.set_text("🔒 GHOST SESSION");
+            mode_label.set_text("Private");
             mode_label.style_context().add_class("norva-badge-secure");
-            mode_label.set_tooltip_text(Some("Secure Ghost Session: ephemeral RAM only, zero disk traces"));
+            mode_label.set_tooltip_text(Some("Ephemeral Session: memory-only, zero disk traces"));
         } else {
-            mode_label.set_text("● SHIELDS ARMED");
+            mode_label.set_text("Protected");
             mode_label.style_context().add_class("norva-badge-normal");
-            mode_label.set_tooltip_text(Some("Hardened Privacy: 8 SQLite Vaults, active anti-tracking, zero-trust hardware"));
+            mode_label.set_tooltip_text(Some("Hardened Privacy: multi-vault isolation & tracking defense"));
         }
         tab_bar.pack_end(&mode_label, false, false, 12);
 
@@ -136,19 +138,27 @@ impl NorvaGtkChrome {
         toolbar.style_context().add_class("norva-toolbar");
 
         // Nav buttons cluster
-        let back_btn = Button::with_label("←");
+        let back_icon = Image::from_icon_name(Some("go-previous-symbolic"), IconSize::Menu);
+        let back_btn = Button::new();
+        back_btn.set_image(Some(&back_icon));
         back_btn.style_context().add_class("norva-nav-btn");
         back_btn.set_tooltip_text(Some("Back (Alt+Left)"));
 
-        let fwd_btn = Button::with_label("→");
+        let fwd_icon = Image::from_icon_name(Some("go-next-symbolic"), IconSize::Menu);
+        let fwd_btn = Button::new();
+        fwd_btn.set_image(Some(&fwd_icon));
         fwd_btn.style_context().add_class("norva-nav-btn");
         fwd_btn.set_tooltip_text(Some("Forward (Alt+Right)"));
 
-        let reload_btn = Button::with_label("↻");
+        let reload_icon = Image::from_icon_name(Some("view-refresh-symbolic"), IconSize::Menu);
+        let reload_btn = Button::new();
+        reload_btn.set_image(Some(&reload_icon));
         reload_btn.style_context().add_class("norva-nav-btn");
         reload_btn.set_tooltip_text(Some("Reload (Ctrl+R)"));
 
-        let home_btn = Button::with_label("⌂");
+        let home_icon = Image::from_icon_name(Some("go-home-symbolic"), IconSize::Menu);
+        let home_btn = Button::new();
+        home_btn.set_image(Some(&home_icon));
         home_btn.style_context().add_class("norva-nav-btn");
         home_btn.set_tooltip_text(Some("Start Page (Alt+Home)"));
 
@@ -161,44 +171,51 @@ impl NorvaGtkChrome {
         let omnibox_frame = Box::new(Orientation::Horizontal, 4);
         omnibox_frame.style_context().add_class("norva-omnibox-frame");
 
-        let security_btn = Button::with_label("🔒");
+        let security_icon = Image::from_icon_name(Some("security-high-symbolic"), IconSize::Menu);
+        let security_btn = Button::new();
+        security_btn.set_image(Some(&security_icon));
         security_btn.style_context().add_class("norva-btn-flat");
         security_btn.set_tooltip_text(Some("Connection Security & Origin Info"));
 
         let engine_btn = Button::new();
         engine_btn.style_context().add_class("norva-engine-pill");
         engine_btn.set_tooltip_text(Some("Switch Search Provider"));
-        let engine_label = Label::new(Some("DDG ▼"));
+        let engine_label = Label::new(Some("DuckDuckGo"));
         engine_btn.add(&engine_label);
+        engine_btn.set_visible(false);
 
         let omnibox = Entry::new();
         omnibox.style_context().add_class("norva-omnibox-entry");
-        omnibox.set_placeholder_text(Some("Search with DuckDuckGo or enter web address"));
+        omnibox.set_placeholder_text(Some("Search DuckDuckGo or enter URL"));
         omnibox.set_hexpand(true);
 
-        let clear_omni_btn = Button::with_label("✕");
+        let clear_icon = Image::from_icon_name(Some("edit-clear-symbolic"), IconSize::Menu);
+        let clear_omni_btn = Button::new();
+        clear_omni_btn.set_image(Some(&clear_icon));
         clear_omni_btn.style_context().add_class("norva-omni-clear-btn");
         clear_omni_btn.set_tooltip_text(Some("Clear address bar"));
         clear_omni_btn.set_visible(false);
 
-        let reader_btn = Button::with_label("📖");
+        let reader_btn = Button::with_label("Reader");
         reader_btn.style_context().add_class("norva-omni-action-btn");
-        reader_btn.set_tooltip_text(Some("Toggle Reader Mode"));
+        reader_btn.set_tooltip_text(Some("Toggle Reader View"));
+        reader_btn.set_visible(false);
 
         let zoom_btn = Button::with_label("100%");
         zoom_btn.style_context().add_class("norva-zoom-pill");
         zoom_btn.set_tooltip_text(Some("Page Zoom (Ctrl + / -)"));
+        zoom_btn.set_visible(false);
 
-        let bookmark_btn = Button::with_label("☆");
+        let bookmark_icon = Image::from_icon_name(Some("non-starred-symbolic"), IconSize::Menu);
+        let bookmark_btn = Button::new();
+        bookmark_btn.set_image(Some(&bookmark_icon));
         bookmark_btn.style_context().add_class("norva-bookmark-star");
-        bookmark_btn.set_tooltip_text(Some("Bookmark this tab (Ctrl+D)"));
+        bookmark_btn.set_tooltip_text(Some("Bookmark tab (Ctrl+D)"));
 
-        omnibox_frame.pack_start(&security_btn, false, false, 0);
-        omnibox_frame.pack_start(&engine_btn, false, false, 2);
-        omnibox_frame.pack_start(&omnibox, true, true, 2);
+        omnibox_frame.pack_start(&security_btn, false, false, 2);
+        omnibox_frame.pack_start(&omnibox, true, true, 4);
         omnibox_frame.pack_start(&clear_omni_btn, false, false, 0);
         omnibox_frame.pack_start(&reader_btn, false, false, 2);
-        omnibox_frame.pack_start(&zoom_btn, false, false, 2);
         omnibox_frame.pack_end(&bookmark_btn, false, false, 2);
 
         // Auto-show clear button when omnibox has text
@@ -215,48 +232,55 @@ impl NorvaGtkChrome {
         toolbar.pack_start(&omnibox_frame, true, true, 4);
 
         // Privacy Shield Counter button
-        let shield_btn = Button::with_label("🛡️ 0");
+        let shield_btn = Button::with_label("Shields 0");
         shield_btn.style_context().add_class("norva-shield-btn");
-        shield_btn.set_tooltip_text(Some("NORVA Shields: Trackers & Ads Neutralized"));
+        shield_btn.set_tooltip_text(Some("Norva Shields: Trackers & Ads Neutralized"));
         toolbar.pack_start(&shield_btn, false, false, 2);
 
-        // Hardware zero-trust indicators
+        // Hardware zero-trust indicators (kept in struct, hidden from main navbar to eliminate clutter)
         let hw_cluster = Box::new(Orientation::Horizontal, 1);
         hw_cluster.style_context().add_class("norva-hw-cluster");
 
-        let cam_btn = Button::with_label("📷");
+        let cam_btn = Button::with_label("Cam");
         cam_btn.style_context().add_class("norva-hw-btn");
         cam_btn.set_tooltip_text(Some("Camera: Zero-Trust Arbiter"));
 
-        let mic_btn = Button::with_label("🎙️");
+        let mic_btn = Button::with_label("Mic");
         mic_btn.style_context().add_class("norva-hw-btn");
         mic_btn.set_tooltip_text(Some("Microphone: Zero-Trust Arbiter"));
 
-        let loc_btn = Button::with_label("📍");
+        let loc_btn = Button::with_label("GPS");
         loc_btn.style_context().add_class("norva-hw-btn");
         loc_btn.set_tooltip_text(Some("Geolocation: Strict Isolation"));
 
         hw_cluster.pack_start(&cam_btn, false, false, 0);
         hw_cluster.pack_start(&mic_btn, false, false, 0);
         hw_cluster.pack_start(&loc_btn, false, false, 0);
+        hw_cluster.set_visible(false);
         toolbar.pack_start(&hw_cluster, false, false, 2);
 
         // Downloads Button
-        let downloads_btn = Button::with_label("📥");
+        let dl_icon = Image::from_icon_name(Some("folder-download-symbolic"), IconSize::Menu);
+        let downloads_btn = Button::new();
+        downloads_btn.set_image(Some(&dl_icon));
         downloads_btn.style_context().add_class("norva-nav-btn");
-        downloads_btn.set_tooltip_text(Some("Downloads Manager (Ctrl+J)"));
+        downloads_btn.set_tooltip_text(Some("Downloads (Ctrl+J)"));
         toolbar.pack_start(&downloads_btn, false, false, 2);
 
         // Find in Page Button
-        let find_btn = Button::with_label("🔍");
+        let find_icon_btn = Image::from_icon_name(Some("edit-find-symbolic"), IconSize::Menu);
+        let find_btn = Button::new();
+        find_btn.set_image(Some(&find_icon_btn));
         find_btn.style_context().add_class("norva-nav-btn");
         find_btn.set_tooltip_text(Some("Find in Page (Ctrl+F)"));
         toolbar.pack_start(&find_btn, false, false, 2);
 
         // Modern 3-dots Menu button
-        let menu_btn = Button::with_label("⋮");
+        let menu_icon = Image::from_icon_name(Some("open-menu-symbolic"), IconSize::Menu);
+        let menu_btn = Button::new();
+        menu_btn.set_image(Some(&menu_icon));
         menu_btn.style_context().add_class("norva-nav-btn");
-        menu_btn.set_tooltip_text(Some("NORVA Menu"));
+        menu_btn.set_tooltip_text(Some("Norva Menu"));
         toolbar.pack_end(&menu_btn, false, false, 2);
 
         root.pack_start(&toolbar, false, false, 0);
@@ -267,32 +291,38 @@ impl NorvaGtkChrome {
         let find_bar = Box::new(Orientation::Horizontal, 6);
         find_bar.style_context().add_class("norva-find-bar");
 
-        let find_icon = Label::new(Some("🔍"));
-        find_icon.style_context().add_class("norva-find-icon");
+        let find_icon = Image::from_icon_name(Some("edit-find-symbolic"), IconSize::Menu);
         find_bar.pack_start(&find_icon, false, false, 2);
 
         let find_entry = Entry::new();
         find_entry.style_context().add_class("norva-find-entry");
-        find_entry.set_placeholder_text(Some("Find text on page..."));
+        find_entry.set_placeholder_text(Some("Find on page..."));
         find_bar.pack_start(&find_entry, false, false, 2);
 
         let find_count_lbl = Label::new(Some("0 of 0"));
         find_count_lbl.style_context().add_class("norva-find-count");
         find_bar.pack_start(&find_count_lbl, false, false, 4);
 
-        let find_prev_btn = Button::with_label("▲");
+        let find_prev_icon = Image::from_icon_name(Some("go-up-symbolic"), IconSize::Menu);
+        let find_prev_btn = Button::new();
+        find_prev_btn.set_image(Some(&find_prev_icon));
         find_prev_btn.style_context().add_class("norva-find-btn");
         find_prev_btn.set_tooltip_text(Some("Previous match (Shift+Enter)"));
         find_bar.pack_start(&find_prev_btn, false, false, 1);
 
-        let find_next_btn = Button::with_label("▼");
+        let find_next_icon = Image::from_icon_name(Some("go-down-symbolic"), IconSize::Menu);
+        let find_next_btn = Button::new();
+        find_next_btn.set_image(Some(&find_next_icon));
         find_next_btn.style_context().add_class("norva-find-btn");
         find_next_btn.set_tooltip_text(Some("Next match (Enter)"));
         find_bar.pack_start(&find_next_btn, false, false, 1);
 
-        let find_close_btn = Button::with_label("✕");
+        let find_close_icon = Image::from_icon_name(Some("window-close-symbolic"), IconSize::Menu);
+        let find_close_btn = Button::new();
+        find_close_btn.set_image(Some(&find_close_icon));
         find_close_btn.style_context().add_class("norva-find-close-btn");
         find_close_btn.set_tooltip_text(Some("Close find bar (Esc)"));
+        find_bar.pack_end(&find_close_btn, false, false, 4);
         find_bar.pack_end(&find_close_btn, false, false, 4);
 
         let find_bar_clone = find_bar.clone();
@@ -437,8 +467,12 @@ impl NorvaGtkChrome {
         let tab_box = Box::new(Orientation::Horizontal, 6);
         tab_box.style_context().add_class("norva-tab-inner");
 
-        let icon_label = Label::new(Some(icon));
-        icon_label.style_context().add_class("norva-tab-icon");
+        let icon_label = Label::new(None);
+        if !icon.is_empty() {
+            icon_label.set_text(icon);
+            icon_label.style_context().add_class("norva-tab-icon");
+            tab_box.pack_start(&icon_label, false, false, 0);
+        }
 
         let title_label = Label::new(Some(title));
         title_label.style_context().add_class("norva-tab-title");
@@ -446,11 +480,12 @@ impl NorvaGtkChrome {
         title_label.set_xalign(0.0);
         title_label.set_ellipsize(gtk::pango::EllipsizeMode::End);
 
-        let close_btn = Button::with_label("✕");
+        let close_icon = Image::from_icon_name(Some("window-close-symbolic"), IconSize::Menu);
+        let close_btn = Button::new();
+        close_btn.set_image(Some(&close_icon));
         close_btn.style_context().add_class("norva-tab-close");
         close_btn.set_tooltip_text(Some("Close tab (Ctrl+W)"));
 
-        tab_box.pack_start(&icon_label, false, false, 0);
         tab_box.pack_start(&title_label, true, true, 0);
         tab_box.pack_end(&close_btn, false, false, 0);
 
@@ -515,44 +550,51 @@ impl NorvaGtkChrome {
     /// Updates the security padlock depending on whether URL is HTTPS, HTTP, or internal.
     pub fn update_security_badge(&self, url: &str) {
         if url.starts_with("https://") {
-            self.security_btn.set_label("🔒");
+            let img = Image::from_icon_name(Some("security-high-symbolic"), IconSize::Menu);
+            self.security_btn.set_image(Some(&img));
             self.security_btn.style_context().remove_class("norva-badge-insecure");
             self.security_btn.style_context().add_class("norva-badge-secure-lock");
-            self.security_btn.set_tooltip_text(Some("Secure TLS Connection"));
+            self.security_btn.set_tooltip_text(Some("Secure Connection (TLS)"));
         } else if url.starts_with("norva://") {
-            self.security_btn.set_label("🛡️");
+            let img = Image::from_icon_name(Some("security-high-symbolic"), IconSize::Menu);
+            self.security_btn.set_image(Some(&img));
             self.security_btn.style_context().remove_class("norva-badge-insecure");
             self.security_btn.style_context().add_class("norva-badge-secure-lock");
-            self.security_btn.set_tooltip_text(Some("NORVA Memory Vault"));
+            self.security_btn.set_tooltip_text(Some("Norva Internal View"));
         } else {
-            self.security_btn.set_label("⚠️");
+            let img = Image::from_icon_name(Some("security-low-symbolic"), IconSize::Menu);
+            self.security_btn.set_image(Some(&img));
             self.security_btn.style_context().remove_class("norva-badge-secure-lock");
             self.security_btn.style_context().add_class("norva-badge-insecure");
-            self.security_btn.set_tooltip_text(Some("Connection is Insecure (HTTP)"));
+            self.security_btn.set_tooltip_text(Some("Insecure Connection (HTTP)"));
         }
     }
 
     /// Updates bookmark star button state (filled gold if bookmarked).
     pub fn set_bookmarked(&self, bookmarked: bool) {
         if bookmarked {
-            self.bookmark_btn.set_label("★");
+            let img = Image::from_icon_name(Some("starred-symbolic"), IconSize::Menu);
+            self.bookmark_btn.set_image(Some(&img));
             self.bookmark_btn.style_context().add_class("bookmarked");
-            self.bookmark_btn.set_tooltip_text(Some("Bookmarked (Click to edit)"));
+            self.bookmark_btn.set_tooltip_text(Some("Bookmarked (Ctrl+D)"));
         } else {
-            self.bookmark_btn.set_label("☆");
+            let img = Image::from_icon_name(Some("non-starred-symbolic"), IconSize::Menu);
+            self.bookmark_btn.set_image(Some(&img));
             self.bookmark_btn.style_context().remove_class("bookmarked");
-            self.bookmark_btn.set_tooltip_text(Some("Bookmark this tab (Ctrl+D)"));
+            self.bookmark_btn.set_tooltip_text(Some("Bookmark tab (Ctrl+D)"));
         }
     }
 
-    /// Sets page loading state, updating Reload button to Stop ('✕') and vice-versa.
+    /// Sets page loading state, updating Reload button to Stop and vice-versa.
     pub fn set_page_loading(&self, loading: bool) {
         *self.is_page_loading.borrow_mut() = loading;
         if loading {
-            self.reload_btn.set_label("✕");
+            let img = Image::from_icon_name(Some("process-stop-symbolic"), IconSize::Menu);
+            self.reload_btn.set_image(Some(&img));
             self.reload_btn.set_tooltip_text(Some("Stop loading (Esc)"));
         } else {
-            self.reload_btn.set_label("↻");
+            let img = Image::from_icon_name(Some("view-refresh-symbolic"), IconSize::Menu);
+            self.reload_btn.set_image(Some(&img));
             self.reload_btn.set_tooltip_text(Some("Reload (Ctrl+R)"));
         }
     }
@@ -591,7 +633,12 @@ impl NorvaGtkChrome {
                 tab.url = url.to_string();
                 tab.icon = icon.to_string();
                 tab.title_label.set_text(title);
-                tab.icon_label.set_text(icon);
+                if !icon.is_empty() {
+                    tab.icon_label.set_text(icon);
+                    tab.icon_label.set_visible(true);
+                } else {
+                    tab.icon_label.set_visible(false);
+                }
                 break;
             }
         }
@@ -624,7 +671,7 @@ impl NorvaGtkChrome {
     /// Updates the live shield blocked counter.
     pub fn set_shield_count(&self, count: usize) {
         *self.total_blocked.borrow_mut() = count;
-        self.shield_btn.set_label(&format!("🛡️ {}", count));
+        self.shield_btn.set_label(&format!("Shields {}", count));
     }
 
     /// Shows or hides the find bar.
@@ -651,21 +698,21 @@ impl NorvaGtkChrome {
         pbox.set_margin_start(14);
         pbox.set_margin_end(14);
 
-        let title = Label::new(Some("🔒 Origin Security & Integrity"));
+        let title = Label::new(Some("Security & Permissions"));
         title.style_context().add_class("norva-popover-title");
         pbox.pack_start(&title, false, false, 2);
 
-        let stat1 = Label::new(Some("• TLS / SSL Protocol: Encrypted & Verified"));
+        let stat1 = Label::new(Some("Connection: Encrypted & Verified (TLS)"));
         stat1.style_context().add_class("norva-status-green");
         stat1.set_xalign(0.0);
 
-        let stat2 = Label::new(Some("• Hardware Zero-Trust: Camera, Mic, GPS Gated"));
+        let stat2 = Label::new(Some("Hardware: Zero-trust device isolation"));
         stat2.set_xalign(0.0);
 
-        let stat3 = Label::new(Some("• Tracking Neutralization: Active & Enforced"));
+        let stat3 = Label::new(Some("Shields: Active tracker defense"));
         stat3.set_xalign(0.0);
 
-        let stat4 = Label::new(Some("• Data Vault: Isolated SQLite Compartment"));
+        let stat4 = Label::new(Some("Storage: Dedicated SQLite vault"));
         stat4.set_xalign(0.0);
 
         pbox.pack_start(&stat1, false, false, 2);
@@ -673,7 +720,7 @@ impl NorvaGtkChrome {
         pbox.pack_start(&stat3, false, false, 2);
         pbox.pack_start(&stat4, false, false, 2);
 
-        let perm_btn = Button::with_label("Manage Site Permissions");
+        let perm_btn = Button::with_label("Manage Permissions");
         perm_btn.style_context().add_class("norva-btn-primary");
         let pop_clone = popover.clone();
         let on_open = on_open_permissions.clone();
@@ -734,16 +781,16 @@ impl NorvaGtkChrome {
 
             btn.connect_clicked(move |_| {
                 let short_name = match id {
-                    "duckduckgo" => "DDG ▼",
-                    "google" => "Google ▼",
-                    "bing" => "Bing ▼",
-                    "yahoo" => "Yahoo ▼",
-                    "ahmia" => "Ahmia ▼",
-                    "startpage" => "Startpage ▼",
-                    "brave" => "Brave ▼",
-                    "github" => "GitHub ▼",
-                    "wikipedia" => "Wiki ▼",
-                    _ => "Search ▼",
+                    "duckduckgo" => "DDG",
+                    "google" => "Google",
+                    "bing" => "Bing",
+                    "yahoo" => "Yahoo",
+                    "ahmia" => "Ahmia",
+                    "startpage" => "Startpage",
+                    "brave" => "Brave",
+                    "github" => "GitHub",
+                    "wikipedia" => "Wiki",
+                    _ => "Search",
                 };
                 lbl.set_text(short_name);
                 *sel_eng.borrow_mut() = id.to_string();
@@ -776,21 +823,21 @@ impl NorvaGtkChrome {
         pbox.set_margin_start(14);
         pbox.set_margin_end(14);
 
-        let title = Label::new(Some("🛡️ NORVA Privacy Defense Shield"));
+        let title = Label::new(Some("Privacy Shields"));
         title.style_context().add_class("norva-popover-title");
         pbox.pack_start(&title, false, false, 2);
 
-        let status_lbl = Label::new(Some("Shields Armed: All Trackers Neutralized"));
+        let status_lbl = Label::new(Some("Active Defense: Trackers & Ads Neutralized"));
         status_lbl.style_context().add_class("norva-status-green");
         pbox.pack_start(&status_lbl, false, false, 2);
 
-        let item1 = Label::new(Some("• Advertising Network Sockets: BLOCKED"));
+        let item1 = Label::new(Some("• Advertising & Tracker Sockets: Blocked"));
         item1.set_xalign(0.0);
-        let item2 = Label::new(Some("• Analytics & Telemetry Beacons: BLOCKED"));
+        let item2 = Label::new(Some("• Telemetry Beacons: Blocked"));
         item2.set_xalign(0.0);
-        let item3 = Label::new(Some("• URL Click Tracking Tokens (fbclid, gclid): STRIPPED"));
+        let item3 = Label::new(Some("• URL Click Tracking Tokens: Stripped"));
         item3.set_xalign(0.0);
-        let item4 = Label::new(Some("• Canvas & Audio Fingerprinting: RANDOMIZED"));
+        let item4 = Label::new(Some("• Canvas & Audio Fingerprinting: Defended"));
         item4.set_xalign(0.0);
 
         pbox.pack_start(&item1, false, false, 1);
@@ -798,7 +845,7 @@ impl NorvaGtkChrome {
         pbox.pack_start(&item3, false, false, 1);
         pbox.pack_start(&item4, false, false, 1);
 
-        let open_btn = Button::with_label("Open Shields Command Center");
+        let open_btn = Button::with_label("Open Shields Dashboard");
         open_btn.style_context().add_class("norva-btn-primary");
         let pop_clone = popover.clone();
         let on_open = on_open_shields.clone();
@@ -831,7 +878,7 @@ impl NorvaGtkChrome {
         pbox.set_margin_start(12);
         pbox.set_margin_end(12);
 
-        let title = Label::new(Some("📥 Downloads"));
+        let title = Label::new(Some("Downloads"));
         title.style_context().add_class("norva-popover-title");
         pbox.pack_start(&title, false, false, 2);
 
@@ -839,7 +886,7 @@ impl NorvaGtkChrome {
         desc.set_xalign(0.0);
         pbox.pack_start(&desc, false, false, 2);
 
-        let open_mgr_btn = Button::with_label("Open Downloads Manager");
+        let open_mgr_btn = Button::with_label("Open Downloads");
         open_mgr_btn.style_context().add_class("norva-btn-primary");
         let pop_clone = popover.clone();
         let on_open = on_open_downloads.clone();
@@ -849,7 +896,7 @@ impl NorvaGtkChrome {
         });
         pbox.pack_start(&open_mgr_btn, false, false, 4);
 
-        let clear_btn = Button::with_label("Clear Download History");
+        let clear_btn = Button::with_label("Clear Downloads History");
         clear_btn.style_context().add_class("norva-popover-item");
         let pop_c2 = popover.clone();
         let on_clr = on_clear_downloads.clone();
@@ -892,7 +939,7 @@ impl NorvaGtkChrome {
         zoom_lbl.set_xalign(0.0);
         zoom_row.pack_start(&zoom_lbl, true, true, 4);
 
-        let z_out_btn = Button::with_label("➖");
+        let z_out_btn = Button::with_label("−");
         z_out_btn.style_context().add_class("norva-zoom-btn");
         let on_z1 = on_zoom.clone();
         z_out_btn.connect_clicked(move |_| {
@@ -906,7 +953,7 @@ impl NorvaGtkChrome {
             on_z2(0.0);
         });
 
-        let z_in_btn = Button::with_label("➕");
+        let z_in_btn = Button::with_label("+");
         z_in_btn.style_context().add_class("norva-zoom-btn");
         let on_z3 = on_zoom.clone();
         z_in_btn.connect_clicked(move |_| {
@@ -919,18 +966,18 @@ impl NorvaGtkChrome {
         pbox.pack_start(&zoom_row, false, false, 4);
 
         let menu_items = [
-            ("➕ New Tab", "new_tab"),
-            ("🔍 Find in Page", "find"),
-            ("📜 History Vault", "norva://history"),
-            ("★ Bookmarks Manager", "norva://bookmarks"),
-            ("📥 Downloads", "norva://downloads"),
-            ("🔑 Password Vault", "norva://passwords"),
-            ("🛡️ Privacy Shields Center", "norva://shields"),
-            ("📷 Site Permissions & Hardware", "norva://permissions"),
-            ("🍪 Cookie Isolation & Cache Purge", "norva://cookies"),
-            ("📖 Reader Mode", "reader"),
-            ("⚙️ Browser Settings", "norva://settings"),
-            ("🏠 Start Page", "norva://newtab"),
+            ("New Tab", "new_tab"),
+            ("Find in Page", "find"),
+            ("History", "norva://history"),
+            ("Bookmarks", "norva://bookmarks"),
+            ("Downloads", "norva://downloads"),
+            ("Passwords", "norva://passwords"),
+            ("Privacy Shields", "norva://shields"),
+            ("Site Permissions", "norva://permissions"),
+            ("Storage & Cookies", "norva://cookies"),
+            ("Reader View", "reader"),
+            ("Settings", "norva://settings"),
+            ("Start Page", "norva://newtab"),
         ];
 
         for (label, action) in menu_items {
@@ -970,9 +1017,9 @@ impl NorvaGtkChrome {
         F: Fn() + 'static + Clone,
     {
         let hw_buttons = [
-            (&self.cam_btn, "📷 Camera Privacy Guard", "Webcam access is strictly enforced via permissions.db."),
-            (&self.mic_btn, "🎙️ Microphone Privacy Guard", "Audio input streams are guarded against stealth listeners."),
-            (&self.loc_btn, "📍 Location Privacy Guard", "GPS and IP geolocation requests are isolated and filtered."),
+            (&self.cam_btn, "Camera Privacy Guard", "Webcam access is strictly enforced via permissions.db."),
+            (&self.mic_btn, "Microphone Privacy Guard", "Audio input streams are guarded against stealth listeners."),
+            (&self.loc_btn, "Location Privacy Guard", "GPS and IP geolocation requests are isolated and filtered."),
         ];
 
         for (btn, title, desc) in hw_buttons {
@@ -1018,19 +1065,19 @@ impl NorvaGtkChrome {
     fn apply_theme_css() {
         let css = r###"
         /* ================================================================
-           NORVA 2026 — Executive Modern Browser Chrome Design System
+           NORVA Executive Dark Browser Chrome Theme (Linear / Arc / Safari)
            ================================================================ */
 
         window, .background {
-            background-color: #090a0f;
-            color: #f8fafc;
+            background-color: #0b0c10;
+            color: #f4f4f5;
         }
 
         * {
             -gtk-icon-shadow: none;
             text-shadow: none;
-            transition-duration: 140ms;
-            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 120ms;
+            transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         button,
@@ -1071,15 +1118,15 @@ impl NorvaGtkChrome {
         }
 
         .norva-chrome-root {
-            background-color: #090a0f;
+            background-color: #0b0c10;
         }
 
         /* ---- 1. TAB STRIP ---- */
         .norva-tab-bar {
-            background-color: #090a0f;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-            padding: 6px 12px 0 12px;
-            min-height: 40px;
+            background-color: #0b0c10;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 6px 10px 0 10px;
+            min-height: 38px;
         }
 
         .norva-tabs-scroll {
@@ -1093,37 +1140,37 @@ impl NorvaGtkChrome {
 
         .norva-tab {
             background-color: transparent;
-            border-radius: 10px 10px 0 0;
-            min-width: 170px;
+            border-radius: 8px 8px 0 0;
+            min-width: 160px;
             max-width: 240px;
-            min-height: 34px;
-            margin-right: 3px;
-            border-top: 2px solid transparent;
+            min-height: 32px;
+            margin-right: 2px;
+            border-top: none;
             border-left: 1px solid transparent;
-            border-right: 1px solid rgba(255, 255, 255, 0.05);
-            transition: all 0.15s ease;
+            border-right: 1px solid rgba(255, 255, 255, 0.04);
+            transition: all 0.12s ease;
         }
 
         .norva-tab:hover {
-            background-color: rgba(255, 255, 255, 0.05);
+            background-color: rgba(255, 255, 255, 0.04);
         }
 
         .norva-tab.active-tab {
-            background-color: #10121b;
+            background-color: #12131a;
             border-right: 1px solid rgba(255, 255, 255, 0.08);
             border-left: 1px solid rgba(255, 255, 255, 0.08);
-            border-top: 2px solid #6366f1;
-            box-shadow: 0 -2px 10px rgba(99, 102, 241, 0.15);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: none;
         }
 
         .norva-tab-inner {
-            padding: 5px 8px 5px 12px;
+            padding: 4px 6px 4px 10px;
         }
 
         .norva-tab-icon {
-            font-size: 13px;
+            font-size: 11px;
             margin-right: 6px;
-            opacity: 0.85;
+            opacity: 0.7;
         }
 
         .active-tab .norva-tab-icon {
@@ -1131,40 +1178,42 @@ impl NorvaGtkChrome {
         }
 
         .norva-tab-title {
-            font-family: 'Inter', system-ui, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', system-ui, sans-serif;
             font-size: 12px;
-            font-weight: 500;
-            color: #94a3b8;
+            font-weight: 450;
+            color: #71717a;
+        }
+
+        .norva-tab:hover .norva-tab-title {
+            color: #d4d4d8;
         }
 
         .active-tab .norva-tab-title {
-            color: #ffffff;
-            font-weight: 600;
+            color: #f4f4f5;
+            font-weight: 550;
         }
 
         .norva-tab-close {
             background-color: transparent;
             border: none;
             box-shadow: none;
-            color: #64748b;
-            border-radius: 50%;
+            color: #71717a;
+            border-radius: 4px;
             padding: 0;
-            font-size: 10px;
-            font-weight: 700;
-            min-width: 20px;
-            min-height: 20px;
+            min-width: 18px;
+            min-height: 18px;
             margin-left: 4px;
-            opacity: 0.45;
-            transition: all 0.15s ease;
+            opacity: 0.0;
+            transition: all 0.12s ease;
         }
 
         .norva-tab:hover .norva-tab-close,
         .active-tab .norva-tab-close {
-            opacity: 0.85;
+            opacity: 0.6;
         }
 
         .norva-tab-close:hover {
-            background-color: rgba(255, 255, 255, 0.16);
+            background-color: rgba(255, 255, 255, 0.12);
             color: #ffffff;
             opacity: 1.0;
         }
@@ -1172,66 +1221,62 @@ impl NorvaGtkChrome {
         .norva-new-tab-btn {
             background-color: transparent;
             border: none;
-            color: #94a3b8;
-            border-radius: 50%;
-            min-width: 28px;
-            min-height: 28px;
-            font-size: 18px;
-            font-weight: 400;
-            margin: 2px 4px;
-            transition: all 0.15s ease;
+            color: #71717a;
+            border-radius: 6px;
+            min-width: 26px;
+            min-height: 26px;
+            margin: 2px 2px;
+            transition: all 0.12s ease;
         }
 
         .norva-new-tab-btn:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-            color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.08);
+            color: #f4f4f5;
         }
 
         .norva-badge-normal {
-            background-color: rgba(16, 185, 129, 0.12);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            color: #34d399;
-            padding: 3px 10px;
-            border-radius: 14px;
-            font-family: 'Inter', system-ui, sans-serif;
+            background-color: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #a1a1aa;
+            padding: 2px 9px;
+            border-radius: 12px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif;
             font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
             margin: 4px 0;
         }
 
         .norva-badge-secure {
-            background-color: rgba(244, 63, 94, 0.14);
-            border: 1px solid rgba(244, 63, 94, 0.35);
-            color: #fb7185;
-            padding: 3px 10px;
-            border-radius: 14px;
-            font-family: 'Inter', system-ui, sans-serif;
+            background-color: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.25);
+            color: #a5b4fc;
+            padding: 2px 9px;
+            border-radius: 12px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif;
             font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
             margin: 4px 0;
         }
 
         /* ---- 2. MAIN TOOLBAR & OMNIBOX ---- */
         .norva-toolbar {
-            background-color: #10121b;
+            background-color: #12131a;
             border-bottom: 1px solid rgba(255, 255, 255, 0.06);
             padding: 4px 10px;
-            min-height: 44px;
+            min-height: 42px;
         }
 
         .norva-nav-btn {
             background-color: transparent;
             border: none;
-            color: #94a3b8;
-            border-radius: 50%;
-            min-width: 32px;
-            min-height: 32px;
-            font-size: 15px;
-            font-weight: 600;
+            color: #a1a1aa;
+            border-radius: 6px;
+            min-width: 30px;
+            min-height: 30px;
             margin: 0 1px;
-            transition: all 0.15s ease;
+            transition: all 0.12s ease;
         }
 
         .norva-nav-btn:hover {
@@ -1240,42 +1285,42 @@ impl NorvaGtkChrome {
         }
 
         .norva-nav-btn:active {
-            background-color: rgba(99, 102, 241, 0.2);
-            color: #6366f1;
+            background-color: rgba(255, 255, 255, 0.14);
         }
 
         /* Omnibox Capsule Frame */
         .norva-omnibox-frame {
-            background-color: #090a0f;
-            border: 1px solid rgba(255, 255, 255, 0.09);
-            border-radius: 22px;
-            padding: 0 10px;
-            min-height: 34px;
-            margin: 0 6px;
-            transition: all 0.18s ease;
+            background-color: #0b0c10;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 0 8px;
+            min-height: 32px;
+            margin: 0 8px;
+            transition: all 0.15s ease;
         }
 
         .norva-omnibox-frame:focus-within {
-            border-color: #6366f1;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
-            background-color: #0d0e16;
+            border-color: rgba(99, 102, 241, 0.6);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.18);
+            background-color: #0e0f15;
         }
 
         .norva-btn-flat {
             background-color: transparent;
             border: none;
             padding: 0 4px;
-            font-size: 13px;
+            color: #71717a;
             border-radius: 50%;
-            min-width: 26px;
-            min-height: 26px;
+            min-width: 24px;
+            min-height: 24px;
         }
 
         .norva-badge-secure-lock {
-            color: #10b981;
+            color: #a1a1aa;
         }
         .norva-badge-secure-lock:hover {
-            background-color: rgba(16, 185, 129, 0.15);
+            color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.08);
         }
 
         .norva-badge-insecure {
@@ -1286,153 +1331,139 @@ impl NorvaGtkChrome {
         }
 
         .norva-engine-pill {
-            background-color: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            color: #cbd5e1;
-            border-radius: 12px;
-            padding: 2px 8px;
-            font-family: 'Inter', system-ui, sans-serif;
+            background-color: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            color: #a1a1aa;
+            border-radius: 10px;
+            padding: 1px 7px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif;
             font-size: 11px;
             font-weight: 500;
-            min-height: 24px;
-            margin: 0 4px;
-            transition: all 0.15s ease;
-        }
-
-        .norva-engine-pill:hover {
-            background-color: rgba(255, 255, 255, 0.12);
-            border-color: rgba(255, 255, 255, 0.16);
-            color: #ffffff;
+            min-height: 22px;
+            margin: 0 3px;
         }
 
         .norva-omnibox-entry {
             background-color: transparent;
             border: none;
-            color: #f8fafc;
-            font-family: 'Inter', system-ui, sans-serif;
+            color: #f4f4f5;
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', system-ui, sans-serif;
             font-size: 13px;
-            padding: 4px 6px;
-            caret-color: #6366f1;
+            padding: 3px 6px;
+            caret-color: #818cf8;
         }
 
         .norva-omni-clear-btn {
             background-color: transparent;
             border: none;
-            color: #64748b;
+            color: #71717a;
             border-radius: 50%;
-            min-width: 22px;
-            min-height: 22px;
-            font-size: 10px;
-            font-weight: 700;
-            margin: 0 2px;
+            min-width: 20px;
+            min-height: 20px;
+            margin: 0 1px;
         }
         .norva-omni-clear-btn:hover {
             color: #ffffff;
-            background-color: rgba(255, 255, 255, 0.12);
+            background-color: rgba(255, 255, 255, 0.1);
         }
 
         .norva-omni-action-btn {
             background-color: transparent;
             border: none;
-            color: #64748b;
-            border-radius: 50%;
-            min-width: 26px;
-            min-height: 26px;
-            font-size: 13px;
+            color: #71717a;
+            border-radius: 4px;
+            min-width: 24px;
+            min-height: 24px;
+            font-size: 11px;
+            font-weight: 500;
             margin: 0 1px;
         }
         .norva-omni-action-btn:hover {
-            color: #818cf8;
-            background-color: rgba(99, 102, 241, 0.15);
+            color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.08);
         }
 
         .norva-zoom-pill {
             background-color: rgba(255, 255, 255, 0.04);
-            border-radius: 10px;
-            color: #94a3b8;
-            font-family: 'Inter', system-ui, sans-serif;
-            font-size: 10.5px;
+            border-radius: 8px;
+            color: #71717a;
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif;
+            font-size: 10px;
             font-weight: 600;
-            padding: 2px 6px;
-            min-height: 22px;
+            padding: 1px 5px;
+            min-height: 20px;
             margin: 0 2px;
-        }
-        .norva-zoom-pill:hover {
-            color: #ffffff;
-            background-color: rgba(255, 255, 255, 0.1);
         }
 
         .norva-bookmark-star {
             background-color: transparent;
             border: none;
-            color: #64748b;
+            color: #71717a;
             border-radius: 50%;
-            min-width: 26px;
-            min-height: 26px;
-            font-size: 15px;
+            min-width: 24px;
+            min-height: 24px;
             padding: 0;
-            transition: all 0.15s ease;
+            transition: all 0.12s ease;
         }
 
         .norva-bookmark-star:hover {
-            color: #f59e0b;
-            background-color: rgba(245, 158, 11, 0.14);
+            color: #fbbf24;
+            background-color: rgba(251, 191, 36, 0.12);
         }
 
         .norva-bookmark-star.bookmarked {
-            color: #f59e0b;
+            color: #fbbf24;
         }
 
         /* Shield Button */
         .norva-shield-btn {
-            background-color: rgba(99, 102, 241, 0.12);
-            border: 1px solid rgba(99, 102, 241, 0.3);
-            color: #818cf8;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #a1a1aa;
             border-radius: 14px;
-            padding: 3px 12px;
-            font-family: 'Inter', system-ui, sans-serif;
-            font-size: 11.5px;
-            font-weight: 700;
-            min-height: 30px;
+            padding: 2px 10px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            min-height: 28px;
             margin: 0 2px;
-            transition: all 0.15s ease;
+            transition: all 0.12s ease;
         }
 
         .norva-shield-btn:hover {
-            background-color: rgba(99, 102, 241, 0.22);
-            border-color: rgba(99, 102, 241, 0.5);
-            color: #ffffff;
-            box-shadow: 0 0 12px rgba(99, 102, 241, 0.25);
+            background-color: rgba(99, 102, 241, 0.14);
+            border-color: rgba(99, 102, 241, 0.35);
+            color: #c7d2fe;
         }
 
         /* Hardware Zero-Trust Cluster */
         .norva-hw-cluster {
-            background-color: rgba(255, 255, 255, 0.04);
-            border-radius: 12px;
-            padding: 2px 4px;
-            margin: 0 3px;
+            background-color: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            padding: 1px 3px;
+            margin: 0 2px;
         }
 
         .norva-hw-btn {
             background-color: transparent;
             border: none;
-            font-size: 13px;
-            padding: 0;
-            opacity: 0.65;
-            border-radius: 6px;
-            min-width: 26px;
-            min-height: 26px;
-            transition: all 0.15s ease;
+            font-size: 10px;
+            color: #71717a;
+            padding: 0 4px;
+            border-radius: 4px;
+            min-width: 22px;
+            min-height: 22px;
+            transition: all 0.12s ease;
         }
 
         .norva-hw-btn:hover {
-            opacity: 1.0;
-            background-color: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.08);
         }
 
         /* ---- 3. FIND IN PAGE BAR ---- */
         .norva-find-bar {
-            background-color: #10121b;
+            background-color: #12131a;
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             border-top: 1px solid rgba(255, 255, 255, 0.04);
             padding: 4px 14px;
@@ -1440,60 +1471,56 @@ impl NorvaGtkChrome {
         }
 
         .norva-find-icon {
-            font-size: 12px;
-            color: #94a3b8;
+            color: #71717a;
             margin-right: 4px;
         }
 
         .norva-find-entry {
-            background-color: #090a0f;
+            background-color: #0b0c10;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
+            border-radius: 6px;
             color: #ffffff;
-            font-family: 'Inter', system-ui, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif;
             font-size: 12px;
             padding: 2px 8px;
-            min-width: 200px;
+            min-width: 220px;
         }
 
         .norva-find-count {
-            font-family: 'Inter', system-ui, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif;
             font-size: 11px;
-            color: #94a3b8;
-            margin: 0 4px;
+            color: #71717a;
+            margin: 0 6px;
         }
 
         .norva-find-btn {
-            background-color: rgba(255, 255, 255, 0.05);
-            border-radius: 6px;
-            color: #cbd5e1;
-            font-size: 10px;
+            background-color: transparent;
+            border-radius: 4px;
+            color: #a1a1aa;
             min-width: 24px;
             min-height: 24px;
             margin: 0 1px;
         }
         .norva-find-btn:hover {
-            background-color: rgba(255, 255, 255, 0.12);
+            background-color: rgba(255, 255, 255, 0.08);
             color: #ffffff;
         }
 
         .norva-find-close-btn {
             background-color: transparent;
-            border-radius: 50%;
-            color: #64748b;
-            font-size: 11px;
-            font-weight: 700;
+            border-radius: 4px;
+            color: #71717a;
             min-width: 24px;
             min-height: 24px;
         }
         .norva-find-close-btn:hover {
             color: #ffffff;
-            background-color: rgba(255, 255, 255, 0.12);
+            background-color: rgba(255, 255, 255, 0.08);
         }
 
         /* ---- 4. BOOKMARKS BAR ---- */
         .norva-bookmarks-bar {
-            background-color: #10121b;
+            background-color: #12131a;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             padding: 2px 10px;
             min-height: 28px;
@@ -1502,35 +1529,35 @@ impl NorvaGtkChrome {
         .norva-bookmark-pill {
             background-color: transparent;
             border: none;
-            color: #94a3b8;
-            border-radius: 6px;
-            padding: 3px 8px;
-            font-family: 'Inter', system-ui, sans-serif;
+            color: #a1a1aa;
+            border-radius: 4px;
+            padding: 2px 8px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif;
             font-size: 11.5px;
-            font-weight: 500;
-            min-height: 24px;
+            font-weight: 450;
+            min-height: 22px;
             margin: 0 1px;
-            transition: all 0.15s ease;
+            transition: all 0.12s ease;
         }
 
         .norva-bookmark-pill:hover {
-            background-color: rgba(255, 255, 255, 0.08);
-            color: #f8fafc;
+            background-color: rgba(255, 255, 255, 0.07);
+            color: #f4f4f5;
         }
 
         /* ---- 5. POPOVERS ---- */
         .norva-popover {
-            background-color: #141622;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 14px;
-            color: #f8fafc;
+            background-color: #161722;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #f4f4f5;
             padding: 6px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7);
         }
 
         .norva-popover-title {
-            font-family: 'Inter', system-ui, sans-serif;
-            font-weight: 700;
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif;
+            font-weight: 600;
             font-size: 13px;
             color: #ffffff;
             margin-bottom: 6px;
@@ -1540,18 +1567,18 @@ impl NorvaGtkChrome {
         .norva-popover-item {
             background-color: transparent;
             border: none;
-            color: #94a3b8;
-            border-radius: 8px;
-            padding: 8px 12px;
-            font-family: 'Inter', system-ui, sans-serif;
+            color: #a1a1aa;
+            border-radius: 6px;
+            padding: 7px 12px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif;
             font-size: 12.5px;
-            font-weight: 500;
-            min-height: 32px;
-            transition: all 0.12s ease;
+            font-weight: 450;
+            min-height: 30px;
+            transition: all 0.1s ease;
         }
 
         .norva-popover-item:hover {
-            background-color: rgba(99, 102, 241, 0.16);
+            background-color: rgba(255, 255, 255, 0.08);
             color: #ffffff;
         }
 
@@ -1562,16 +1589,16 @@ impl NorvaGtkChrome {
         }
 
         .norva-zoom-btn {
-            background-color: rgba(255, 255, 255, 0.06);
-            border-radius: 6px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
             font-size: 11px;
-            font-weight: 600;
-            color: #cbd5e1;
-            padding: 4px 8px;
-            min-height: 26px;
+            font-weight: 500;
+            color: #d4d4d8;
+            padding: 3px 8px;
+            min-height: 24px;
         }
         .norva-zoom-btn:hover {
-            background-color: rgba(99, 102, 241, 0.25);
+            background-color: rgba(255, 255, 255, 0.12);
             color: #ffffff;
         }
 
@@ -1579,38 +1606,37 @@ impl NorvaGtkChrome {
             background-color: #6366f1;
             border: none;
             color: #ffffff;
-            border-radius: 8px;
-            padding: 8px 14px;
-            font-family: 'Inter', system-ui, sans-serif;
+            border-radius: 6px;
+            padding: 7px 14px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif;
             font-size: 12px;
-            font-weight: 600;
-            min-height: 32px;
-            transition: all 0.15s ease;
+            font-weight: 550;
+            min-height: 30px;
+            transition: all 0.12s ease;
         }
 
         .norva-btn-primary:hover {
             background-color: #4f46e5;
-            box-shadow: 0 0 14px rgba(99, 102, 241, 0.35);
         }
 
         .norva-status-green {
             color: #10b981;
-            font-family: 'Inter', system-ui, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif;
             font-size: 12px;
-            font-weight: 600;
+            font-weight: 500;
         }
 
         scrollbar {
             background-color: transparent;
         }
         scrollbar slider {
-            background-color: rgba(255, 255, 255, 0.12);
+            background-color: rgba(255, 255, 255, 0.1);
             border-radius: 999px;
-            min-width: 6px;
-            min-height: 6px;
+            min-width: 5px;
+            min-height: 5px;
         }
         scrollbar slider:hover {
-            background-color: rgba(255, 255, 255, 0.22);
+            background-color: rgba(255, 255, 255, 0.2);
         }
         "###;
 

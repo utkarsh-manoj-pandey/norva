@@ -126,11 +126,10 @@ pub fn get_hud_injection_script() -> &'static str {
             <button class="btn" id="hud-fwd" title="Forward">›</button>
             <button class="btn" id="hud-reload" title="Reload">↻</button>
             <input type="text" class="omnibox-input" id="hud-omnibox" placeholder="Search (!g, !b, !ddg, !ahmia) or URL..." />
-            <div class="shield-badge" id="hud-shields" title="NORVA Privacy Shields & Anti-Tracking">
-                <span>🛡️</span>
+            <div class="shield-badge" id="hud-shields" title="NORVA Privacy Shields">
                 <span>Shields</span>
             </div>
-            <button class="btn" id="hud-history" title="History">📜</button>
+            <button class="btn" id="hud-history" title="History">History</button>
         `;
 
         shadow.appendChild(style);

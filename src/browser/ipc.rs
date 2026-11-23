@@ -176,7 +176,7 @@ impl IpcDispatcher {
             "add_bookmark" => {
                 if let Some(url) = msg.url {
                     let title = msg.title.unwrap_or_else(|| url.clone());
-                    let icon = msg.icon.unwrap_or_else(|| "🌐".to_string());
+                    let icon = msg.icon.unwrap_or_default();
                     let folder = msg.folder.unwrap_or_else(|| "Bookmarks".to_string());
                     let _ = self.db.bookmarks.add_bookmark(&url, &title, &icon, &folder);
                     let _ = self.proxy.send_event(NorvaUserEvent::RefreshBookmarks);

@@ -319,9 +319,9 @@ impl NorvaBrowser {
             let proxy_close = proxy.clone();
             chrome.add_tab(
                 1,
-                "NORVA Start",
+                "New Tab",
                 &start_url,
-                "🛡️",
+                "",
                 move |id| {
                     let _ = proxy_switch.send_event(NorvaUserEvent::SwitchTab(id));
                 },
@@ -401,7 +401,7 @@ impl NorvaBrowser {
                         } else {
                             url.clone()
                         };
-                        let _ = db_star.bookmarks.add_bookmark(&url, &title, "★", "Bookmarks");
+                        let _ = db_star.bookmarks.add_bookmark(&url, &title, "", "Bookmarks");
                         chrome_star.set_bookmarked(true);
                     }
                     let _ = proxy_star.send_event(NorvaUserEvent::RefreshBookmarks);
@@ -687,7 +687,7 @@ impl NorvaBrowser {
                                 new_id,
                                 "New Tab",
                                 "norva://newtab",
-                                "🌐",
+                                "",
                                 move |id| {
                                     let _ = p_sw.send_event(NorvaUserEvent::SwitchTab(id));
                                 },
@@ -725,7 +725,7 @@ impl NorvaBrowser {
                                     new_id,
                                     "New Tab",
                                     "norva://newtab",
-                                    "🌐",
+                                    "",
                                     move |id| {
                                         let _ = p_sw.send_event(NorvaUserEvent::SwitchTab(id));
                                     },
@@ -832,7 +832,7 @@ impl NorvaBrowser {
                                     new_id,
                                     "New Tab",
                                     &url,
-                                    "🌐",
+                                    "",
                                     move |id| {
                                         let _ = p_sw.send_event(NorvaUserEvent::SwitchTab(id));
                                     },
@@ -858,26 +858,6 @@ impl NorvaBrowser {
 }
 
 /// Helper function to determine a suitable tab favicon icon based on destination URL.
-fn get_url_icon(url: &str) -> &'static str {
-    if url.starts_with("norva://") {
-        "🛡️"
-    } else if url.contains("google.") {
-        "🔍"
-    } else if url.contains("bing.") {
-        "⚡"
-    } else if url.contains("duckduckgo.") {
-        "🦆"
-    } else if url.contains("yahoo.") {
-        "🟣"
-    } else if url.contains("ahmia.") {
-        "🧅"
-    } else if url.contains("wikipedia.org") {
-        "📚"
-    } else if url.contains("rust-lang.org") {
-        "🦀"
-    } else if url.contains("github.com") {
-        "🐙"
-    } else {
-        "🌐"
-    }
+fn get_url_icon(_url: &str) -> &'static str {
+    ""
 }

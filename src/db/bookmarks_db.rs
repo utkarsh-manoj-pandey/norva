@@ -52,7 +52,7 @@ impl BookmarksDatabase {
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 url TEXT NOT NULL UNIQUE,
                 title TEXT NOT NULL,
-                icon TEXT NOT NULL DEFAULT '🌐',
+                icon TEXT NOT NULL DEFAULT '',
                 folder TEXT NOT NULL DEFAULT 'Bookmarks',
                 created_at TEXT NOT NULL,
                 visit_count INTEGER NOT NULL DEFAULT 0
@@ -80,19 +80,19 @@ impl BookmarksDatabase {
         let count: i64 = conn.query_row("SELECT COUNT(*) FROM bookmarks", [], |row| row.get(0))?;
         if count == 0 {
             let defaults = [
-                ("https://duckduckgo.com", "DuckDuckGo", "🦆", "Search"),
-                ("https://ahmia.fi", "Ahmia Tor", "🧅", "Privacy"),
-                ("https://www.eff.org", "EFF Privacy", "🛡️", "Privacy"),
-                ("https://www.torproject.org", "Tor Project", "🧅", "Privacy"),
-                ("https://www.wikipedia.org", "Wikipedia", "📚", "Reference"),
-                ("https://www.rust-lang.org", "Rust Lang", "🦀", "Development"),
-                ("https://github.com", "GitHub", "🐙", "Development"),
-                ("norva://shields", "Shields Center", "🛡️", "Norva"),
-                ("norva://history", "History Vault", "📜", "Norva"),
-                ("norva://bookmarks", "Bookmarks", "★", "Norva"),
-                ("norva://downloads", "Downloads", "📥", "Norva"),
-                ("norva://passwords", "Passwords", "🔑", "Norva"),
-                ("norva://settings", "Settings", "⚙️", "Norva"),
+                ("https://duckduckgo.com", "DuckDuckGo", "", "Search"),
+                ("https://ahmia.fi", "Ahmia Tor", "", "Privacy"),
+                ("https://www.eff.org", "EFF Privacy", "", "Privacy"),
+                ("https://www.torproject.org", "Tor Project", "", "Privacy"),
+                ("https://www.wikipedia.org", "Wikipedia", "", "Reference"),
+                ("https://www.rust-lang.org", "Rust Lang", "", "Development"),
+                ("https://github.com", "GitHub", "", "Development"),
+                ("norva://shields", "Shields", "", "Norva"),
+                ("norva://history", "History", "", "Norva"),
+                ("norva://bookmarks", "Bookmarks", "", "Norva"),
+                ("norva://downloads", "Downloads", "", "Norva"),
+                ("norva://passwords", "Passwords", "", "Norva"),
+                ("norva://settings", "Settings", "", "Norva"),
             ];
 
             let now = Utc::now().to_rfc3339();
