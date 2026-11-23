@@ -270,7 +270,7 @@ fn render_internal_header(active: &str, title: &str) -> String {
 /// Renders the primary `norva://newtab` executive start page.
 pub fn render_newtab_page(
     stats: &ShieldStats,
-    _engines: &[SearchEngineConfig],
+    engines: &[SearchEngineConfig],
     default_engine: &SearchEngineConfig,
     secure_mode: bool,
     _cache_mb: f64,
@@ -283,6 +283,63 @@ pub fn render_newtab_page(
 
     let saved_mb = (stats.estimated_bandwidth_saved_kb as f64) / 1024.0;
 
+    // Build engine options and templates map
+    let all_engines = if engines.is_empty() {
+        vec![
+            ("duckduckgo", "DuckDuckGo", "https://duckduckgo.com/?q={query}", "Default Privacy"),
+            ("google", "Google Search", "https://www.google.com/search?q={query}", "Web Search"),
+            ("brave", "Brave Search", "https://search.brave.com/search?q={query}", "Independent Index"),
+            ("bing", "Microsoft Bing", "https://www.bing.com/search?q={query}", "Web Search"),
+            ("startpage", "Startpage", "https://www.startpage.com/do/dsearch?query={query}", "Private Google"),
+            ("ahmia", "Ahmia Tor", "https://ahmia.fi/search/?q={query}", ".onion Hidden Services"),
+            ("github", "GitHub", "https://github.com/search?q={query}", "Code & Repositories"),
+            ("wikipedia", "Wikipedia", "https://en.wikipedia.org/wiki/Special:Search?search={query}", "Encyclopedia"),
+            ("yahoo", "Yahoo Search", "https://search.yahoo.com/search?p={query}", "Web Search"),
+        ]
+        .into_iter()
+        .map(|(id, name, tmpl, desc)| SearchEngineConfig {
+            id: id.to_string(),
+            name: name.to_string(),
+            query_template: tmpl.to_string(),
+            bang: format!("!{}", id),
+            description: desc.to_string(),
+            is_tor_compatible: false,
+            is_default: id == default_engine.id,
+        })
+        .collect::<Vec<_>>()
+    } else {
+        engines.to_vec()
+    };
+
+    let mut engine_options_html = String::new();
+    let mut engine_templates_js = String::new();
+
+    for eng in &all_engines {
+        let is_active = eng.id == default_engine.id;
+        let active_cls = if is_active { "active" } else { "" };
+        let check_icon = if is_active {
+            r###"<span class="nt-engine-check">✓</span>"###
+        } else {
+            ""
+        };
+
+        engine_options_html.push_str(&format!(
+            r###"<div class="nt-engine-option {}" data-id="{}" data-name="{}" onclick="selectEngine('{}', '{}')">
+                <div class="nt-engine-opt-meta">
+                    <span class="nt-engine-opt-name">{}</span>
+                    <span class="nt-engine-opt-desc">{}</span>
+                </div>
+                {}
+            </div>"###,
+            active_cls, eng.id, eng.name, eng.id, eng.name, eng.name, eng.description, check_icon
+        ));
+
+        engine_templates_js.push_str(&format!(
+            r#""{}": "{}", "#,
+            eng.id, eng.query_template
+        ));
+    }
+
     let template = r###"<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -292,60 +349,31 @@ pub fn render_newtab_page(
         {{COMMON_CSS}}
 
         .nt-canvas {
-            max-width: 1040px;
+            max-width: 980px;
             margin: 0 auto;
-            padding: 24px 24px 48px;
+            padding: 36px 24px 32px;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
         }
 
+        /* Top Session Bar */
         .nt-topbar {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            margin-bottom: 24px;
-        }
-
-        .nt-brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
-            color: inherit;
-        }
-        .nt-brand-text {
-            font-size: 19px;
-            font-weight: 700;
-            letter-spacing: -0.6px;
-            color: #ffffff;
-        }
-
-        .nt-nav-links {
-            display: flex;
-            align-items: center;
-            gap: 18px;
-        }
-        .nt-nav-links a {
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: 500;
-            transition: color 0.12s ease;
-        }
-        .nt-nav-links a:hover {
-            color: #ffffff;
+            justify-content: flex-end;
+            margin-bottom: 20px;
         }
 
         .session-badge {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            padding: 3px 10px;
+            padding: 4px 12px;
             border-radius: 20px;
             font-size: 11px;
-            font-weight: 500;
+            font-weight: 550;
             letter-spacing: 0.3px;
             background: rgba(255, 255, 255, 0.04);
             border: 1px solid var(--border-subtle);
@@ -361,58 +389,168 @@ pub fn render_newtab_page(
             background: #818cf8;
         }
 
-        /* Hero: Clock & Search */
+        /* Hero Brand & Search */
         .nt-hero {
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: 10px;
-            margin-bottom: 40px;
+            margin-bottom: 36px;
         }
-        .nt-clock {
-            font-size: 76px;
-            font-weight: 200;
-            letter-spacing: -3px;
+
+        .nt-emblem-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.22), rgba(168, 85, 247, 0.12));
+            border: 1px solid rgba(99, 102, 241, 0.35);
+            border-radius: 16px;
+            margin-bottom: 14px;
+            box-shadow: 0 10px 24px rgba(99, 102, 241, 0.18);
+        }
+
+        .nt-brand-heading {
+            font-size: 26px;
+            font-weight: 750;
+            letter-spacing: -0.8px;
             color: #ffffff;
-            line-height: 1;
-            margin-bottom: 6px;
-            user-select: none;
+            margin-bottom: 4px;
         }
-        .nt-date {
-            font-size: 11.5px;
-            font-weight: 600;
-            letter-spacing: 2px;
+
+        .nt-brand-sub {
+            font-size: 12.5px;
+            font-weight: 500;
             color: var(--text-muted);
+            letter-spacing: 0.8px;
             text-transform: uppercase;
-            margin-bottom: 32px;
-            user-select: none;
+            margin-bottom: 30px;
+        }
+
+        /* Interactive Search Capsule with Dropdown */
+        .nt-search-container {
+            width: 100%;
+            max-width: 640px;
+            position: relative;
         }
 
         .nt-search-box {
             display: flex;
             align-items: center;
             width: 100%;
-            max-width: 620px;
-            height: 48px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.09);
-            border-radius: 24px;
-            padding: 0 16px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+            height: 50px;
+            background: #12131b;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 25px;
+            padding: 0 10px 0 8px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
             transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .nt-search-box:focus-within {
-            border-color: rgba(99, 102, 241, 0.6);
-            background: rgba(255, 255, 255, 0.06);
-            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2), 0 12px 36px rgba(0, 0, 0, 0.5);
+            border-color: rgba(99, 102, 241, 0.7);
+            background: #161722;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.22), 0 14px 40px rgba(0, 0, 0, 0.6);
         }
-        .nt-search-icon {
-            color: var(--text-muted);
-            margin-right: 12px;
-            display: flex;
-            align-items: center;
+
+        .nt-engine-selector {
+            position: relative;
             flex-shrink: 0;
         }
+
+        .nt-engine-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 18px;
+            padding: 5px 12px;
+            color: #e4e4e7;
+            font-size: 12.5px;
+            font-weight: 550;
+            cursor: pointer;
+            transition: all 0.12s ease;
+            user-select: none;
+        }
+        .nt-engine-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.16);
+            color: #ffffff;
+        }
+        .nt-engine-caret {
+            color: var(--text-muted);
+            transition: transform 0.15s ease;
+        }
+
+        .nt-engine-menu {
+            position: absolute;
+            top: calc(100% + 10px);
+            left: 0;
+            min-width: 280px;
+            background: #161722;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 14px;
+            box-shadow: 0 18px 48px rgba(0, 0, 0, 0.75);
+            z-index: 1000;
+            padding: 6px;
+            display: none;
+        }
+        .nt-engine-menu.open {
+            display: block;
+        }
+        .nt-engine-menu-title {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            padding: 8px 12px 4px 12px;
+        }
+
+        .nt-engine-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.1s ease;
+        }
+        .nt-engine-option:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .nt-engine-option.active {
+            background: rgba(99, 102, 241, 0.14);
+            border: 1px solid rgba(99, 102, 241, 0.28);
+        }
+        .nt-engine-opt-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .nt-engine-opt-name {
+            font-size: 13px;
+            font-weight: 550;
+            color: #ffffff;
+        }
+        .nt-engine-opt-desc {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+        .nt-engine-check {
+            color: #818cf8;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .nt-search-divider {
+            width: 1px;
+            height: 22px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 0 10px 0 8px;
+            flex-shrink: 0;
+        }
+
         .nt-search-input {
             flex: 1;
             background: transparent;
@@ -425,6 +563,7 @@ pub fn render_newtab_page(
         .nt-search-input::placeholder {
             color: var(--text-muted);
         }
+
         .nt-submit-btn {
             background: transparent;
             border: none;
@@ -435,21 +574,24 @@ pub fn render_newtab_page(
             align-items: center;
             justify-content: center;
             border-radius: 50%;
-            transition: color 0.12s ease;
+            transition: all 0.12s ease;
+            flex-shrink: 0;
         }
         .nt-submit-btn:hover {
             color: #ffffff;
+            background: rgba(255, 255, 255, 0.08);
         }
 
-        /* Speed Dials Grid */
+        /* Symmetrical 2x4 Speed Dials Grid */
+        .nt-dials-section {
+            margin-bottom: 36px;
+        }
         .nt-dials-grid {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 24px;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
             max-width: 680px;
-            margin: 0 auto 40px;
+            margin: 0 auto;
         }
         .dial-tile {
             display: flex;
@@ -459,46 +601,142 @@ pub fn render_newtab_page(
             color: inherit;
             gap: 8px;
             cursor: pointer;
-            transition: transform 0.12s ease;
-            width: 68px;
+            padding: 10px 4px;
+            border-radius: 12px;
+            transition: all 0.14s ease;
         }
         .dial-tile:hover {
+            background: rgba(255, 255, 255, 0.03);
             transform: translateY(-2px);
         }
         .dial-squircle {
             width: 52px;
             height: 52px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid var(--border-subtle);
+            background: #14151f;
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #d4d4d8;
-            transition: all 0.12s ease;
+            color: #e2e8f0;
+            transition: all 0.14s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
         .dial-tile:hover .dial-squircle {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: var(--border-hover);
+            background: #1a1b28;
+            border-color: rgba(99, 102, 241, 0.4);
             color: #ffffff;
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45);
         }
         .dial-label {
-            font-size: 11.5px;
+            font-size: 12px;
             color: var(--text-secondary);
             font-weight: 500;
             text-align: center;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 68px;
+            max-width: 90px;
             transition: color 0.12s ease;
         }
         .dial-tile:hover .dial-label {
             color: #ffffff;
         }
 
-        /* Bottom Status Pill */
+        /* 3-Card Feature Hub */
+        .nt-hub {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        .hub-card {
+            background: #12131b;
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 18px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 14px;
+            transition: all 0.14s ease;
+        }
+        .hub-card:hover {
+            border-color: var(--border-hover);
+            background: #151622;
+        }
+        .hub-card-top {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .hub-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-subtle);
+            color: #818cf8;
+            flex-shrink: 0;
+        }
+        .hub-card-title {
+            font-size: 13.5px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+        .hub-stat-num {
+            font-size: 22px;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+        }
+        .hub-stat-label {
+            font-size: 11.5px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+        .hub-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .hub-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+            font-size: 11.5px;
+            font-weight: 500;
+            padding: 4px 10px;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: all 0.12s ease;
+        }
+        .hub-pill:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--border-hover);
+            color: #ffffff;
+        }
+        .hub-link {
+            font-size: 12px;
+            color: #818cf8;
+            text-decoration: none;
+            font-weight: 550;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: color 0.12s ease;
+        }
+        .hub-link:hover {
+            color: #a5b4fc;
+        }
+
+        /* Footer Status Pill */
         .nt-footer {
             display: flex;
             justify-content: center;
@@ -508,14 +746,14 @@ pub fn render_newtab_page(
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 5px 14px;
+            padding: 5px 16px;
             border-radius: 20px;
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid var(--border-subtle);
             color: var(--text-muted);
             text-decoration: none;
             font-size: 11.5px;
-            font-weight: 450;
+            font-weight: 500;
             transition: all 0.12s ease;
         }
         .status-pill:hover {
@@ -524,119 +762,180 @@ pub fn render_newtab_page(
             color: var(--text-secondary);
         }
         .status-dot {
-            width: 5px;
-            height: 5px;
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
             background: #10b981;
         }
         .status-sep {
             color: rgba(255, 255, 255, 0.12);
         }
+
+        @media (max-width: 720px) {
+            .nt-dials-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .nt-hub {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="nt-canvas">
         <header class="nt-topbar">
-            <a href="norva://newtab" class="nt-brand">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            {{MODE_PILL}}
+        </header>
+
+        <main class="nt-hero">
+            <div class="nt-emblem-wrap">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <polygon points="12 2 2 7 12 12 22 7 12 2"/>
                     <polyline points="2 17 12 22 22 17"/>
                     <polyline points="2 12 12 17 22 12"/>
                 </svg>
-                <span class="nt-brand-text">norva</span>
-            </a>
-
-            <nav class="nt-nav-links">
-                <a href="norva://history">History</a>
-                <a href="norva://bookmarks">Bookmarks</a>
-                <a href="norva://downloads">Downloads</a>
-                <a href="norva://passwords">Passwords</a>
-                <a href="norva://shields">Shields</a>
-                <a href="norva://settings">Settings</a>
-            </nav>
-
-            <div>
-                {{MODE_PILL}}
             </div>
-        </header>
+            <h1 class="nt-brand-heading">NORVA</h1>
+            <p class="nt-brand-sub">Private • Fast • Sovereign</p>
 
-        <main class="nt-hero">
-            <div id="nt-clock" class="nt-clock">12:00</div>
-            <div id="nt-date" class="nt-date">MONDAY, NOVEMBER 23</div>
+            <div class="nt-search-container">
+                <div class="nt-search-box">
+                    <div class="nt-engine-selector" id="nt-engine-selector">
+                        <button type="button" class="nt-engine-btn" id="nt-engine-btn" title="Click to switch search engine">
+                            <span id="nt-engine-name">{{DEFAULT_NAME}}</span>
+                            <svg class="nt-engine-caret" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                        </button>
+                        <div class="nt-engine-menu" id="nt-engine-menu">
+                            <div class="nt-engine-menu-title">Select Search Engine</div>
+                            {{ENGINE_OPTIONS}}
+                        </div>
+                    </div>
 
-            <div class="nt-search-box">
-                <div class="nt-search-icon">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                        <circle cx="11" cy="11" r="8"/>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                    </svg>
+                    <div class="nt-search-divider"></div>
+
+                    <input type="text" id="nt-search-input" class="nt-search-input" placeholder="Search with {{DEFAULT_NAME}} or enter URL..." autocomplete="off" autofocus />
+                    <button class="nt-submit-btn" id="nt-search-btn" title="Search">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                            <line x1="5" y1="12" x2="19" y2="12"/>
+                            <polyline points="12 5 19 12 12 19"/>
+                        </svg>
+                    </button>
                 </div>
-                <input type="text" id="nt-search-input" class="nt-search-input" placeholder="Search with {{DEFAULT_NAME}} or enter URL..." autocomplete="off" autofocus />
-                <button class="nt-submit-btn" id="nt-search-btn" title="Search">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                        <line x1="5" y1="12" x2="19" y2="12"/>
-                        <polyline points="12 5 19 12 12 19"/>
-                    </svg>
-                </button>
             </div>
         </main>
 
-        <section class="nt-dials-grid">
-            <a href="#" class="dial-tile" onclick="navigate('https://duckduckgo.com')">
-                <div class="dial-squircle">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                </div>
-                <span class="dial-label">DuckDuckGo</span>
-            </a>
+        <!-- Balanced 2x4 Speed Dials Grid -->
+        <section class="nt-dials-section">
+            <div class="nt-dials-grid">
+                <a href="#" class="dial-tile" onclick="navigate('https://duckduckgo.com')">
+                    <div class="dial-squircle">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    </div>
+                    <span class="dial-label">DuckDuckGo</span>
+                </a>
 
-            <a href="#" class="dial-tile" onclick="navigate('https://github.com')">
-                <div class="dial-squircle">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-                </div>
-                <span class="dial-label">GitHub</span>
-            </a>
+                <a href="#" class="dial-tile" onclick="navigate('https://github.com')">
+                    <div class="dial-squircle">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                    </div>
+                    <span class="dial-label">GitHub</span>
+                </a>
 
-            <a href="#" class="dial-tile" onclick="navigate('https://www.wikipedia.org')">
-                <div class="dial-squircle">
-                    <span style="font-family: serif; font-weight: 700; font-size: 20px;">W</span>
-                </div>
-                <span class="dial-label">Wikipedia</span>
-            </a>
+                <a href="#" class="dial-tile" onclick="navigate('https://www.wikipedia.org')">
+                    <div class="dial-squircle">
+                        <span style="font-family: serif; font-weight: 700; font-size: 20px;">W</span>
+                    </div>
+                    <span class="dial-label">Wikipedia</span>
+                </a>
 
-            <a href="#" class="dial-tile" onclick="navigate('https://news.ycombinator.com')">
-                <div class="dial-squircle">
-                    <span style="font-weight: 700; font-size: 17px; color: #ff6600;">Y</span>
-                </div>
-                <span class="dial-label">Hacker News</span>
-            </a>
+                <a href="#" class="dial-tile" onclick="navigate('https://news.ycombinator.com')">
+                    <div class="dial-squircle">
+                        <span style="font-weight: 700; font-size: 17px; color: #ff6600;">Y</span>
+                    </div>
+                    <span class="dial-label">Hacker News</span>
+                </a>
 
-            <a href="#" class="dial-tile" onclick="navigate('https://www.reddit.com')">
-                <div class="dial-squircle">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="9" cy="10" r="1.5" fill="currentColor"/><circle cx="15" cy="10" r="1.5" fill="currentColor"/><path d="M8 15s1.5 2 4 2 4-2 4-2"/></svg>
-                </div>
-                <span class="dial-label">Reddit</span>
-            </a>
+                <a href="#" class="dial-tile" onclick="navigate('https://www.reddit.com')">
+                    <div class="dial-squircle">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="9" cy="10" r="1.5" fill="currentColor"/><circle cx="15" cy="10" r="1.5" fill="currentColor"/><path d="M8 15s1.5 2 4 2 4-2 4-2"/></svg>
+                    </div>
+                    <span class="dial-label">Reddit</span>
+                </a>
 
-            <a href="#" class="dial-tile" onclick="navigate('https://www.torproject.org')">
-                <div class="dial-squircle">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
-                </div>
-                <span class="dial-label">Tor Project</span>
-            </a>
+                <a href="#" class="dial-tile" onclick="navigate('https://www.torproject.org')">
+                    <div class="dial-squircle">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+                    </div>
+                    <span class="dial-label">Tor Project</span>
+                </a>
 
-            <a href="#" class="dial-tile" onclick="navigate('https://www.rust-lang.org')">
-                <div class="dial-squircle">
-                    <span style="font-weight: 700; font-size: 14px;">Rust</span>
-                </div>
-                <span class="dial-label">Rust Lang</span>
-            </a>
+                <a href="#" class="dial-tile" onclick="navigate('https://www.rust-lang.org')">
+                    <div class="dial-squircle">
+                        <span style="font-weight: 700; font-size: 14px;">Rust</span>
+                    </div>
+                    <span class="dial-label">Rust Lang</span>
+                </a>
 
-            <a href="norva://shields" class="dial-tile">
-                <div class="dial-squircle">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <a href="#" class="dial-tile" onclick="navigate('https://search.brave.com')">
+                    <div class="dial-squircle">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fb923c" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    </div>
+                    <span class="dial-label">Brave Search</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- Executive Feature Hub -->
+        <section class="nt-hub">
+            <div class="hub-card">
+                <div>
+                    <div class="hub-card-top">
+                        <div class="hub-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        </div>
+                        <div class="hub-card-title">Shields & Defense</div>
+                    </div>
+                    <div style="margin-top: 12px;">
+                        <div class="hub-stat-num">{{ADS_BLOCKED}}</div>
+                        <div class="hub-stat-label">Trackers & ads blocked ({{SAVED_MB}} MB saved)</div>
+                    </div>
                 </div>
-                <span class="dial-label">Shields</span>
-            </a>
+                <a href="norva://shields" class="hub-link">Open Shields Center →</a>
+            </div>
+
+            <div class="hub-card">
+                <div>
+                    <div class="hub-card-top">
+                        <div class="hub-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        </div>
+                        <div class="hub-card-title">Privacy Vaults</div>
+                    </div>
+                    <div class="hub-pills" style="margin-top: 12px;">
+                        <a href="norva://history" class="hub-pill">History</a>
+                        <a href="norva://bookmarks" class="hub-pill">Bookmarks</a>
+                        <a href="norva://downloads" class="hub-pill">Downloads</a>
+                        <a href="norva://passwords" class="hub-pill">Passwords</a>
+                    </div>
+                </div>
+                <a href="norva://settings" class="hub-link">Browser Settings →</a>
+            </div>
+
+            <div class="hub-card">
+                <div>
+                    <div class="hub-card-top">
+                        <div class="hub-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2a10 10 0 1 0 10 10H12V2z"/></svg>
+                        </div>
+                        <div class="hub-card-title">Hardware Arbiter</div>
+                    </div>
+                    <div style="margin-top: 12px;">
+                        <div style="font-size: 13px; font-weight: 550; color: #10b981;">• Cam & Mic: Zero-Trust Guard</div>
+                        <div class="hub-stat-label" style="margin-top: 4px;">Hardware streams strictly gated via permissions.db</div>
+                    </div>
+                </div>
+                <a href="norva://permissions" class="hub-link">Manage Site Permissions →</a>
+            </div>
         </section>
 
         <footer class="nt-footer">
@@ -652,16 +951,57 @@ pub fn render_newtab_page(
     </div>
 
     <script>
-        function updateClock() {
-            const clock = document.getElementById("nt-clock");
-            const date = document.getElementById("nt-date");
-            if (!clock || !date) return;
-            const now = new Date();
-            clock.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
-            date.textContent = now.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase();
+        const engineTemplates = { {{ENGINE_TEMPLATES}} };
+        let activeEngineId = "{{DEFAULT_ID}}";
+        let activeEngineName = "{{DEFAULT_NAME}}";
+
+        const engineBtn = document.getElementById("nt-engine-btn");
+        const engineMenu = document.getElementById("nt-engine-menu");
+        const engineNameSpan = document.getElementById("nt-engine-name");
+        const searchInput = document.getElementById("nt-search-input");
+        const searchBtn = document.getElementById("nt-search-btn");
+
+        // Toggle engine dropdown
+        engineBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            engineMenu.classList.toggle("open");
+        });
+
+        document.addEventListener("click", () => {
+            engineMenu.classList.remove("open");
+        });
+
+        function selectEngine(id, name) {
+            activeEngineId = id;
+            activeEngineName = name;
+            engineNameSpan.textContent = name;
+            searchInput.placeholder = `Search with ${name} or enter URL...`;
+
+            document.querySelectorAll(".nt-engine-option").forEach((opt) => {
+                const match = opt.getAttribute("data-id") === id;
+                opt.classList.toggle("active", match);
+                const check = opt.querySelector(".nt-engine-check");
+                if (match && !check) {
+                    const span = document.createElement("span");
+                    span.className = "nt-engine-check";
+                    span.textContent = "✓";
+                    opt.appendChild(span);
+                } else if (!match && check) {
+                    check.remove();
+                }
+            });
+
+            // Post to Rust IPC to update default search engine & synchronize GTK Omnibox
+            if (window.ipc && window.ipc.postMessage) {
+                window.ipc.postMessage(JSON.stringify({
+                    action: "set_default_engine",
+                    query: id
+                }));
+            }
+
+            engineMenu.classList.remove("open");
+            searchInput.focus();
         }
-        updateClock();
-        setInterval(updateClock, 1000);
 
         function navigate(url) {
             if (window.ipc && window.ipc.postMessage) {
@@ -671,19 +1011,34 @@ pub fn render_newtab_page(
             }
         }
 
-        const input = document.getElementById("nt-search-input");
-        const submitBtn = document.getElementById("nt-search-btn");
+        function submitSearch() {
+            const val = searchInput.value.trim();
+            if (!val) return;
 
-        input.addEventListener("keydown", (e) => {
+            // Direct URL detection
+            if (val.startsWith("http://") || val.startsWith("https://") || val.startsWith("norva://") || (val.includes(".") && !val.includes(" "))) {
+                navigate(val);
+                return;
+            }
+
+            // Route search through selected engine template
+            const tmpl = engineTemplates[activeEngineId];
+            if (tmpl) {
+                const url = tmpl.replace("{query}", encodeURIComponent(val));
+                navigate(url);
+            } else {
+                navigate(val);
+            }
+        }
+
+        searchInput.addEventListener("keydown", (e) => {
             if (e.key === "Enter") {
-                const val = input.value.trim();
-                if (val) navigate(val);
+                submitSearch();
             }
         });
 
-        submitBtn.addEventListener("click", () => {
-            const val = input.value.trim();
-            if (val) navigate(val);
+        searchBtn.addEventListener("click", () => {
+            submitSearch();
         });
     </script>
 </body>
@@ -692,7 +1047,10 @@ pub fn render_newtab_page(
     template
         .replace("{{COMMON_CSS}}", get_common_css())
         .replace("{{MODE_PILL}}", mode_pill)
+        .replace("{{DEFAULT_ID}}", &default_engine.id)
         .replace("{{DEFAULT_NAME}}", &default_engine.name)
+        .replace("{{ENGINE_OPTIONS}}", &engine_options_html)
+        .replace("{{ENGINE_TEMPLATES}}", &engine_templates_js)
         .replace("{{ADS_BLOCKED}}", &stats.total_all_time.to_string())
         .replace("{{SAVED_MB}}", &format!("{:.1}", saved_mb))
 }

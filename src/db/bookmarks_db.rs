@@ -77,22 +77,20 @@ impl BookmarksDatabase {
     /// Seeds default privacy and tech bookmarks if the table is empty.
     fn seed_defaults_if_empty(&self) -> Result<()> {
         let conn = self.conn.lock().unwrap();
+        // Purge any legacy internal norva:// subsystem URLs from bookmarks
+        let _ = conn.execute("DELETE FROM bookmarks WHERE url LIKE 'norva://%';", []);
+
         let count: i64 = conn.query_row("SELECT COUNT(*) FROM bookmarks", [], |row| row.get(0))?;
         if count == 0 {
             let defaults = [
                 ("https://duckduckgo.com", "DuckDuckGo", "", "Search"),
-                ("https://ahmia.fi", "Ahmia Tor", "", "Privacy"),
-                ("https://www.eff.org", "EFF Privacy", "", "Privacy"),
-                ("https://www.torproject.org", "Tor Project", "", "Privacy"),
+                ("https://github.com", "GitHub", "", "Development"),
                 ("https://www.wikipedia.org", "Wikipedia", "", "Reference"),
                 ("https://www.rust-lang.org", "Rust Lang", "", "Development"),
-                ("https://github.com", "GitHub", "", "Development"),
-                ("norva://shields", "Shields", "", "Norva"),
-                ("norva://history", "History", "", "Norva"),
-                ("norva://bookmarks", "Bookmarks", "", "Norva"),
-                ("norva://downloads", "Downloads", "", "Norva"),
-                ("norva://passwords", "Passwords", "", "Norva"),
-                ("norva://settings", "Settings", "", "Norva"),
+                ("https://news.ycombinator.com", "Hacker News", "", "Tech"),
+                ("https://www.torproject.org", "Tor Project", "", "Privacy"),
+                ("https://www.eff.org", "EFF Privacy", "", "Privacy"),
+                ("https://search.brave.com", "Brave Search", "", "Search"),
             ];
 
             let now = Utc::now().to_rfc3339();

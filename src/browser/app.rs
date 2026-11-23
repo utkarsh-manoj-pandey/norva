@@ -302,6 +302,8 @@ impl NorvaBrowser {
                 .ok_or_else(|| "Failed to obtain GTK default vbox from Tao window")?;
 
             let chrome = std::rc::Rc::new(crate::ui::NorvaGtkChrome::new(is_secure));
+            let init_engine = db.settings.get_default_engine();
+            chrome.set_engine_name(&init_engine.id, &init_engine.name);
 
             // Pack the authentic browser chrome header at the top
             vbox.pack_start(&chrome.root, false, false, 0);
@@ -737,8 +739,10 @@ impl NorvaBrowser {
                             }
                         }
                     }
-                    NorvaUserEvent::SelectEngine { id, name: _ } => {
+                    NorvaUserEvent::SelectEngine { id, name } => {
                         let _ = db_event.settings.set_default_engine(&id);
+                        #[cfg(target_os = "linux")]
+                        chrome.set_engine_name(&id, &name);
                     }
                     NorvaUserEvent::ToggleBookmarksBar => {
                         #[cfg(target_os = "linux")]

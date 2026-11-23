@@ -145,6 +145,11 @@ impl IpcDispatcher {
             "set_default_engine" => {
                 if let Some(id) = msg.id.map(|i| i.to_string()).or(msg.query) {
                     let _ = self.db.settings.set_default_engine(&id);
+                    let eng = self.db.settings.get_default_engine();
+                    let _ = self.proxy.send_event(NorvaUserEvent::SelectEngine {
+                        id: eng.id,
+                        name: eng.name,
+                    });
                 }
             }
             "add_engine" => {
