@@ -24,8 +24,9 @@ use crate::db::DatabaseManager;
 use crate::privacy::{AdBlockEngine, CacheManager, CookieManager, FilterAction, PermissionsManager};
 use crate::search::{QueryRouter, SearchEngine};
 use crate::ui::{
-    render_cookies_page, render_history_page, render_newtab_page,
-    render_permissions_page, render_settings_page, render_shields_page,
+    render_bookmarks_page, render_cookies_page, render_downloads_page, render_history_page,
+    render_newtab_page, render_passwords_page, render_permissions_page, render_settings_page,
+    render_shields_page,
 };
 
 /// Master application runtime for the NORVA Browser.
@@ -195,6 +196,18 @@ impl NorvaBrowser {
                         let default_eng = db_proto.settings.get_default_engine();
                         render_settings_page(&engines, &default_eng, is_secure)
                     }
+                    "bookmarks" => {
+                        let bms = db_proto.bookmarks.get_all().unwrap_or_default();
+                        render_bookmarks_page(&bms)
+                    }
+                    "downloads" => {
+                        let dls = db_proto.downloads.get_recent(100).unwrap_or_default();
+                        render_downloads_page(&dls)
+                    }
+                    "passwords" => {
+                        let creds = db_proto.passwords.get_all().unwrap_or_default();
+                        render_passwords_page(&creds)
+                    }
                     _ => {
                         let stats = db_proto.shields.get_stats().unwrap_or_default();
                         let engines = db_proto.settings.get_all_search_engines().unwrap_or_default();
@@ -357,35 +370,41 @@ impl NorvaBrowser {
             });
 
             // 4. Wire Bookmarks Bar
-            let proxy_bm = proxy.clone();
-            chrome.populate_bookmarks(move |url| {
-                let _ = proxy_bm.send_event(NorvaUserEvent::Navigate(url.to_string()));
-            });
+            let db_bm_init = db.clone();
+            if let Ok(bms) = db_bm_init.bookmarks.get_all() {
+                let proxy_bm = proxy.clone();
+                chrome.populate_from_db(&bms, move |url| {
+                    let _ = proxy_bm.send_event(NorvaUserEvent::Navigate(url.to_string()));
+                });
+            } else {
+                let proxy_bm = proxy.clone();
+                chrome.populate_bookmarks(move |url| {
+                    let _ = proxy_bm.send_event(NorvaUserEvent::Navigate(url.to_string()));
+                });
+            }
 
             // 5. Wire Bookmark star button (★)
-            let b_box = chrome.bookmarks_box.clone();
+            let db_star = db.clone();
             let b_omni = chrome.omnibox.clone();
             let proxy_star = proxy.clone();
+            let chrome_star = chrome.clone();
             chrome.bookmark_btn.connect_clicked(move |_| {
                 let url = b_omni.text().to_string();
                 if !url.is_empty() {
-                    let label = if url.starts_with("norva://") {
-                        format!("🛡️ {}", url.trim_start_matches("norva://"))
-                    } else if let Some(domain) = url.split("://").nth(1).and_then(|d| d.split('/').next()) {
-                        domain.to_string()
+                    let is_bm = db_star.bookmarks.is_bookmarked(&url).unwrap_or(false);
+                    if is_bm {
+                        let _ = db_star.bookmarks.delete_by_url(&url);
+                        chrome_star.set_bookmarked(false);
                     } else {
-                        "Bookmark".to_string()
-                    };
-                    let b_btn = gtk::Button::with_label(&label);
-                    b_btn.style_context().add_class("norva-bookmark-pill");
-                    b_btn.set_tooltip_text(Some(&url));
-                    let nav_p = proxy_star.clone();
-                    let target_url = url.clone();
-                    b_btn.connect_clicked(move |_| {
-                        let _ = nav_p.send_event(NorvaUserEvent::Navigate(target_url.clone()));
-                    });
-                    b_btn.show_all();
-                    b_box.pack_start(&b_btn, false, false, 0);
+                        let title = if url.starts_with("norva://") {
+                            format!("NORVA {}", url.trim_start_matches("norva://"))
+                        } else {
+                            url.clone()
+                        };
+                        let _ = db_star.bookmarks.add_bookmark(&url, &title, "★", "Bookmarks");
+                        chrome_star.set_bookmarked(true);
+                    }
+                    let _ = proxy_star.send_event(NorvaUserEvent::RefreshBookmarks);
                 }
             });
 
@@ -416,9 +435,62 @@ impl NorvaBrowser {
                 let _ = proxy_sec.send_event(NorvaUserEvent::Navigate("norva://permissions".to_string()));
             });
 
-            // 10. Wire 3-dots Menu Popover
+            // 10. Wire Downloads Popover
+            let proxy_dl_nav = proxy.clone();
+            let db_dl_clr = db.clone();
+            chrome.attach_downloads_popover(
+                move || {
+                    let _ = proxy_dl_nav.send_event(NorvaUserEvent::Navigate("norva://downloads".to_string()));
+                },
+                move || {
+                    let _ = db_dl_clr.downloads.clear_all();
+                },
+            );
+
+            // 11. Wire Reader Mode & Zoom Buttons
+            let proxy_reader = proxy.clone();
+            chrome.reader_btn.connect_clicked(move |_| {
+                let _ = proxy_reader.send_event(NorvaUserEvent::ToggleReaderMode);
+            });
+
+            let proxy_zoom = proxy.clone();
+            chrome.zoom_btn.connect_clicked(move |_| {
+                let _ = proxy_zoom.send_event(NorvaUserEvent::ZoomReset);
+            });
+
+            // 12. Wire Find in Page controls
+            let proxy_fn1 = proxy.clone();
+            let fe1 = chrome.find_entry.clone();
+            chrome.find_entry.connect_activate(move |_| {
+                let q = fe1.text().to_string();
+                if !q.is_empty() {
+                    let _ = proxy_fn1.send_event(NorvaUserEvent::FindInPageNext(q));
+                }
+            });
+
+            let proxy_fn2 = proxy.clone();
+            let fe2 = chrome.find_entry.clone();
+            chrome.find_next_btn.connect_clicked(move |_| {
+                let q = fe2.text().to_string();
+                if !q.is_empty() {
+                    let _ = proxy_fn2.send_event(NorvaUserEvent::FindInPageNext(q));
+                }
+            });
+
+            let proxy_fn3 = proxy.clone();
+            let fe3 = chrome.find_entry.clone();
+            chrome.find_prev_btn.connect_clicked(move |_| {
+                let q = fe3.text().to_string();
+                if !q.is_empty() {
+                    let _ = proxy_fn3.send_event(NorvaUserEvent::FindInPagePrev(q));
+                }
+            });
+
+            // 13. Wire 3-dots Menu Popover
             let proxy_menu_nav = proxy.clone();
             let proxy_menu_nt = proxy.clone();
+            let proxy_menu_z = proxy.clone();
+            let proxy_menu_f = proxy.clone();
             chrome.attach_menu_popover(
                 move |url| {
                     let _ = proxy_menu_nav.send_event(NorvaUserEvent::Navigate(url.to_string()));
@@ -426,7 +498,101 @@ impl NorvaBrowser {
                 move || {
                     let _ = proxy_menu_nt.send_event(NorvaUserEvent::NewTab);
                 },
+                move |delta| {
+                    if delta == 0.0 {
+                        let _ = proxy_menu_z.send_event(NorvaUserEvent::ZoomReset);
+                    } else if delta > 0.0 {
+                        let _ = proxy_menu_z.send_event(NorvaUserEvent::ZoomIn);
+                    } else {
+                        let _ = proxy_menu_z.send_event(NorvaUserEvent::ZoomOut);
+                    }
+                },
+                move || {
+                    let _ = proxy_menu_f.send_event(NorvaUserEvent::ToggleFindInPage);
+                },
             );
+
+            // 14. Global Keyboard Shortcuts Hook
+            let proxy_k = proxy.clone();
+            let omni_k = chrome.omnibox.clone();
+            let chrome_k = chrome.clone();
+            window.gtk_window().connect_key_press_event(move |_, key| {
+                use gtk::gdk::keys::constants as k;
+                let state = key.state();
+                let ctrl = state.contains(gtk::gdk::ModifierType::CONTROL_MASK);
+                let alt = state.contains(gtk::gdk::ModifierType::MOD1_MASK);
+                let shift = state.contains(gtk::gdk::ModifierType::SHIFT_MASK);
+                let keyval = key.keyval();
+
+                if ctrl && !shift && (keyval == k::t || keyval == k::T) {
+                    let _ = proxy_k.send_event(NorvaUserEvent::NewTab);
+                    return gtk::glib::Propagation::Stop;
+                }
+                if ctrl && !shift && (keyval == k::w || keyval == k::W) {
+                    let active_id = *chrome_k.active_tab_id.borrow();
+                    let _ = proxy_k.send_event(NorvaUserEvent::CloseTab(active_id));
+                    return gtk::glib::Propagation::Stop;
+                }
+                if (ctrl && (keyval == k::r || keyval == k::R)) || keyval == k::F5 {
+                    let _ = proxy_k.send_event(NorvaUserEvent::Reload);
+                    return gtk::glib::Propagation::Stop;
+                }
+                if (ctrl && (keyval == k::l || keyval == k::L)) || (alt && (keyval == k::d || keyval == k::D)) {
+                    omni_k.grab_focus();
+                    omni_k.select_region(0, -1);
+                    return gtk::glib::Propagation::Stop;
+                }
+                if ctrl && !shift && (keyval == k::h || keyval == k::H) {
+                    let _ = proxy_k.send_event(NorvaUserEvent::Navigate("norva://history".to_string()));
+                    return gtk::glib::Propagation::Stop;
+                }
+                if ctrl && !shift && (keyval == k::b || keyval == k::B) {
+                    let _ = proxy_k.send_event(NorvaUserEvent::Navigate("norva://bookmarks".to_string()));
+                    return gtk::glib::Propagation::Stop;
+                }
+                if ctrl && shift && (keyval == k::b || keyval == k::B) {
+                    let _ = proxy_k.send_event(NorvaUserEvent::ToggleBookmarksBar);
+                    return gtk::glib::Propagation::Stop;
+                }
+                if ctrl && !shift && (keyval == k::j || keyval == k::J) {
+                    let _ = proxy_k.send_event(NorvaUserEvent::Navigate("norva://downloads".to_string()));
+                    return gtk::glib::Propagation::Stop;
+                }
+                if ctrl && !shift && (keyval == k::f || keyval == k::F) {
+                    let _ = proxy_k.send_event(NorvaUserEvent::ToggleFindInPage);
+                    return gtk::glib::Propagation::Stop;
+                }
+                if ctrl && (keyval == k::plus || keyval == k::equal || keyval == k::KP_Add) {
+                    let _ = proxy_k.send_event(NorvaUserEvent::ZoomIn);
+                    return gtk::glib::Propagation::Stop;
+                }
+                if ctrl && (keyval == k::minus || keyval == k::KP_Subtract) {
+                    let _ = proxy_k.send_event(NorvaUserEvent::ZoomOut);
+                    return gtk::glib::Propagation::Stop;
+                }
+                if ctrl && (keyval == k::_0 || keyval == k::KP_0) {
+                    let _ = proxy_k.send_event(NorvaUserEvent::ZoomReset);
+                    return gtk::glib::Propagation::Stop;
+                }
+                if keyval == k::Escape {
+                    chrome_k.find_bar.set_visible(false);
+                    return gtk::glib::Propagation::Stop;
+                }
+                if alt && keyval == k::Left {
+                    let _ = proxy_k.send_event(NorvaUserEvent::GoBack);
+                    return gtk::glib::Propagation::Stop;
+                }
+                if alt && keyval == k::Right {
+                    let _ = proxy_k.send_event(NorvaUserEvent::GoForward);
+                    return gtk::glib::Propagation::Stop;
+                }
+                if alt && keyval == k::Home {
+                    let _ = proxy_k.send_event(NorvaUserEvent::Navigate("norva://newtab".to_string()));
+                    return gtk::glib::Propagation::Stop;
+                }
+
+                gtk::glib::Propagation::Proceed
+            });
 
             // Ensure all GTK chrome widgets are visible and interactive
             vbox.show_all();
@@ -459,6 +625,7 @@ impl NorvaBrowser {
                         let _ = webview.load_url(&url);
                         #[cfg(target_os = "linux")]
                         {
+                            chrome.set_page_loading(true);
                             let active_id = *chrome.active_tab_id.borrow();
                             let current_title = chrome.get_tab_title(active_id).unwrap_or_else(|| "Loading...".to_string());
                             let icon = get_url_icon(&url);
@@ -473,6 +640,11 @@ impl NorvaBrowser {
                     }
                     NorvaUserEvent::Reload => {
                         let _ = webview.reload();
+                    }
+                    NorvaUserEvent::StopLoading => {
+                        let _ = webview.evaluate_script("window.stop();");
+                        #[cfg(target_os = "linux")]
+                        chrome.set_page_loading(false);
                     }
                     NorvaUserEvent::EvalScript(script) => {
                         let _ = webview.evaluate_script(&script);
@@ -493,6 +665,10 @@ impl NorvaBrowser {
                             let title = chrome.get_tab_title(active_id).unwrap_or_else(|| "NORVA".to_string());
                             let icon = get_url_icon(&url);
                             chrome.update_active_tab(&title, &url, icon);
+                            chrome.set_page_loading(false);
+                            if let Ok(is_bm) = db_event.bookmarks.is_bookmarked(&url) {
+                                chrome.set_bookmarked(is_bm);
+                            }
                         }
                     }
                     NorvaUserEvent::UpdateShieldCount(count) => {
@@ -564,6 +740,110 @@ impl NorvaBrowser {
                     NorvaUserEvent::SelectEngine { id, name: _ } => {
                         let _ = db_event.settings.set_default_engine(&id);
                     }
+                    NorvaUserEvent::ToggleBookmarksBar => {
+                        #[cfg(target_os = "linux")]
+                        chrome.toggle_bookmarks_bar();
+                    }
+                    NorvaUserEvent::ToggleFindInPage => {
+                        #[cfg(target_os = "linux")]
+                        chrome.toggle_find_bar();
+                    }
+                    NorvaUserEvent::FindInPageNext(q) => {
+                        let escaped = q.replace('\\', "\\\\").replace('\'', "\\'");
+                        let _ = webview.evaluate_script(&format!(
+                            "window.find('{}', false, false, true, false, false, false);",
+                            escaped
+                        ));
+                    }
+                    NorvaUserEvent::FindInPagePrev(q) => {
+                        let escaped = q.replace('\\', "\\\\").replace('\'', "\\'");
+                        let _ = webview.evaluate_script(&format!(
+                            "window.find('{}', false, true, true, false, false, false);",
+                            escaped
+                        ));
+                    }
+                    NorvaUserEvent::ZoomIn => {
+                        #[cfg(target_os = "linux")]
+                        {
+                            let mut z = *chrome.zoom_level.borrow();
+                            z = (z + 10.0).min(300.0);
+                            chrome.set_zoom_level(z);
+                            let _ = webview.evaluate_script(&format!("document.body.style.zoom = '{:.0}%';", z));
+                        }
+                    }
+                    NorvaUserEvent::ZoomOut => {
+                        #[cfg(target_os = "linux")]
+                        {
+                            let mut z = *chrome.zoom_level.borrow();
+                            z = (z - 10.0).max(30.0);
+                            chrome.set_zoom_level(z);
+                            let _ = webview.evaluate_script(&format!("document.body.style.zoom = '{:.0}%';", z));
+                        }
+                    }
+                    NorvaUserEvent::ZoomReset => {
+                        #[cfg(target_os = "linux")]
+                        {
+                            chrome.set_zoom_level(100.0);
+                            let _ = webview.evaluate_script("document.body.style.zoom = '100%';");
+                        }
+                    }
+                    NorvaUserEvent::ToggleReaderMode => {
+                        let script = r#"
+                        (function() {
+                            if (window.__norva_reader_active) {
+                                window.location.reload();
+                                return;
+                            }
+                            window.__norva_reader_active = true;
+                            const article = document.querySelector('article') || document.querySelector('main') || document.body;
+                            const title = document.title;
+                            const content = article.innerHTML;
+                            document.body.innerHTML = `
+                                <div style="max-width: 720px; margin: 40px auto; padding: 24px; font-family: -apple-system, system-ui, serif; line-height: 1.8; font-size: 19px; color: #f1f5f9; background: #090a0f;">
+                                    <div style="font-size: 12px; color: #818cf8; font-weight: 700; margin-bottom: 8px;">NORVA DISTRACTION-FREE READER</div>
+                                    <h1 style="font-size: 32px; font-weight: 800; margin-bottom: 24px; color: #ffffff;">${title}</h1>
+                                    <div>${content}</div>
+                                </div>
+                            `;
+                            document.body.style.background = '#090a0f';
+                        })();
+                        "#;
+                        let _ = webview.evaluate_script(script);
+                    }
+                    NorvaUserEvent::RefreshBookmarks => {
+                        #[cfg(target_os = "linux")]
+                        {
+                            if let Ok(bms) = db_event.bookmarks.get_all() {
+                                let p_b = proxy_tab.clone();
+                                chrome.populate_from_db(&bms, move |u| {
+                                    let _ = p_b.send_event(NorvaUserEvent::Navigate(u.to_string()));
+                                });
+                            }
+                        }
+                    }
+                    NorvaUserEvent::DuplicateTab(id) => {
+                        #[cfg(target_os = "linux")]
+                        {
+                            if let Some(url) = chrome.get_tab_url(id) {
+                                let new_id = chrome.get_next_tab_id();
+                                let p_sw = proxy_tab.clone();
+                                let p_cl = proxy_tab.clone();
+                                chrome.add_tab(
+                                    new_id,
+                                    "New Tab",
+                                    &url,
+                                    "🌐",
+                                    move |id| {
+                                        let _ = p_sw.send_event(NorvaUserEvent::SwitchTab(id));
+                                    },
+                                    move |id| {
+                                        let _ = p_cl.send_event(NorvaUserEvent::CloseTab(id));
+                                    },
+                                );
+                            }
+                        }
+                    }
+                    NorvaUserEvent::PinTab(_id) => {}
                 },
                 Event::WindowEvent {
                     event: WindowEvent::CloseRequested,

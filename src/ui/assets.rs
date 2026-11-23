@@ -4,7 +4,10 @@
 // Description: Executive Cyber-Dark UI Pages for internal norva:// views.
 // ============================================================================
 
+use crate::db::bookmarks_db::BookmarkEntry;
+use crate::db::downloads_db::DownloadEntry;
 use crate::db::history_db::HistoryEntry;
+use crate::db::passwords_db::PasswordEntry;
 use crate::db::permissions_db::{PermissionAuditLog, SitePermission};
 use crate::db::settings_db::SearchEngineConfig;
 use crate::db::shields_db::{BlockedEvent, ShieldStats};
@@ -889,6 +892,9 @@ pub fn render_newtab_page(
         <div class="vault-bar">
             <span style="font-size: 12px; color: var(--text-muted); margin-right: 6px;">NORVA Vaults:</span>
             <a href="norva://history" class="vault-pill">📜 History Vault</a>
+            <a href="norva://bookmarks" class="vault-pill">★ Bookmarks Vault</a>
+            <a href="norva://downloads" class="vault-pill">📥 Downloads</a>
+            <a href="norva://passwords" class="vault-pill">🔑 Passwords Vault</a>
             <a href="norva://shields" class="vault-pill">🛡️ Shields Center ({{ADS_BLOCKED}} blocked)</a>
             <a href="norva://permissions" class="vault-pill">📷 Device Permissions</a>
             <a href="norva://cookies" class="vault-pill">🍪 Cache & Storage ({{CACHE_MB}} MB)</a>
@@ -1098,6 +1104,9 @@ pub fn render_history_page(entries: &[HistoryEntry]) -> String {
         <div class="internal-nav-chips">
             <a href="norva://newtab" class="chip">🏠 Start</a>
             <a href="norva://history" class="chip active">📜 History</a>
+            <a href="norva://bookmarks" class="chip">★ Bookmarks</a>
+            <a href="norva://downloads" class="chip">📥 Downloads</a>
+            <a href="norva://passwords" class="chip">🔑 Passwords</a>
             <a href="norva://shields" class="chip">🛡️ Shields</a>
             <a href="norva://permissions" class="chip">📷 Permissions</a>
             <a href="norva://cookies" class="chip">🍪 Storage</a>
@@ -1259,6 +1268,9 @@ pub fn render_shields_page(stats: &ShieldStats, events: &[BlockedEvent]) -> Stri
         <div class="internal-nav-chips">
             <a href="norva://newtab" class="chip">🏠 Start</a>
             <a href="norva://history" class="chip">📜 History</a>
+            <a href="norva://bookmarks" class="chip">★ Bookmarks</a>
+            <a href="norva://downloads" class="chip">📥 Downloads</a>
+            <a href="norva://passwords" class="chip">🔑 Passwords</a>
             <a href="norva://shields" class="chip active">🛡️ Shields</a>
             <a href="norva://permissions" class="chip">📷 Permissions</a>
             <a href="norva://cookies" class="chip">🍪 Storage</a>
@@ -1417,6 +1429,9 @@ pub fn render_permissions_page(permissions: &[SitePermission], audits: &[Permiss
         <div class="internal-nav-chips">
             <a href="norva://newtab" class="chip">🏠 Start</a>
             <a href="norva://history" class="chip">📜 History</a>
+            <a href="norva://bookmarks" class="chip">★ Bookmarks</a>
+            <a href="norva://downloads" class="chip">📥 Downloads</a>
+            <a href="norva://passwords" class="chip">🔑 Passwords</a>
             <a href="norva://shields" class="chip">🛡️ Shields</a>
             <a href="norva://permissions" class="chip active">📷 Permissions</a>
             <a href="norva://cookies" class="chip">🍪 Storage</a>
@@ -1533,6 +1548,9 @@ pub fn render_cookies_page(cache_mb: f64) -> String {
         <div class="internal-nav-chips">
             <a href="norva://newtab" class="chip">🏠 Start</a>
             <a href="norva://history" class="chip">📜 History</a>
+            <a href="norva://bookmarks" class="chip">★ Bookmarks</a>
+            <a href="norva://downloads" class="chip">📥 Downloads</a>
+            <a href="norva://passwords" class="chip">🔑 Passwords</a>
             <a href="norva://shields" class="chip">🛡️ Shields</a>
             <a href="norva://permissions" class="chip">📷 Permissions</a>
             <a href="norva://cookies" class="chip active">🍪 Storage</a>
@@ -1656,6 +1674,9 @@ pub fn render_settings_page(
         <div class="internal-nav-chips">
             <a href="norva://newtab" class="chip">🏠 Start</a>
             <a href="norva://history" class="chip">📜 History</a>
+            <a href="norva://bookmarks" class="chip">★ Bookmarks</a>
+            <a href="norva://downloads" class="chip">📥 Downloads</a>
+            <a href="norva://passwords" class="chip">🔑 Passwords</a>
             <a href="norva://shields" class="chip">🛡️ Shields</a>
             <a href="norva://permissions" class="chip">📷 Permissions</a>
             <a href="norva://cookies" class="chip">🍪 Storage</a>
@@ -1705,3 +1726,672 @@ pub fn render_settings_page(
         .replace("{{MODE_DESC}}", mode_desc)
         .replace("{{ENGINE_ROWS}}", &engine_rows)
 }
+
+/// Renders the `norva://bookmarks` management view.
+pub fn render_bookmarks_page(bookmarks: &[BookmarkEntry]) -> String {
+    let mut bookmark_cards = String::new();
+    if bookmarks.is_empty() {
+        bookmark_cards.push_str(
+            r###"<div style="text-align: center; padding: 60px 20px; color: var(--text-muted);">
+                <div style="font-size: 40px; margin-bottom: 12px;">★</div>
+                <h3 style="font-size: 16px; color: var(--text-secondary); margin-bottom: 6px;">No Bookmarks Saved</h3>
+                <p style="font-size: 13px;">Save frequently visited pages with Ctrl+D or the star button in the address bar.</p>
+            </div>"###,
+        );
+    } else {
+        bookmark_cards.push_str(r###"<div class="bm-grid">"###);
+        for bm in bookmarks {
+            bookmark_cards.push_str(&format!(
+                r###"<div class="bm-card" data-title="{}" data-url="{}">
+                    <div class="bm-card-top">
+                        <span class="bm-icon">{}</span>
+                        <div class="bm-info">
+                            <div class="bm-title">{}</div>
+                            <div class="bm-url">{}</div>
+                        </div>
+                    </div>
+                    <div class="bm-folder-badge">{}</div>
+                    <div class="bm-actions">
+                        <button class="btn btn-primary" style="padding: 5px 12px; font-size: 12px;" onclick="openUrl('{}')">Open</button>
+                        <button class="btn btn-danger" style="padding: 5px 10px; font-size: 12px;" onclick="deleteBookmark({})">Delete</button>
+                    </div>
+                </div>"###,
+                bm.title.to_lowercase(),
+                bm.url.to_lowercase(),
+                bm.icon,
+                bm.title,
+                bm.url,
+                bm.folder,
+                bm.url,
+                bm.id,
+            ));
+        }
+        bookmark_cards.push_str("</div>");
+    }
+
+    let template = r###"<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bookmarks Vault | NORVA</title>
+    <style>
+        {{COMMON_CSS}}
+        .bm-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        .bm-card {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 12px;
+            transition: all 0.15s ease;
+        }
+        .bm-card:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+        .bm-card-top {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .bm-icon {
+            font-size: 22px;
+            line-height: 1;
+            padding: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+        .bm-info {
+            flex: 1;
+            overflow: hidden;
+        }
+        .bm-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #ffffff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .bm-url {
+            font-size: 12px;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 2px;
+        }
+        .bm-folder-badge {
+            display: inline-block;
+            align-self: flex-start;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--accent-indigo);
+            background: rgba(99, 102, 241, 0.12);
+            border: 1px solid rgba(99, 102, 241, 0.25);
+            border-radius: 6px;
+            padding: 2px 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .bm-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .search-bar {
+            width: 100%;
+            background: #090a0f;
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            color: #ffffff;
+            padding: 10px 16px;
+            font-size: 13.5px;
+            outline: none;
+            margin-bottom: 24px;
+        }
+        .search-bar:focus {
+            border-color: var(--accent-indigo);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.25);
+        }
+        .add-form {
+            display: none;
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 120px auto;
+            gap: 12px;
+            align-items: center;
+        }
+        .form-input {
+            background: #090a0f;
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            color: #ffffff;
+            padding: 8px 12px;
+            font-size: 13px;
+            outline: none;
+        }
+        .form-input:focus {
+            border-color: var(--accent-indigo);
+        }
+    </style>
+</head>
+<body>
+    <header class="internal-header">
+        <div class="internal-header-left">
+            <a href="norva://newtab" class="back-link">
+                <span>←</span> <span>Start Page</span>
+            </a>
+            <h2 class="internal-title">★ Bookmarks Vault</h2>
+        </div>
+        <div class="internal-nav-chips">
+            <a href="norva://newtab" class="chip">🏠 Start</a>
+            <a href="norva://history" class="chip">📜 History</a>
+            <a href="norva://bookmarks" class="chip active">★ Bookmarks</a>
+            <a href="norva://downloads" class="chip">📥 Downloads</a>
+            <a href="norva://passwords" class="chip">🔑 Passwords</a>
+            <a href="norva://shields" class="chip">🛡️ Shields</a>
+            <a href="norva://permissions" class="chip">📷 Permissions</a>
+            <a href="norva://cookies" class="chip">🍪 Storage</a>
+            <a href="norva://settings" class="chip">⚙️ Settings</a>
+        </div>
+    </header>
+
+    <main class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <input type="text" id="bmSearch" class="search-bar" placeholder="Filter bookmarks by title or URL..." oninput="filterBookmarks()" style="margin-bottom: 0; max-width: 480px;">
+            <div style="display: flex; gap: 8px;">
+                <button class="btn btn-primary" onclick="toggleAddForm()">+ Add Bookmark</button>
+                <button class="btn btn-danger" onclick="clearAllBookmarks()">Clear All</button>
+            </div>
+        </div>
+
+        <div id="addForm" class="add-form">
+            <h4 style="margin-bottom: 12px; color: #ffffff;">Add New Bookmark</h4>
+            <div class="form-row">
+                <input type="text" id="bmUrl" class="form-input" placeholder="https://example.com">
+                <input type="text" id="bmTitle" class="form-input" placeholder="Site Title">
+                <input type="text" id="bmFolder" class="form-input" placeholder="Folder" value="Bookmarks">
+                <button class="btn btn-primary" onclick="saveBookmark()">Save</button>
+            </div>
+        </div>
+
+        {{BOOKMARK_CARDS}}
+    </main>
+
+    <script>
+        function openUrl(url) {
+            if (window.ipc && window.ipc.postMessage) {
+                window.ipc.postMessage(JSON.stringify({ action: "navigate", query: url }));
+            } else {
+                window.location.href = url;
+            }
+        }
+        function deleteBookmark(id) {
+            if (confirm("Delete this bookmark?")) {
+                if (window.ipc && window.ipc.postMessage) {
+                    window.ipc.postMessage(JSON.stringify({ action: "delete_bookmark", id: id }));
+                    setTimeout(() => window.location.reload(), 150);
+                }
+            }
+        }
+        function clearAllBookmarks() {
+            if (confirm("Clear all stored bookmarks? This cannot be undone.")) {
+                if (window.ipc && window.ipc.postMessage) {
+                    window.ipc.postMessage(JSON.stringify({ action: "clear_bookmarks" }));
+                    setTimeout(() => window.location.reload(), 150);
+                }
+            }
+        }
+        function toggleAddForm() {
+            const f = document.getElementById("addForm");
+            f.style.display = f.style.display === "block" ? "none" : "block";
+        }
+        function saveBookmark() {
+            const url = document.getElementById("bmUrl").value.trim();
+            const title = document.getElementById("bmTitle").value.trim() || url;
+            const folder = document.getElementById("bmFolder").value.trim() || "Bookmarks";
+            if (!url) return;
+            if (window.ipc && window.ipc.postMessage) {
+                window.ipc.postMessage(JSON.stringify({ action: "add_bookmark", url: url, title: title, folder: folder }));
+                setTimeout(() => window.location.reload(), 150);
+            }
+        }
+        function filterBookmarks() {
+            const q = document.getElementById("bmSearch").value.toLowerCase();
+            document.querySelectorAll(".bm-card").forEach(c => {
+                const title = c.getAttribute("data-title") || "";
+                const url = c.getAttribute("data-url") || "";
+                c.style.display = (title.includes(q) || url.includes(q)) ? "flex" : "none";
+            });
+        }
+    </script>
+</body>
+</html>"###;
+
+    template
+        .replace("{{COMMON_CSS}}", get_common_css())
+        .replace("{{BOOKMARK_CARDS}}", &bookmark_cards)
+}
+
+/// Renders the `norva://downloads` management view.
+pub fn render_downloads_page(downloads: &[DownloadEntry]) -> String {
+    let mut download_rows = String::new();
+    if downloads.is_empty() {
+        download_rows.push_str(
+            r###"<div style="text-align: center; padding: 60px 20px; color: var(--text-muted);">
+                <div style="font-size: 40px; margin-bottom: 12px;">📥</div>
+                <h3 style="font-size: 16px; color: var(--text-secondary); margin-bottom: 6px;">No Downloads Yet</h3>
+                <p style="font-size: 13px;">Files you download will appear here with zero tracking.</p>
+            </div>"###,
+        );
+    } else {
+        download_rows.push_str(r###"<div class="dl-list">"###);
+        for dl in downloads {
+            let size_str = if dl.file_size_bytes > 1024 * 1024 {
+                format!("{:.2} MB", dl.file_size_bytes as f64 / (1024.0 * 1024.0))
+            } else if dl.file_size_bytes > 1024 {
+                format!("{:.1} KB", dl.file_size_bytes as f64 / 1024.0)
+            } else {
+                format!("{} B", dl.file_size_bytes)
+            };
+
+            download_rows.push_str(&format!(
+                r###"<div class="dl-item">
+                    <div class="dl-icon">📄</div>
+                    <div class="dl-info">
+                        <div class="dl-filename">{}</div>
+                        <div class="dl-sub">{} • {} • {}</div>
+                    </div>
+                    <div class="dl-status">{}</div>
+                    <div class="dl-actions">
+                        <button class="btn btn-danger" style="padding: 4px 10px; font-size: 12px;" onclick="deleteDownload({})">Delete</button>
+                    </div>
+                </div>"###,
+                dl.filename,
+                size_str,
+                dl.created_at.split('T').next().unwrap_or(""),
+                dl.url,
+                dl.status.to_uppercase(),
+                dl.id
+            ));
+        }
+        download_rows.push_str("</div>");
+    }
+
+    let template = r###"<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Downloads Manager | NORVA</title>
+    <style>
+        {{COMMON_CSS}}
+        .dl-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .dl-item {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            transition: all 0.15s ease;
+        }
+        .dl-item:hover {
+            border-color: var(--border-hover);
+        }
+        .dl-icon {
+            font-size: 24px;
+            line-height: 1;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+        .dl-info {
+            flex: 1;
+            overflow: hidden;
+        }
+        .dl-filename {
+            font-size: 14px;
+            font-weight: 600;
+            color: #ffffff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .dl-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .dl-status {
+            font-size: 11px;
+            font-weight: 700;
+            color: #34d399;
+            background: rgba(16, 185, 129, 0.12);
+            padding: 3px 8px;
+            border-radius: 6px;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+    <header class="internal-header">
+        <div class="internal-header-left">
+            <a href="norva://newtab" class="back-link">
+                <span>←</span> <span>Start Page</span>
+            </a>
+            <h2 class="internal-title">📥 Downloads Manager</h2>
+        </div>
+        <div class="internal-nav-chips">
+            <a href="norva://newtab" class="chip">🏠 Start</a>
+            <a href="norva://history" class="chip">📜 History</a>
+            <a href="norva://bookmarks" class="chip">★ Bookmarks</a>
+            <a href="norva://downloads" class="chip active">📥 Downloads</a>
+            <a href="norva://passwords" class="chip">🔑 Passwords</a>
+            <a href="norva://shields" class="chip">🛡️ Shields</a>
+            <a href="norva://permissions" class="chip">📷 Permissions</a>
+            <a href="norva://cookies" class="chip">🍪 Storage</a>
+            <a href="norva://settings" class="chip">⚙️ Settings</a>
+        </div>
+    </header>
+
+    <main class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="font-size: 16px; font-weight: 700; color: #ffffff;">Transfer & Download Logs</h3>
+            <button class="btn btn-danger" onclick="clearDownloads()">Clear Download History</button>
+        </div>
+
+        {{DOWNLOAD_ROWS}}
+    </main>
+
+    <script>
+        function deleteDownload(id) {
+            if (window.ipc && window.ipc.postMessage) {
+                window.ipc.postMessage(JSON.stringify({ action: "delete_download", id: id }));
+                setTimeout(() => window.location.reload(), 150);
+            }
+        }
+        function clearDownloads() {
+            if (confirm("Clear all download records?")) {
+                if (window.ipc && window.ipc.postMessage) {
+                    window.ipc.postMessage(JSON.stringify({ action: "clear_downloads" }));
+                    setTimeout(() => window.location.reload(), 150);
+                }
+            }
+        }
+    </script>
+</body>
+</html>"###;
+
+    template
+        .replace("{{COMMON_CSS}}", get_common_css())
+        .replace("{{DOWNLOAD_ROWS}}", &download_rows)
+}
+
+/// Renders the `norva://passwords` secure credentials vault view.
+pub fn render_passwords_page(credentials: &[PasswordEntry]) -> String {
+    let mut cred_cards = String::new();
+    if credentials.is_empty() {
+        cred_cards.push_str(
+            r###"<div style="text-align: center; padding: 60px 20px; color: var(--text-muted);">
+                <div style="font-size: 40px; margin-bottom: 12px;">🔑</div>
+                <h3 style="font-size: 16px; color: var(--text-secondary); margin-bottom: 6px;">Password Vault Empty</h3>
+                <p style="font-size: 13px;">Save login credentials securely with localized zero-telemetry SQLite storage.</p>
+            </div>"###,
+        );
+    } else {
+        cred_cards.push_str(r###"<div class="cred-grid">"###);
+        for cred in credentials {
+            cred_cards.push_str(&format!(
+                r###"<div class="cred-card" data-domain="{}" data-user="{}">
+                    <div class="cred-top">
+                        <span class="cred-icon">🔒</span>
+                        <div>
+                            <div class="cred-domain">{}</div>
+                            <div class="cred-user">{}</div>
+                        </div>
+                    </div>
+                    <div class="cred-pass-box">
+                        <input type="password" id="pwd_{}" class="cred-pass-input" value="{}" readonly>
+                        <button class="btn" style="padding: 4px 8px; font-size: 12px;" onclick="togglePwd({})">👁️</button>
+                        <button class="btn btn-primary" style="padding: 4px 10px; font-size: 12px;" onclick="copyPwd('pwd_{}')">Copy</button>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.04); padding-top: 8px;">
+                        <span style="font-size: 11px; color: var(--text-muted);">Updated: {}</span>
+                        <button class="btn btn-danger" style="padding: 4px 10px; font-size: 11px;" onclick="deleteCred({})">Delete</button>
+                    </div>
+                </div>"###,
+                cred.domain.to_lowercase(),
+                cred.username.to_lowercase(),
+                cred.domain,
+                cred.username,
+                cred.id,
+                cred.password,
+                cred.id,
+                cred.id,
+                cred.updated_at.split('T').next().unwrap_or(""),
+                cred.id
+            ));
+        }
+        cred_cards.push_str("</div>");
+    }
+
+    let template = r###"<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Password Vault | NORVA</title>
+    <style>
+        {{COMMON_CSS}}
+        .cred-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 16px;
+        }
+        .cred-card {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: all 0.15s ease;
+        }
+        .cred-card:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+        .cred-top {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .cred-icon {
+            font-size: 18px;
+            padding: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+        .cred-domain {
+            font-size: 14px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+        .cred-user {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        .cred-pass-box {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #090a0f;
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 4px 6px;
+        }
+        .cred-pass-input {
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            font-family: monospace;
+            font-size: 13px;
+            flex: 1;
+            outline: none;
+            padding: 4px;
+        }
+        .add-modal {
+            display: none;
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 12px;
+            align-items: center;
+        }
+        .form-input {
+            background: #090a0f;
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            color: #ffffff;
+            padding: 8px 12px;
+            font-size: 13px;
+            outline: none;
+        }
+        .form-input:focus {
+            border-color: var(--accent-indigo);
+        }
+    </style>
+</head>
+<body>
+    <header class="internal-header">
+        <div class="internal-header-left">
+            <a href="norva://newtab" class="back-link">
+                <span>←</span> <span>Start Page</span>
+            </a>
+            <h2 class="internal-title">🔑 Passwords & Credentials Vault</h2>
+        </div>
+        <div class="internal-nav-chips">
+            <a href="norva://newtab" class="chip">🏠 Start</a>
+            <a href="norva://history" class="chip">📜 History</a>
+            <a href="norva://bookmarks" class="chip">★ Bookmarks</a>
+            <a href="norva://downloads" class="chip">📥 Downloads</a>
+            <a href="norva://passwords" class="chip active">🔑 Passwords</a>
+            <a href="norva://shields" class="chip">🛡️ Shields</a>
+            <a href="norva://permissions" class="chip">📷 Permissions</a>
+            <a href="norva://cookies" class="chip">🍪 Storage</a>
+            <a href="norva://settings" class="chip">⚙️ Settings</a>
+        </div>
+    </header>
+
+    <main class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <input type="text" id="credSearch" class="form-input" placeholder="Search domain or username..." oninput="filterCreds()" style="max-width: 440px; width: 100%;">
+            <div style="display: flex; gap: 8px;">
+                <button class="btn btn-primary" onclick="toggleAddModal()">+ Save Login</button>
+                <button class="btn btn-danger" onclick="clearAllCreds()">Purge Vault</button>
+            </div>
+        </div>
+
+        <div id="addModal" class="add-modal">
+            <h4 style="margin-bottom: 12px; color: #ffffff;">Save New Credentials</h4>
+            <div class="form-grid">
+                <input type="text" id="domainInput" class="form-input" placeholder="example.com">
+                <input type="text" id="userInput" class="form-input" placeholder="Username / Email">
+                <input type="password" id="passInput" class="form-input" placeholder="Password">
+                <button class="btn btn-primary" onclick="saveCred()">Save</button>
+            </div>
+        </div>
+
+        {{CRED_CARDS}}
+    </main>
+
+    <script>
+        function toggleAddModal() {
+            const m = document.getElementById("addModal");
+            m.style.display = m.style.display === "block" ? "none" : "block";
+        }
+        function togglePwd(id) {
+            const inp = document.getElementById("pwd_" + id);
+            inp.type = inp.type === "password" ? "text" : "password";
+        }
+        function copyPwd(id) {
+            const inp = document.getElementById(id);
+            navigator.clipboard.writeText(inp.value).then(() => {
+                alert("Password copied to clipboard!");
+            });
+        }
+        function saveCred() {
+            const domain = document.getElementById("domainInput").value.trim();
+            const username = document.getElementById("userInput").value.trim();
+            const password = document.getElementById("passInput").value;
+            if (!domain || !username || !password) return;
+            if (window.ipc && window.ipc.postMessage) {
+                window.ipc.postMessage(JSON.stringify({ action: "save_credential", domain: domain, username: username, password: password }));
+                setTimeout(() => window.location.reload(), 150);
+            }
+        }
+        function deleteCred(id) {
+            if (confirm("Delete this saved credential?")) {
+                if (window.ipc && window.ipc.postMessage) {
+                    window.ipc.postMessage(JSON.stringify({ action: "delete_credential", id: id }));
+                    setTimeout(() => window.location.reload(), 150);
+                }
+            }
+        }
+        function clearAllCreds() {
+            if (confirm("Delete all passwords in vault? This cannot be undone.")) {
+                if (window.ipc && window.ipc.postMessage) {
+                    window.ipc.postMessage(JSON.stringify({ action: "clear_credentials" }));
+                    setTimeout(() => window.location.reload(), 150);
+                }
+            }
+        }
+        function filterCreds() {
+            const q = document.getElementById("credSearch").value.toLowerCase();
+            document.querySelectorAll(".cred-card").forEach(c => {
+                const d = c.getAttribute("data-domain") || "";
+                const u = c.getAttribute("data-user") || "";
+                c.style.display = (d.includes(q) || u.includes(q)) ? "flex" : "none";
+            });
+        }
+    </script>
+</body>
+</html>"###;
+
+    template
+        .replace("{{COMMON_CSS}}", get_common_css())
+        .replace("{{CRED_CARDS}}", &cred_cards)
+}
+

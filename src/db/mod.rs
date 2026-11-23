@@ -4,14 +4,20 @@
 // Description: Multi-Database Manager coordinating separate SQLite databases per use case.
 // ============================================================================
 
+pub mod bookmarks_db;
 pub mod cache_cookies_db;
+pub mod downloads_db;
 pub mod history_db;
+pub mod passwords_db;
 pub mod permissions_db;
 pub mod settings_db;
 pub mod shields_db;
 
+pub use bookmarks_db::{BookmarkEntry, BookmarksDatabase};
 pub use cache_cookies_db::{CacheCookiesDatabase, CleanupAudit, CookiePolicy};
+pub use downloads_db::{DownloadEntry, DownloadsDatabase};
 pub use history_db::{HistoryDatabase, HistoryEntry, HistoryStats};
+pub use passwords_db::{PasswordEntry, PasswordsDatabase};
 pub use permissions_db::{PermissionAuditLog, PermissionPolicy, PermissionsDatabase, SitePermission};
 pub use settings_db::{SearchEngineConfig, SettingsDatabase};
 pub use shields_db::{BlockCategory, BlockedEvent, ShieldStats, ShieldsDatabase};
@@ -42,6 +48,9 @@ pub struct DatabaseManager {
     pub shields: Arc<ShieldsDatabase>,
     pub settings: Arc<SettingsDatabase>,
     pub cache_cookies: Arc<CacheCookiesDatabase>,
+    pub bookmarks: Arc<BookmarksDatabase>,
+    pub downloads: Arc<DownloadsDatabase>,
+    pub passwords: Arc<PasswordsDatabase>,
 }
 
 impl DatabaseManager {
@@ -71,12 +80,30 @@ impl DatabaseManager {
             &config.cache_cookies_db_path,
         )?);
 
+        let bookmarks = Arc::new(BookmarksDatabase::new(
+            &config.bookmarks_db_path,
+            config.secure_mode,
+        )?);
+
+        let downloads = Arc::new(DownloadsDatabase::new(
+            &config.downloads_db_path,
+            config.secure_mode,
+        )?);
+
+        let passwords = Arc::new(PasswordsDatabase::new(
+            &config.passwords_db_path,
+            config.secure_mode,
+        )?);
+
         Ok(Self {
             history,
             permissions,
             shields,
             settings,
             cache_cookies,
+            bookmarks,
+            downloads,
+            passwords,
         })
     }
 }

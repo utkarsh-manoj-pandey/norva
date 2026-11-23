@@ -22,8 +22,8 @@
 | **Backend** | **Rust 2024 Edition** | Zero-cost abstractions, memory safety, thread safety, humanly written architectural rationales across every module. |
 | **Browser Chrome** | **Native GTK-3 (Executive Dark)** | Authentic desktop browser layout: dedicated multi-tab strip at top, navigation toolbar (Back/Forward/Reload/Home), centered Omnibox with live search engine switcher, Privacy Shield counter, hardware zero-trust indicators, 3-dots menu, and Bookmarks bar. |
 | **Web Engine** | **Tao + Wry (WebKitGTK)** | Hardware-accelerated web viewport seamlessly attached below the native chrome, running across Wayland and X11 without distortion. |
-| **Database** | **SQLite (Multi-Vault)** | **5 dedicated, isolated database files** with Write-Ahead Logging (WAL), 64MB memory caches, busy timeouts, and in-memory Secure Mode. |
-| **Performance** | **Lock-Free Atomic Caches** | Zero-allocation subdomain matching, atomic telemetry counters, and asynchronous background cache calculations eliminating browser freezes. |
+| **Database** | **SQLite (Multi-Vault)** | **8 dedicated, isolated database files** (`history.db`, `permissions.db`, `privacy_shields.db`, `settings.db`, `cache_cookies.db`, `bookmarks.db`, `downloads.db`, `passwords.db`) with Write-Ahead Logging (WAL), 64MB memory caches, busy timeouts, and in-memory Secure Mode. |
+| **Performance** | **Lock-Free Atomic Caches** | Zero-allocation subdomain matching, atomic telemetry counters, asynchronous background cache calculations, and distraction-free reader mode eliminating browser freezes. |
 
 ---
 
@@ -87,6 +87,19 @@ Unlike traditional browsers that lump bookmarks, history, telemetry, and site st
 
 5. **`cache_cookies.db`** (Storage & Cookie Isolation):
    - Controls per-domain storage policies, ephemeral cookie wipes, third-party cookie blocking, and cache cleanup audits.
+
+6. **`bookmarks.db`** (Bookmarks & Speed Dial Vault):
+   - Houses user-saved bookmarks, folders, favicon glyphs, and speed dials.
+   - Pre-seeded with top privacy and developer destinations.
+   - Supports live toggle and one-click access directly from the Bookmarks Bar (`Ctrl+Shift+B`).
+
+7. **`downloads.db`** (Transfers & Download History):
+   - Audits all completed, in-progress, and cancelled file downloads.
+   - Accessible via the top toolbar download shelf (`📥`) and `norva://downloads`.
+
+8. **`passwords.db`** (Encrypted Local Credentials Vault):
+   - Provides local, zero-telemetry password and credential storage.
+   - Masked password viewing with one-click clipboard copying at `norva://passwords`.
 
 ---
 
@@ -161,4 +174,48 @@ cargo run -- https://duckduckgo.com
 ### Running Test Suite
 ```bash
 cargo test
+```
+
+---
+
+## ⌨️ Full Keyboard Shortcuts Reference
+
+| Shortcut | Action | Description |
+| :--- | :--- | :--- |
+| `Ctrl + T` | **New Tab** | Opens a fresh tab with `norva://newtab` |
+| `Ctrl + W` | **Close Tab** | Closes the active browser tab |
+| `Ctrl + R` / `F5` | **Reload** | Reloads current page |
+| `Ctrl + L` / `Alt + D` | **Focus Omnibox** | Highlights address bar for instant query entry |
+| `Ctrl + H` | **History Vault** | Navigates to `norva://history` |
+| `Ctrl + B` | **Bookmarks Vault** | Navigates to `norva://bookmarks` |
+| `Ctrl + Shift + B` | **Toggle Bookmarks Bar** | Shows or hides the top bookmarks speed bar |
+| `Ctrl + J` | **Downloads Manager** | Navigates to `norva://downloads` |
+| `Ctrl + F` | **Find in Page** | Opens interactive in-page search bar |
+| `Ctrl + D` | **Bookmark Tab** | Toggles bookmark star for active tab |
+| `Ctrl + +` / `Ctrl + =` | **Zoom In** | Increments viewport zoom level |
+| `Ctrl + -` | **Zoom Out** | Decrements viewport zoom level |
+| `Ctrl + 0` | **Reset Zoom** | Resets viewport zoom to 100% |
+| `Alt + Left` | **Go Back** | Navigates to previous history page |
+| `Alt + Right` | **Go Forward** | Navigates forward in history |
+| `Alt + Home` | **Home** | Navigates to `norva://newtab` |
+| `Escape` | **Cancel / Dismiss** | Closes Find in Page bar or stops page loading |
+
+---
+
+## 🚀 Pushing Updates to GitHub (Interactive Python Script with Dry Run)
+
+NORVA includes an interactive deployment script that prompts you whether to test beforehand in Dry Run Mode or push directly to GitHub, asking for your commit message:
+
+```bash
+# Interactive mode (Asks: Direct Push vs Dry Run test mode, then prompts for commit message)
+python3 push_to_github.py
+
+# Direct dry run mode (runs cargo test, diff simulation & remote check)
+python3 push_to_github.py --dry-run
+
+# Direct push with a custom commit message
+python3 push_to_github.py -m "Your custom commit message"
+
+# Automated mode with default detailed message
+python3 push_to_github.py --auto
 ```

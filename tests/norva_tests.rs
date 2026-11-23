@@ -279,3 +279,86 @@ fn test_gtk_chrome_css_validity() {
     }
     let _ = norva::ui::NorvaGtkChrome::new(false);
 }
+
+#[test]
+fn test_bookmarks_database() {
+    let dir = get_test_dir("bookmarks");
+    let db_path = dir.join("bookmarks.db");
+
+    let bm_db = norva::db::bookmarks_db::BookmarksDatabase::new(&db_path, false)
+        .expect("Bookmarks DB initialization failed");
+
+    // Default seeded bookmarks
+    let all = bm_db.get_all().expect("Failed to get bookmarks");
+    assert!(!all.is_empty());
+    assert!(bm_db.is_bookmarked("https://duckduckgo.com").unwrap());
+
+    // Add custom bookmark
+    bm_db
+        .add_bookmark("https://norva-browser.org", "NORVA Home", "🛡️", "Privacy")
+        .expect("Failed to add bookmark");
+
+    assert!(bm_db.is_bookmarked("https://norva-browser.org").unwrap());
+
+    // Search bookmark
+    let results = bm_db.search("norva-browser").expect("Search failed");
+    assert_eq!(results.len(), 1);
+    assert_eq!(results[0].title, "NORVA Home");
+
+    // Delete bookmark
+    bm_db.delete_by_url("https://norva-browser.org").expect("Delete failed");
+    assert!(!bm_db.is_bookmarked("https://norva-browser.org").unwrap());
+}
+
+#[test]
+fn test_downloads_database() {
+    let dir = get_test_dir("downloads");
+    let db_path = dir.join("downloads.db");
+
+    let dl_db = norva::db::downloads_db::DownloadsDatabase::new(&db_path, false)
+        .expect("Downloads DB initialization failed");
+
+    let id = dl_db
+        .record_download(
+            "https://example.com/file.tar.gz",
+            "file.tar.gz",
+            "/home/user/Downloads/file.tar.gz",
+            1048576,
+            "completed",
+        )
+        .expect("Failed to record download");
+
+    let recent = dl_db.get_recent(10).expect("Failed to get recent downloads");
+    assert_eq!(recent.len(), 1);
+    assert_eq!(recent[0].filename, "file.tar.gz");
+    assert_eq!(recent[0].file_size_bytes, 1048576);
+
+    dl_db.delete_download(id).expect("Delete download failed");
+    let after_del = dl_db.get_recent(10).unwrap();
+    assert_eq!(after_del.len(), 0);
+}
+
+#[test]
+fn test_passwords_database() {
+    let dir = get_test_dir("passwords");
+    let db_path = dir.join("passwords.db");
+
+    let pwd_db = norva::db::passwords_db::PasswordsDatabase::new(&db_path, false)
+        .expect("Passwords DB initialization failed");
+
+    let id = pwd_db
+        .save_credential("github.com", "norva_user", "super_secret_token", Some("Personal account"))
+        .expect("Failed to save credential");
+
+    let list = pwd_db.get_for_domain("github.com").expect("Failed to get credentials");
+    assert_eq!(list.len(), 1);
+    assert_eq!(list[0].username, "norva_user");
+    assert_eq!(list[0].password, "super_secret_token");
+
+    let search_res = pwd_db.search("norva_user").expect("Search failed");
+    assert_eq!(search_res.len(), 1);
+
+    pwd_db.delete(id).expect("Delete credential failed");
+    let empty_list = pwd_db.get_for_domain("github.com").unwrap();
+    assert_eq!(empty_list.len(), 0);
+}

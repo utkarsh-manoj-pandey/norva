@@ -30,6 +30,12 @@ pub struct NorvaConfig {
     pub settings_db_path: PathBuf,
     /// Path to the dedicated SQLite Cache & Cookie Storage database
     pub cache_cookies_db_path: PathBuf,
+    /// Path to the dedicated SQLite Bookmarks database
+    pub bookmarks_db_path: PathBuf,
+    /// Path to the dedicated SQLite Downloads database
+    pub downloads_db_path: PathBuf,
+    /// Path to the dedicated SQLite Passwords & Credentials vault database
+    pub passwords_db_path: PathBuf,
     /// Directory dedicated to WebKit's web data context
     pub web_data_dir: PathBuf,
     /// Directory dedicated to WebKit's disk cache
@@ -71,6 +77,9 @@ impl NorvaConfig {
             shields_db_path: db_dir.join("privacy_shields.db"),
             settings_db_path: db_dir.join("settings.db"),
             cache_cookies_db_path: db_dir.join("cache_cookies.db"),
+            bookmarks_db_path: db_dir.join("bookmarks.db"),
+            downloads_db_path: db_dir.join("downloads.db"),
+            passwords_db_path: db_dir.join("passwords.db"),
             web_data_dir,
             web_cache_dir,
             secure_mode,
