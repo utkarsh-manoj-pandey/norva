@@ -229,22 +229,3 @@ cargo test
 | `Alt + Home` | **Home** | Navigates to `norva://newtab` |
 | `Escape` | **Cancel / Dismiss** | Closes Find in Page bar or stops page loading |
 
----
-
-## 🚀 Pushing Updates to GitHub (Interactive Python Script with Dry Run)
-
-NORVA includes an interactive deployment script that prompts you whether to test beforehand in Dry Run Mode or push directly to GitHub, asking for your commit message:
-
-```bash
-# Interactive mode (Asks: Direct Push vs Dry Run test mode, then prompts for commit message)
-python3 push_to_github.py
-
-# Direct dry run mode (runs cargo test, diff simulation & remote check)
-python3 push_to_github.py --dry-run
-
-# Direct push with a custom commit message
-python3 push_to_github.py -m "Your custom commit message"
-
-# Automated mode with default detailed message
-python3 push_to_github.py --auto
-```
