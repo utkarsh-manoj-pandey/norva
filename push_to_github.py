@@ -62,8 +62,10 @@ def display_file_status(status_output):
     lines = status_output.splitlines()
     print(f"{YELLOW}{BOLD}Files Pending Commit ({len(lines)} files):{RESET}")
     for line in lines:
+        if not line.strip():
+            continue
         code_status = line[:2]
-        filename = line[3:]
+        filename = line[2:].strip()
         if 'M' in code_status:
             print(f"  {YELLOW}[MODIFIED]{RESET}  {filename}")
         elif 'A' in code_status or '?' in code_status:

@@ -1,4 +1,25 @@
-# 🛡️ NORVA (Native Open-source Rust-based Virtual Access)
+<p align="center">
+  <img src="assets/norva-banner.png" alt="NORVA Browser Banner" width="100%" />
+</p>
+
+<p align="center">
+  <img src="assets/norva-logo.svg" alt="NORVA Logo" width="120" height="120" />
+</p>
+
+<h1 align="center">NORVA</h1>
+
+<p align="center">
+  <strong>Native Open-source Rust-based Virtual Access</strong><br>
+  <em>High-Security • Anti-Tracking • Hardware Isolated • Multi-Engine Privacy Browser</em>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Language-Rust_2024-orange.svg" alt="Rust 2024" />
+  <img src="https://img.shields.io/badge/Security-Zero--Trust-green.svg" alt="Zero-Trust" />
+  <img src="https://img.shields.io/badge/Engine-WebKitGTK-blue.svg" alt="WebKitGTK" />
+  <img src="https://img.shields.io/badge/Databases-8_Isolated_Vaults-purple.svg" alt="8 Isolated Vaults" />
+  <img src="https://img.shields.io/badge/License-MIT%2FApache--2.0-blueviolet.svg" alt="License" />
+</p>
 
 ```
   ███╗   ██╗ ██████╗ ██████╗ ██╗   ██╗ █████╗ 
@@ -28,6 +49,10 @@
 ---
 
 ## 🖥️ Executive Desktop Browser Interface & Layout
+
+<p align="center">
+  <img src="assets/screenshots/norva-newtab-dark.png" alt="NORVA Executive Browser Interface" width="100%" />
+</p>
 
 NORVA features an authentic, executive-grade cyber-dark interface free of childish widgets or amateurish clutter:
 
@@ -63,6 +88,10 @@ NORVA features an authentic, executive-grade cyber-dark interface free of childi
 ---
 
 ## 🗄️ Multi-Database Architecture: "A New DB for Every Use Case"
+
+<p align="center">
+  <img src="assets/screenshots/norva-multivault-architecture.png" alt="NORVA Multi-Vault SQLite Architecture" width="100%" />
+</p>
 
 Unlike traditional browsers that lump bookmarks, history, telemetry, and site storage into one giant fragile file, NORVA enforces strict architectural compartmentalization:
 
