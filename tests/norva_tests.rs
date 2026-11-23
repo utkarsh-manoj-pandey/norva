@@ -253,6 +253,48 @@ fn test_search_engines_and_query_router() {
         target_internal,
         norva::search::query_router::ResolvedTarget::InternalPage("norva://shields".to_string())
     );
+
+    // 8. Brave search bang (!brave) with `{}` template
+    let target_brave = router.resolve("!brave rust async");
+    match target_brave {
+        norva::search::query_router::ResolvedTarget::Search { engine_name, query, target_url } => {
+            assert_eq!(engine_name, "Brave Search");
+            assert_eq!(query, "rust async");
+            assert_eq!(target_url, "https://search.brave.com/search?q=rust+async");
+        }
+        _ => panic!("Expected Brave Search target"),
+    }
+
+    // 9. Default search query without bang replaces query correctly
+    let target_default = router.resolve("norva privacy browser");
+    match target_default {
+        norva::search::query_router::ResolvedTarget::Search { query, target_url, .. } => {
+            assert_eq!(query, "norva privacy browser");
+            assert!(target_url.contains("q=norva+privacy+browser"));
+            assert!(!target_url.contains("{}"));
+            assert!(!target_url.contains("{query}"));
+        }
+        _ => panic!("Expected default search target"),
+    }
+
+    // 10. Direct expand_search_template multi-format verification
+    use norva::search::engine::expand_search_template;
+    assert_eq!(
+        expand_search_template("https://search.brave.com/search?q={}", "hello world"),
+        "https://search.brave.com/search?q=hello+world"
+    );
+    assert_eq!(
+        expand_search_template("https://duckduckgo.com/?q={query}", "hello world"),
+        "https://duckduckgo.com/?q=hello+world"
+    );
+    assert_eq!(
+        expand_search_template("https://example.com/search?q=%s", "hello world"),
+        "https://example.com/search?q=hello+world"
+    );
+    assert_eq!(
+        expand_search_template("https://example.com/search", "hello world"),
+        "https://example.com/search?q=hello+world"
+    );
 }
 
 #[test]

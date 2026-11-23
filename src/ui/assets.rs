@@ -1011,6 +1011,24 @@ pub fn render_newtab_page(
             }
         }
 
+        function formatSearchUrl(template, query) {
+            const q = encodeURIComponent(query);
+            if (!template) {
+                return "https://search.brave.com/search?q=" + q;
+            }
+            if (template.indexOf("{query}") !== -1) {
+                return template.split("{query}").join(q);
+            }
+            if (template.indexOf("{}") !== -1) {
+                return template.split("{}").join(q);
+            }
+            if (template.indexOf("%s") !== -1) {
+                return template.split("%s").join(q);
+            }
+            const sep = template.indexOf("?") !== -1 ? "&q=" : "?q=";
+            return template + sep + q;
+        }
+
         function submitSearch() {
             const val = searchInput.value.trim();
             if (!val) return;
@@ -1023,12 +1041,8 @@ pub fn render_newtab_page(
 
             // Route search through selected engine template
             const tmpl = engineTemplates[activeEngineId];
-            if (tmpl) {
-                const url = tmpl.replace("{query}", encodeURIComponent(val));
-                navigate(url);
-            } else {
-                navigate(val);
-            }
+            const url = formatSearchUrl(tmpl, val);
+            navigate(url);
         }
 
         searchInput.addEventListener("keydown", (e) => {

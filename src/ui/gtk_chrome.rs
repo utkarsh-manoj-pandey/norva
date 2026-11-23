@@ -88,21 +88,22 @@ impl NorvaGtkChrome {
 
         let root = Box::new(Orientation::Vertical, 0);
         root.style_context().add_class("norva-chrome-root");
+        root.set_vexpand(false);
 
         // --------------------------------------------------------------------
         // 1. TOP TAB BAR ROW
         // --------------------------------------------------------------------
         let tab_bar = Box::new(Orientation::Horizontal, 0);
         tab_bar.style_context().add_class("norva-tab-bar");
+        tab_bar.set_vexpand(false);
+        tab_bar.set_hexpand(true);
 
-        let tabs_scroll = gtk::ScrolledWindow::new(gtk::Adjustment::NONE, gtk::Adjustment::NONE);
-        tabs_scroll.set_policy(gtk::PolicyType::Automatic, gtk::PolicyType::Never);
-        tabs_scroll.style_context().add_class("norva-tabs-scroll");
-
-        let tabs_box = Box::new(Orientation::Horizontal, 4);
+        let tabs_box = Box::new(Orientation::Horizontal, 2);
         tabs_box.style_context().add_class("norva-tabs-container");
-        tabs_scroll.add(&tabs_box);
-        tab_bar.pack_start(&tabs_scroll, false, false, 0);
+        tabs_box.set_vexpand(false);
+        tabs_box.set_hexpand(false);
+        tabs_box.set_halign(gtk::Align::Start);
+        tab_bar.pack_start(&tabs_box, false, false, 0);
 
         // New Tab [+] button
         let new_tab_icon = Image::from_icon_name(Some("list-add-symbolic"), IconSize::Menu);
@@ -111,10 +112,14 @@ impl NorvaGtkChrome {
         new_tab_btn.set_image(Some(&new_tab_icon));
         new_tab_btn.style_context().add_class("norva-new-tab-btn");
         new_tab_btn.set_tooltip_text(Some("New tab (Ctrl+T)"));
+        new_tab_btn.set_vexpand(false);
+        new_tab_btn.set_hexpand(false);
         tab_bar.pack_start(&new_tab_btn, false, false, 4);
 
         // Flexible spacer
         let spacer_tab = Box::new(Orientation::Horizontal, 0);
+        spacer_tab.set_vexpand(false);
+        spacer_tab.set_hexpand(true);
         tab_bar.pack_start(&spacer_tab, true, true, 0);
 
         // Session status pill on far right
@@ -128,6 +133,8 @@ impl NorvaGtkChrome {
             mode_label.style_context().add_class("norva-badge-normal");
             mode_label.set_tooltip_text(Some("Hardened Privacy: multi-vault isolation & tracking defense"));
         }
+        mode_label.set_vexpand(false);
+        mode_label.set_hexpand(false);
         tab_bar.pack_end(&mode_label, false, false, 12);
 
         root.pack_start(&tab_bar, false, false, 0);
@@ -137,6 +144,8 @@ impl NorvaGtkChrome {
         // --------------------------------------------------------------------
         let toolbar = Box::new(Orientation::Horizontal, 4);
         toolbar.style_context().add_class("norva-toolbar");
+        toolbar.set_vexpand(false);
+        toolbar.set_hexpand(true);
 
         // Nav buttons cluster
         let back_icon = Image::from_icon_name(Some("go-previous-symbolic"), IconSize::Menu);
@@ -202,18 +211,21 @@ impl NorvaGtkChrome {
         clear_omni_btn.set_image(Some(&clear_icon));
         clear_omni_btn.style_context().add_class("norva-omni-clear-btn");
         clear_omni_btn.set_tooltip_text(Some("Clear address bar"));
+        clear_omni_btn.set_no_show_all(true);
         clear_omni_btn.set_visible(false);
 
         let reader_btn = Button::with_label("Reader");
         reader_btn.set_relief(gtk::ReliefStyle::None);
         reader_btn.style_context().add_class("norva-omni-action-btn");
         reader_btn.set_tooltip_text(Some("Toggle Reader View"));
+        reader_btn.set_no_show_all(true);
         reader_btn.set_visible(false);
 
         let zoom_btn = Button::with_label("100%");
         zoom_btn.set_relief(gtk::ReliefStyle::None);
         zoom_btn.style_context().add_class("norva-zoom-pill");
         zoom_btn.set_tooltip_text(Some("Page Zoom (Ctrl + / -)"));
+        zoom_btn.set_no_show_all(true);
         zoom_btn.set_visible(false);
 
         let bookmark_icon = Image::from_icon_name(Some("non-starred-symbolic"), IconSize::Menu);
@@ -271,6 +283,7 @@ impl NorvaGtkChrome {
         hw_cluster.pack_start(&cam_btn, false, false, 0);
         hw_cluster.pack_start(&mic_btn, false, false, 0);
         hw_cluster.pack_start(&loc_btn, false, false, 0);
+        hw_cluster.set_no_show_all(true);
         hw_cluster.set_visible(false);
 
         // Downloads Button
@@ -361,7 +374,9 @@ impl NorvaGtkChrome {
             }
         });
 
+        find_bar.set_no_show_all(true);
         find_bar.set_visible(false);
+        find_bar.set_vexpand(false);
         root.pack_start(&find_bar, false, false, 0);
 
         // --------------------------------------------------------------------
@@ -369,6 +384,8 @@ impl NorvaGtkChrome {
         // --------------------------------------------------------------------
         let bookmarks_box = Box::new(Orientation::Horizontal, 4);
         bookmarks_box.style_context().add_class("norva-bookmarks-bar");
+        bookmarks_box.set_vexpand(false);
+        bookmarks_box.set_hexpand(true);
         root.pack_start(&bookmarks_box, false, false, 0);
 
         Self {
@@ -496,20 +513,45 @@ impl NorvaGtkChrome {
     {
         let tab_event_box = EventBox::new();
         tab_event_box.style_context().add_class("norva-tab");
-        tab_event_box.set_size_request(200, 34);
+        tab_event_box.set_size_request(180, 32);
+        tab_event_box.set_vexpand(false);
+        tab_event_box.set_hexpand(false);
+        tab_event_box.set_halign(gtk::Align::Start);
+
+        // Explicitly render CSS background and border frame on Cairo surface
+        tab_event_box.connect_draw(|widget, cr| {
+            let context = widget.style_context();
+            let width = widget.allocated_width();
+            let height = widget.allocated_height();
+            gtk::render_background(&context, cr, 0.0, 0.0, width as f64, height as f64);
+            gtk::render_frame(&context, cr, 0.0, 0.0, width as f64, height as f64);
+            gtk::glib::Propagation::Proceed
+        });
 
         let tab_box = Box::new(Orientation::Horizontal, 6);
         tab_box.style_context().add_class("norva-tab-inner");
+        tab_box.set_vexpand(false);
+        tab_box.set_hexpand(false);
 
         let icon_label = Label::new(None);
-        if !icon.is_empty() {
-            icon_label.set_text(icon);
-            icon_label.style_context().add_class("norva-tab-icon");
-            tab_box.pack_start(&icon_label, false, false, 0);
-        }
+        let display_icon = if !icon.is_empty() {
+            icon
+        } else if url.starts_with("norva://newtab") {
+            "✦"
+        } else if url.starts_with("norva://") {
+            "🛡"
+        } else {
+            "🌐"
+        };
+        icon_label.set_text(display_icon);
+        icon_label.style_context().add_class("norva-tab-icon");
+        icon_label.set_vexpand(false);
+        icon_label.set_hexpand(false);
+        tab_box.pack_start(&icon_label, false, false, 0);
 
         let title_label = Label::new(Some(title));
         title_label.style_context().add_class("norva-tab-title");
+        title_label.set_vexpand(false);
         title_label.set_hexpand(true);
         title_label.set_xalign(0.0);
         title_label.set_ellipsize(gtk::pango::EllipsizeMode::End);
@@ -520,6 +562,8 @@ impl NorvaGtkChrome {
         close_btn.set_image(Some(&close_icon));
         close_btn.style_context().add_class("norva-tab-close");
         close_btn.set_tooltip_text(Some("Close tab (Ctrl+W)"));
+        close_btn.set_vexpand(false);
+        close_btn.set_hexpand(false);
 
         tab_box.pack_start(&title_label, true, true, 0);
         tab_box.pack_end(&close_btn, false, false, 0);
@@ -694,12 +738,17 @@ impl NorvaGtkChrome {
                 tab.url = url.to_string();
                 tab.icon = icon.to_string();
                 tab.title_label.set_text(title);
-                if !icon.is_empty() {
-                    tab.icon_label.set_text(icon);
-                    tab.icon_label.set_visible(true);
+                let display_icon = if !icon.is_empty() {
+                    icon
+                } else if url.starts_with("norva://newtab") {
+                    "✦"
+                } else if url.starts_with("norva://") {
+                    "🛡"
                 } else {
-                    tab.icon_label.set_visible(false);
-                }
+                    "🌐"
+                };
+                tab.icon_label.set_text(display_icon);
+                tab.icon_label.set_visible(true);
                 break;
             }
         }
@@ -1144,8 +1193,9 @@ impl NorvaGtkChrome {
            Total removal of OS theme boxed relief; clean, flat aesthetics.
            ================================================================ */
 
-        window, .background {
-            background-color: #0b0c10;
+        window, .background, .norva-window-vbox, .norva-chrome-root {
+            background-color: #0b0c10 !important;
+            background-image: none !important;
             color: #f4f4f5;
         }
 
@@ -1197,22 +1247,12 @@ impl NorvaGtkChrome {
             box-shadow: none !important;
         }
 
-        .norva-chrome-root {
-            background-color: #0b0c10;
-        }
-
         /* ---- 1. TAB STRIP ---- */
         .norva-tab-bar {
-            background-color: #0b0c10;
+            background-color: #0b0c10 !important;
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 6px 12px 0 12px;
-            min-height: 40px;
-        }
-
-        .norva-tabs-scroll {
-            background-color: transparent !important;
-            background-image: none !important;
-            border: none !important;
+            padding: 2px 8px 0 8px;
+            min-height: 34px;
         }
 
         .norva-tabs-container {
@@ -1221,36 +1261,37 @@ impl NorvaGtkChrome {
         }
 
         .norva-tab {
-            background-color: transparent;
+            background-color: rgba(255, 255, 255, 0.04);
             background-image: none !important;
             border-radius: 8px 8px 0 0;
-            min-width: 180px;
-            max-width: 240px;
-            min-height: 34px;
-            margin-right: 2px;
-            border: 1px solid transparent;
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-bottom: none;
+            padding: 3px 8px;
+            margin-right: 3px;
             transition: all 0.12s ease;
         }
 
         .norva-tab:hover {
-            background-color: rgba(255, 255, 255, 0.04);
+            background-color: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.14);
         }
 
         .norva-tab.active-tab {
-            background-color: #161722;
-            border-top: 1px solid rgba(255, 255, 255, 0.12);
-            border-left: 1px solid rgba(255, 255, 255, 0.08);
-            border-right: 1px solid rgba(255, 255, 255, 0.08);
-            border-bottom: 1px solid #161722;
+            background-color: #161722 !important;
+            border-top: 2px solid #818cf8 !important;
+            border-left: 1px solid rgba(255, 255, 255, 0.14) !important;
+            border-right: 1px solid rgba(255, 255, 255, 0.14) !important;
+            border-bottom: 1px solid #161722 !important;
         }
 
         .norva-tab-inner {
-            padding: 5px 8px 5px 12px;
+            background-color: transparent !important;
+            border: none !important;
+            padding: 0;
         }
 
         .norva-tab-icon {
-            font-size: 11px;
+            font-size: 12px;
             margin-right: 6px;
             opacity: 0.7;
         }
@@ -1261,7 +1302,7 @@ impl NorvaGtkChrome {
 
         .norva-tab-title {
             font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', system-ui, sans-serif;
-            font-size: 12.5px;
+            font-size: 12px;
             font-weight: 500;
             color: #94a3b8;
         }
@@ -1279,22 +1320,22 @@ impl NorvaGtkChrome {
             background-color: transparent !important;
             border: none !important;
             color: #71717a;
-            border-radius: 4px;
+            border-radius: 50%;
             padding: 2px;
-            min-width: 20px;
-            min-height: 20px;
+            min-width: 18px;
+            min-height: 18px;
             margin-left: 6px;
-            opacity: 0.0;
+            opacity: 0.45;
             transition: all 0.12s ease;
         }
 
         .norva-tab:hover .norva-tab-close,
         .active-tab .norva-tab-close {
-            opacity: 0.6;
+            opacity: 0.8;
         }
 
         .norva-tab-close:hover {
-            background-color: rgba(255, 255, 255, 0.14) !important;
+            background-color: rgba(255, 255, 255, 0.15) !important;
             color: #ffffff;
             opacity: 1.0;
         }
@@ -1307,7 +1348,7 @@ impl NorvaGtkChrome {
             min-width: 28px;
             min-height: 28px;
             padding: 2px;
-            margin: 3px 4px;
+            margin: 2px 2px;
             transition: all 0.12s ease;
         }
 

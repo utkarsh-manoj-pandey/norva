@@ -28,10 +28,10 @@ impl SearchEngine {
     /// Formats a search query string into a fully qualified destination URL.
     ///
     /// I have written this helper to safely percent-encode user queries so spaces,
-    /// punctuation, and non-ASCII Unicode characters are cleanly handled.
+    /// punctuation, and non-ASCII Unicode characters are cleanly handled across
+    /// any template format ({query}, {}, %s).
     pub fn build_search_url(&self, query: &str) -> String {
-        let encoded_query = urlencoding_simple(query);
-        self.query_template.replace("{}", &encoded_query)
+        expand_search_template(&self.query_template, query)
     }
 
     /// Attempts to extract the search term and engine from a visited URL.
@@ -92,11 +92,27 @@ impl SearchEngine {
     }
 }
 
+/// Expands a search template by replacing `{query}`, `{}`, or `%s` with the URL-encoded query.
+/// If no placeholder is present, it appends the query parameter automatically.
+pub fn expand_search_template(template: &str, query: &str) -> String {
+    let encoded_query = urlencoding_simple(query);
+    if template.contains("{query}") {
+        template.replace("{query}", &encoded_query)
+    } else if template.contains("{}") {
+        template.replace("{}", &encoded_query)
+    } else if template.contains("%s") {
+        template.replace("%s", &encoded_query)
+    } else {
+        let separator = if template.contains('?') { "&q=" } else { "?q=" };
+        format!("{}{}{}", template, separator, encoded_query)
+    }
+}
+
 /// Simple percent encoder for query parameters.
 ///
 /// I have written this lightweight character encoder to avoid pulling extra heavy
 /// external crates for basic query encoding, ensuring fast execution and small binaries.
-fn urlencoding_simple(input: &str) -> String {
+pub fn urlencoding_simple(input: &str) -> String {
     let mut encoded = String::new();
     for byte in input.bytes() {
         match byte {

@@ -300,16 +300,20 @@ impl NorvaBrowser {
             let vbox = window
                 .default_vbox()
                 .ok_or_else(|| "Failed to obtain GTK default vbox from Tao window")?;
+            vbox.style_context().add_class("norva-window-vbox");
 
             let chrome = std::rc::Rc::new(crate::ui::NorvaGtkChrome::new(is_secure));
             let init_engine = db.settings.get_default_engine();
             chrome.set_engine_name(&init_engine.id, &init_engine.name);
 
-            // Pack the authentic browser chrome header at the top
+            // Pack the authentic browser chrome header at the top (strictly no vertical expansion)
+            chrome.root.set_vexpand(false);
             vbox.pack_start(&chrome.root, false, false, 0);
 
-            // Pack a dedicated webview box to host the WebKitGTK container
+            // Pack a dedicated webview box to host the WebKitGTK container (takes all remaining space)
             let webview_box = gtk::Box::new(gtk::Orientation::Vertical, 0);
+            webview_box.set_vexpand(true);
+            webview_box.set_hexpand(true);
             vbox.pack_start(&webview_box, true, true, 0);
 
             let webview = builder

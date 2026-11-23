@@ -98,7 +98,7 @@ impl QueryRouter {
                     // Navigate to engine homepage
                     engine.query_template.split('?').next().unwrap_or(&engine.query_template).to_string()
                 } else {
-                    engine.query_template.replace("{}", &urlencoding_simple(query))
+                    crate::search::engine::expand_search_template(&engine.query_template, query)
                 };
 
                 return ResolvedTarget::Search {
@@ -121,7 +121,7 @@ impl QueryRouter {
 
         // 4. Fallback to default configured search engine
         let default_engine = self.settings_db.get_default_engine();
-        let target_url = default_engine.query_template.replace("{}", &urlencoding_simple(trimmed));
+        let target_url = crate::search::engine::expand_search_template(&default_engine.query_template, trimmed);
 
         ResolvedTarget::Search {
             engine_name: default_engine.name,
